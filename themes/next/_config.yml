@@ -7,7 +7,6 @@
 # And if true, all config from default NexT `_config.yml` must be copied into `next.yml`. Use if you know what you are doing.
 # Useful if you want to comment some options from NexT `_config.yml` by `next.yml` without editing default config.
 override: false
-
 # Allow to cache content generation. Introduced in NexT v6.0.0.
 cache:
   enable: true
@@ -58,7 +57,8 @@ keywords: "Hexo, NexT"
 # Set rss to false to disable feed link.
 # Leave rss as empty to use site's feed link.
 # Set rss to specific value if you have burned your feed already.
-rss:
+
+rss: /atom.xml
 
 footer:
   # Specify the date when the site was setup.

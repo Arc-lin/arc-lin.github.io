@@ -1,0 +1,492 @@
+<?xml version="1.0" encoding="utf-8"?>
+<feed xmlns="http://www.w3.org/2005/Atom">
+  <title>Arclin</title>
+  
+  <subtitle>Advocate Technology. Enjoy Technology.</subtitle>
+  <link href="/atom.xml" rel="self"/>
+  
+  <link href="https://arclin.me/"/>
+  <updated>2018-02-18T14:22:26.573Z</updated>
+  <id>https://arclin.me/</id>
+  
+  <author>
+    <name>Arclin</name>
+    
+  </author>
+  
+  <generator uri="http://hexo.io/">Hexo</generator>
+  
+  <entry>
+    <title>docker笔记</title>
+    <link href="https://arclin.me/2018/02/18/cjepiiyj000202afy8n3pii33.html"/>
+    <id>https://arclin.me/2018/02/18/cjepiiyj000202afy8n3pii33.html</id>
+    <published>2018-02-18T14:19:00.000Z</published>
+    <updated>2018-02-18T14:22:26.573Z</updated>
+    
+    <content type="html"><![CDATA[<p>docker学习笔记</p><a id="more"></a><p>docker是一种类似虚拟机的存在</p><p>// 查看本机docker信息</p><p><code>docker info</code></p><p>// 运行hello world</p><p><code>docker run centos:6.7 /bin/echo &quot;Hello World&quot;</code></p><p>//  -t 进入伪终端<br>//  -i 允许你对容器内的标准输入 (STDIN) 进行交互。 </p><p><code>docker run -i -t centos:6.7 /bin/bash</code></p><p>// -d 后台模式</p><p><code>docker run -d centos:6.7 /bin/sh -c &quot;while true;do echo hello world; sleep 1; done&quot;</code></p><p>//  查看当前运行的容器</p><p><code>docker ps</code></p><p>// -l 最近创建的容器</p><p><code>docker ps -l</code></p><p>// -a 所有容器</p><p><code>docker ps -a</code></p><p>// 查看运行log</p><p><code>docker logs 2b1b7a428627</code></p><p>//或</p><p><code>docker logs angry_austin</code></p><p>// 具体参数看ps的内容进行替换</p><p>// 停止容器</p><p><code>docker stop angry_austin</code></p><p>// 删除容器</p><p><code>docker rm awesome_bardeen</code></p><p>// 进入容器终端 允许标准输入</p><p><code>docker exec -it practical_fermat /bin/bash</code></p><p>中间的参数是容器名</p><p>// 拉取镜像 (如:httpd)</p><p><code>docker pull httpd</code></p><p>// 指定端口运行容器</p><p><code>docker run -d -p 5000:5001 httpd</code></p><p>// 提交新的镜像并添加tag v2 </p><p><code>docker commit -m &quot;has update&quot; -a=&quot;arclin&quot; 000c5746fa52 arclin/centos:v2</code></p><p>// 添加标签dev  中间那串是容器id</p><p><code>docker tag d 607e5fac1115 arclin/centos:dev</code></p><p>// 删除标签 6.7</p><p><code>docker rmi -f arclin/centos:6.7</code></p><p>// 指定端口运行  8080 是本地端口 80是容器端口 -d 是后台运行的意思</p><p><code>docker run -d -p 8080:80 httpd</code></p><p>// 随机端口运行 -P</p><p><code>docker run -d -P  httpd</code></p><p>// 查看容器practical_fermat的80端口被绑定到本机的哪个端口上了</p><p><code>docker port practical_fermat 80</code></p><p>// 运行的时候顺便给容器命名</p><p><code>docker run -d -P --name testName httpd</code></p><p>// 给容器重命名</p><p><code>docker rename practical_fermat test_httpd</code></p><p>// 运行nginx<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line">docker run -p 81:80 --name mynginx -v $PWD/www:/www -v </span><br><span class="line"></span><br><span class="line">$PWD/conf/nginx.conf:/etc/nginx/nginx.conf -v $PWD/logs:/wwwlogs  -d nginx  </span><br><span class="line">-p 81:80：将容器的80端口映射到主机的81端口</span><br><span class="line">--name mynginx：将容器命名为mynginx</span><br><span class="line">-v $PWD/www:/www：将主机中当前目录下的www挂载到容器的/www</span><br><span class="line">-v $PWD/conf/nginx.conf:/etc/nginx/nginx.conf：将主机中当前目录下的nginx.conf挂载到容器的/etc/nginx/nginx.conf</span><br><span class="line">-v $PWD/logs:/wwwlogs：将主机中当前目录下的logs挂载到容器的/wwwlogs</span><br></pre></td></tr></table></figure></p><p>// 查看nginx的文件系统</p><p><code>docker inspect mynginx | grep Mounts -A 20</code></p><p>// 安装Apache</p><p><code>mkdir -p  ~/apache/www ~/apache/logs ~/apache/conf</code></p><p>// 运行Apache</p><p><code>docker run -p 80:80 -v $PWD/www/:/usr/local/apache2/htdocs/ -v $PWD/conf/httpd.conf:/usr/local/apache2/conf/httpd.conf -v $PWD/logs/:/usr/local/apache2/logs/ -d httpd</code></p><p>// 删除所有容器</p><p><code>sudo docker rm $(docker ps -a -q)</code></p><p>// 下载容器内的文件</p><p><code>docker cp ecef8319d2c8:/root/test.txt /root/</code></p><p>// 上传文件到容器中</p><p><code>docker cp /root/test.txt ecef8319d2c8:/root/</code></p>]]></content>
+    
+    <summary type="html">
+    
+      &lt;p&gt;docker学习笔记&lt;/p&gt;
+    
+    </summary>
+    
+      <category term="Linux" scheme="https://arclin.me/categories/Linux/"/>
+    
+    
+      <category term="docker" scheme="https://arclin.me/tags/docker/"/>
+    
+  </entry>
+  
+  <entry>
+    <title>Nginx 内容替换模块 http_substitutions_filter_module</title>
+    <link href="https://arclin.me/2018/02/18/cjepiiyib000p2afyfklvz3ky.html"/>
+    <id>https://arclin.me/2018/02/18/cjepiiyib000p2afyfklvz3ky.html</id>
+    <published>2018-02-18T14:16:00.000Z</published>
+    <updated>2018-02-18T14:18:08.783Z</updated>
+    
+    <content type="html"><![CDATA[<p>在镜像了某个网站之后,想要改变这个网站上某些元素的显示内容, 这是我们可以使用nginx的一个第三方模块<code>http_substitutions_filter_module</code></p><a id="more"></a><p>修改nginx配置文件<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br></pre></td><td class="code"><pre><span class="line">server &#123;</span><br><span class="line">    server_name g.arclin.me;</span><br><span class="line">    listen 80;</span><br><span class="line">    listen 443 ssl http2;</span><br><span class="line">    ssl_certificate /etc/letsencrypt/live/arclin.me/fullchain.pem;</span><br><span class="line">    ssl_certificate_key /etc/letsencrypt/live/arclin.me/privkey.pem;</span><br><span class="line">    resolver 8.8.8.8;</span><br><span class="line">    location / &#123;</span><br><span class="line">        subs_filter Google\s提供 Arclin提供 r;</span><br><span class="line">        google on;</span><br><span class="line">    &#125;</span><br><span class="line">  &#125;</span><br></pre></td></tr></table></figure></p>]]></content>
+    
+    <summary type="html">
+    
+      &lt;p&gt;在镜像了某个网站之后,想要改变这个网站上某些元素的显示内容, 这是我们可以使用nginx的一个第三方模块&lt;code&gt;http_substitutions_filter_module&lt;/code&gt;&lt;/p&gt;
+    
+    </summary>
+    
+      <category term="Linux" scheme="https://arclin.me/categories/Linux/"/>
+    
+    
+      <category term="nginx" scheme="https://arclin.me/tags/nginx/"/>
+    
+  </entry>
+  
+  <entry>
+    <title>安装shadowsocks服务端</title>
+    <link href="https://arclin.me/2018/02/18/cjepiiyqa00552afyyndta3kg.html"/>
+    <id>https://arclin.me/2018/02/18/cjepiiyqa00552afyyndta3kg.html</id>
+    <published>2018-02-18T14:15:00.000Z</published>
+    <updated>2018-02-18T14:16:32.099Z</updated>
+    
+    <content type="html"><![CDATA[<p>安装shadowsocks服务端</p><a id="more"></a><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">sudo yum install python-pip</span><br><span class="line">sudo pip install shadowsocks</span><br></pre></td></tr></table></figure><p>配置文件</p><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><span class="line">&#123;</span><br><span class="line"> &quot;server”:”172.93.xx.xx”, # 服务器IP </span><br><span class="line"> &quot;server_port&quot;:8388, # 端口号</span><br><span class="line"> &quot;local_address&quot;: &quot;127.0.0.1&quot;,</span><br><span class="line"> &quot;local_port”:1080,</span><br><span class="line"> &quot;password&quot;:&quot;gtPtAb)Wsss&quot;, # 密码</span><br><span class="line"> &quot;timeout&quot;:300,</span><br><span class="line"> &quot;method&quot;:&quot;aes-256-cfb&quot;,# 加密类型</span><br><span class="line"> &quot;fast_open&quot;: false</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>]]></content>
+    
+    <summary type="html">
+    
+      &lt;p&gt;安装shadowsocks服务端&lt;/p&gt;
+    
+    </summary>
+    
+      <category term="Linux" scheme="https://arclin.me/categories/Linux/"/>
+    
+    
+      <category term="Shadowsocks" scheme="https://arclin.me/tags/Shadowsocks/"/>
+    
+  </entry>
+  
+  <entry>
+    <title>nginx 镜像谷歌</title>
+    <link href="https://arclin.me/2018/02/18/cjepiiypp003w2afy39woz2nw.html"/>
+    <id>https://arclin.me/2018/02/18/cjepiiypp003w2afy39woz2nw.html</id>
+    <published>2018-02-18T14:12:00.000Z</published>
+    <updated>2018-02-18T14:14:56.011Z</updated>
+    
+    <content type="html"><![CDATA[<p>nginx 镜像谷歌</p><a id="more"></a><p>安装nginx第三方模块</p><p>下载-&gt;解压-&gt;编译</p><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br></pre></td><td class="code"><pre><span class="line">wget  http://artfiles.org/openssl.org/source/openssl-1.1.0g.tar.gz</span><br><span class="line">wget ftp://ftp.csx.cam.ac.uk/pub/software/programming/pcre/pcre-8.39.tar.gz</span><br><span class="line">wget http://zlib.net/zlib-1.2.11.tar.gz</span><br><span class="line"></span><br><span class="line">git clone https://github.com/nginx/nginx.git</span><br><span class="line">git clone https://github.com/cuber/ngx_http_google_filter_module</span><br><span class="line">git clone https://github.com/yaoweibin/ngx_http_substitutions_filter_module</span><br><span class="line"></span><br><span class="line">tar -zxvf openssl-1.1.0g.tar.gz </span><br><span class="line">tar -zxvf pcre-8.39.tar.gz </span><br><span class="line">tar -zxvf zlib-1.2.11.tar.gz</span><br><span class="line"></span><br><span class="line">cd nginx</span><br><span class="line"></span><br><span class="line">./auto/configure --with-http_v2_module --with-pcre=../pcre-8.39 --with-openssl=../openssl-1.1.0g --with-zlib=../zlib-1.2.11 --with-http_ssl_module --add-module=../ngx_http_google_filter_module --add-module=../ngx_http_substitutions_filter_module</span><br><span class="line"></span><br><span class="line">make -j 4</span><br><span class="line"></span><br><span class="line">sudo make install</span><br></pre></td></tr></table></figure><p>修改配置文件</p><p><code>vi /usr/local/nginx/conf/nginx.conf</code></p><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line">server &#123;</span><br><span class="line">    server_name g.arclin.me;</span><br><span class="line">    listen 80;</span><br><span class="line">    resolver 8.8.8.8;</span><br><span class="line">    location / &#123;</span><br><span class="line">        google on;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure><p>重启nginx</p><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">nginx -s reload</span><br><span class="line">service nginx restart</span><br></pre></td></tr></table></figure><p>reload 时发生错误</p><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">nginx: [error] open() &quot;/var/run/nginx.pid&quot; failed (2: No such file or directory)</span><br></pre></td></tr></table></figure><p>解决</p><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">nginx -c /usr/local/nginx/conf/nginx.conf</span><br></pre></td></tr></table></figure>]]></content>
+    
+    <summary type="html">
+    
+      &lt;p&gt;nginx 镜像谷歌&lt;/p&gt;
+    
+    </summary>
+    
+      <category term="Linux" scheme="https://arclin.me/categories/Linux/"/>
+    
+    
+      <category term="nginx" scheme="https://arclin.me/tags/nginx/"/>
+    
+  </entry>
+  
+  <entry>
+    <title>XCode 添加Target</title>
+    <link href="https://arclin.me/2018/02/18/cjepiiyj200242afyjh91ox79.html"/>
+    <id>https://arclin.me/2018/02/18/cjepiiyj200242afyjh91ox79.html</id>
+    <published>2018-02-18T14:08:00.000Z</published>
+    <updated>2018-02-18T14:11:19.791Z</updated>
+    
+    <content type="html"><![CDATA[<p>在区分开发环境和测试环境或生产环境的时候经常需要在XCode 添加Target, 所以在此记录一下</p><a id="more"></a><ol><li>Duplicate target</li><li>Change DisplayName &amp; Bundle Identifier</li><li>A copy-info.plist，默认生成在程序环境根目录，也就是<code>A.xcodeproj</code>的同级目录中，如果想放到里层（比如与<code>A-info.plist</code>放在同级目录），可以先在Xcode删除<code>A copy-info.plist</code>索引，然后拷贝文件到制定目录中，然后更名为<code>B-info.plist</code>，在add到project中。在<code>Project</code>的<code>Build Settings</code>中，修改<code>Info.plist</code> File选项为<code>B-info.plist</code>的目录（相对路径）,这样就可以看到Info页了（就是B-info.plist），接着修改<code>ProductName</code>和<code>Bundle identifier</code>，使之成为另一个app。<code>Prefix Header的路径</code>，视具体需求而定是否要修改，如果两个target可以公用同一个<code>Prefix Header</code>，那么就不需要修改这里的路径</li><li>修改scheme，在调试的Stop按钮边上，我们可以选择本工程中所有的target来做编译，如果不修改，在这里选择出来的名字就是A copy，为了与新建的target统一起来，同样也要修改这里的名字。点击scheme选择区，然后选Manager Scheme，找到A copy，然后改成你需要的名字，比如B</li><li>生成一个新的target，一定会与原target有区别，这里可以定义预编译宏，来区分两个版本的不同代码，预编译宏可以在Build Settings中Preprocessor Macros定义，比如在我们新建的target B中定义预编译宏MACRO，然后在代码中通过<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">#if defined (MACRO)</span><br><span class="line">//target  B需要执行的代码</span><br><span class="line">#else</span><br><span class="line">//target A需要执行的代码</span><br><span class="line">#endif</span><br></pre></td></tr></table></figure></li></ol><p>来区分</p><ol><li>其他：Build Phases（各target编译所包含的内容，需要注意的是，如果创建了target B后，再往A里面添加资源或文件，target B中不会自动增加这些资源，需要手动添加）<ul><li>Compile Sources<br>需要编译的代码文件</li><li>Link Binary With Libraries<br>编译所依赖的库</li><li>Copy Bundle Resources<br>编译需要的资源<br>每个target可以根据具体需要增减里面的内容</li></ul></li></ol>]]></content>
+    
+    <summary type="html">
+    
+      &lt;p&gt;在区分开发环境和测试环境或生产环境的时候经常需要在XCode 添加Target, 所以在此记录一下&lt;/p&gt;
+    
+    </summary>
+    
+      <category term="iOS" scheme="https://arclin.me/categories/iOS/"/>
+    
+    
+      <category term="iOS" scheme="https://arclin.me/tags/iOS/"/>
+    
+      <category term="XCode" scheme="https://arclin.me/tags/XCode/"/>
+    
+  </entry>
+  
+  <entry>
+    <title>frp 内网穿透</title>
+    <link href="https://arclin.me/2018/02/18/cjepiiyj5002a2afyfivi1fh0.html"/>
+    <id>https://arclin.me/2018/02/18/cjepiiyj5002a2afyfivi1fh0.html</id>
+    <published>2018-02-18T14:05:00.000Z</published>
+    <updated>2018-02-18T14:07:46.864Z</updated>
+    
+    <content type="html"><![CDATA[<p>frp 内网穿透</p><a id="more"></a><p><a href="https://github.com/fatedier/frp/blob/master/README_zh.md" target="_blank" rel="noopener">文档</a></p><h3 id="服务器CentOS下载安装"><a href="#服务器CentOS下载安装" class="headerlink" title="服务器CentOS下载安装"></a>服务器CentOS下载安装</h3><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line">wget https://github.com/fatedier/frp/releases/download/v0.13.0/frp_0.13.0_linux_amd64.tar.gz</span><br><span class="line">tar -zxvf frp_0.13.0_linux_amd64.tar.gz</span><br><span class="line">cd frp_0.13.0_linux_amd64.tar.gz</span><br><span class="line">rm -f frpc</span><br><span class="line">rm -f frpc.ini</span><br><span class="line">vi frps.ini</span><br></pre></td></tr></table></figure><p>编辑frps.ini</p><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line">[common]</span><br><span class="line">vhost_http_port = 8001 # http访问端口</span><br><span class="line">bind_port = 8009 # 远程响应的地址</span><br><span class="line">dashboard_port = 8002 #控制面板端口号</span><br><span class="line"># dashboard 用户名密码，默认都为 admin</span><br><span class="line">dashboard_user = admin</span><br><span class="line">dashboard_pwd = admin</span><br></pre></td></tr></table></figure><h3 id="启动服务端"><a href="#启动服务端" class="headerlink" title="启动服务端"></a>启动服务端</h3><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">./frps -c ./frps.ini</span><br></pre></td></tr></table></figure><h3 id="Mac客户端下载"><a href="#Mac客户端下载" class="headerlink" title="Mac客户端下载"></a>Mac客户端下载</h3><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line">wget https://github.com/fatedier/frp/releases/download/v0.13.0/frp_0.13.0_darwin_amd64.tar.gz</span><br><span class="line">tar -zxvf frp_0.13.0_darwin_amd64.tar.gz</span><br><span class="line">cd frp_0.13.0_darwin_amd64.tar.gz</span><br><span class="line">rm -f frps</span><br><span class="line">rm -f frps.ini</span><br><span class="line">vi frpc.ini</span><br></pre></td></tr></table></figure><p>编辑frpc.ini</p><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line">[common]</span><br><span class="line">server_addr = 120.78.175.51 # 远程服务器地址</span><br><span class="line">server_port = 8009 # 服务端填写的bind_port</span><br><span class="line"></span><br><span class="line">[web]</span><br><span class="line">type = http </span><br><span class="line">local_port = 3000 # 本地要映射的端口</span><br><span class="line">custom_domains = frp.arclin.me # 自定义的域名,需要在dnspod绑定远程主机地址</span><br></pre></td></tr></table></figure><h3 id="客户端运行"><a href="#客户端运行" class="headerlink" title="客户端运行"></a>客户端运行</h3><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">./frpc -c ./frpc.ini</span><br></pre></td></tr></table></figure>]]></content>
+    
+    <summary type="html">
+    
+      &lt;p&gt;frp 内网穿透&lt;/p&gt;
+    
+    </summary>
+    
+      <category term="Linux" scheme="https://arclin.me/categories/Linux/"/>
+    
+    
+      <category term="frp" scheme="https://arclin.me/tags/frp/"/>
+    
+  </entry>
+  
+  <entry>
+    <title>ngrok 内网穿透使用</title>
+    <link href="https://arclin.me/2018/02/18/cjepiiypq003z2afyi4p3m1ha.html"/>
+    <id>https://arclin.me/2018/02/18/cjepiiypq003z2afyi4p3m1ha.html</id>
+    <published>2018-02-18T14:02:00.000Z</published>
+    <updated>2018-02-18T14:03:49.424Z</updated>
+    
+    <content type="html"><![CDATA[<p>ngrok 内网穿透使用</p><a id="more"></a><h3 id="安装golang"><a href="#安装golang" class="headerlink" title="安装golang"></a>安装golang</h3><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">sudo yum install build-essential golang mercurial git</span><br></pre></td></tr></table></figure><h3 id="运行脚本"><a href="#运行脚本" class="headerlink" title="运行脚本"></a>运行脚本</h3><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br></pre></td><td class="code"><pre><span class="line">cd ~</span><br><span class="line">git clone https://github.com/tutumcloud/ngrok.git ngrok</span><br><span class="line">export NGROK_DOMAIN=&quot;ngrok.arclin.me&quot;</span><br><span class="line">cd ngrok</span><br><span class="line">openssl genrsa -out rootCA.key 2048</span><br><span class="line">openssl req -x509 -new -nodes -key rootCA.key -subj &quot;/CN=$NGROK_DOMAIN” -days 5000 -out rootCA.pem</span><br><span class="line">openssl genrsa -out device.key 2048</span><br><span class="line">openssl req -new -key device.key -subj &quot;/CN=$NGROK_DOMAIN” -out device.csr</span><br><span class="line">openssl x509 -req -in device.csr -CA rootCA.pem -CAkey rootCA.key -CAcreateserial -out device.crt -days 5000</span><br><span class="line">cp rootCA.pem assets/client/tls/ngrokroot.crt</span><br><span class="line">cp device.crt assets/server/tls/snakeoil.crt</span><br><span class="line">cp device.key assets/server/tls/snakeoil.key</span><br><span class="line">GOOS=linux GOARCH=amd64</span><br><span class="line">make release-server</span><br><span class="line">cd /usr/lib/golang/src/</span><br><span class="line">GOOS=darwin GOARCH=amd64 ./make.bash</span><br><span class="line">cd ~/ngrok</span><br><span class="line">GOOS=darwin GOARCH=amd64 make release-client</span><br></pre></td></tr></table></figure><h3 id="服务端运行脚本"><a href="#服务端运行脚本" class="headerlink" title="服务端运行脚本"></a>服务端运行脚本</h3><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">nohup  bin/ngrokd -domain=&quot;ngrok.arclin.me&quot; -httpAddr=&quot;:8081&quot; -httpsAddr=&quot;:8082&quot; &amp;</span><br></pre></td></tr></table></figure><blockquote><p>nohub 后台运行</p></blockquote><h3 id="客户端"><a href="#客户端" class="headerlink" title="客户端"></a>客户端</h3><p>新建 <code>./ngrok.cfg</code> 文件写入信息</p><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">server_addr:arclin.me:4443</span><br><span class="line">trust_host_root_certs: false</span><br></pre></td></tr></table></figure><p>客户端运行<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">./ngrok -config=./ngrok.cfg -subdomain=test 3000</span><br></pre></td></tr></table></figure></p>]]></content>
+    
+    <summary type="html">
+    
+      &lt;p&gt;ngrok 内网穿透使用&lt;/p&gt;
+    
+    </summary>
+    
+      <category term="Linux" scheme="https://arclin.me/categories/Linux/"/>
+    
+    
+      <category term="ngrok" scheme="https://arclin.me/tags/ngrok/"/>
+    
+  </entry>
+  
+  <entry>
+    <title>Salesforce SDK Bug</title>
+    <link href="https://arclin.me/2018/02/18/cjepiiyiq001l2afym8mjkk0k.html"/>
+    <id>https://arclin.me/2018/02/18/cjepiiyiq001l2afym8mjkk0k.html</id>
+    <published>2018-02-18T13:59:00.000Z</published>
+    <updated>2018-02-18T14:01:23.927Z</updated>
+    
+    <content type="html"><![CDATA[<p>Salesforce SDK 有几个bug 不修复的话跑不起来 所以在这里记录一下</p><a id="more"></a><ol><li><code>SFOAuthCoordinator</code> 960行 </li></ol><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">if ([self isRedirectURL:requestUrl]) &#123;</span><br><span class="line">     [self handleUserAgentResponse:url];</span><br><span class="line">     decisionHandler(WKNavigationActionPolicyCancel);</span><br><span class="line">     return;</span><br><span class="line"> &#125;</span><br></pre></td></tr></table></figure><ol><li><code>SFSDKLoginHostListViewController</code> <code>viewDidLoad</code>最下面的注册cell移动到<code>viewDidLoad</code>的第一行</li></ol>]]></content>
+    
+    <summary type="html">
+    
+      &lt;p&gt;Salesforce SDK 有几个bug 不修复的话跑不起来 所以在这里记录一下&lt;/p&gt;
+    
+    </summary>
+    
+      <category term="iOS" scheme="https://arclin.me/categories/iOS/"/>
+    
+    
+      <category term="Salesforce" scheme="https://arclin.me/tags/Salesforce/"/>
+    
+  </entry>
+  
+  <entry>
+    <title>MongoDB笔记</title>
+    <link href="https://arclin.me/2018/02/18/cjepiiyi6000h2afyon7v536u.html"/>
+    <id>https://arclin.me/2018/02/18/cjepiiyi6000h2afyon7v536u.html</id>
+    <published>2018-02-18T13:58:00.000Z</published>
+    <updated>2018-02-18T13:59:34.442Z</updated>
+    
+    <content type="html"><![CDATA[<p>MongoDB笔记</p><a id="more"></a><p>OS X安装</p><p><code>brew install mongodb</code></p><p>进入mongodb</p><p><code>mongo</code></p><p>查看所有数据库</p><p><code>db</code></p><p>查看所有<em>有数据的</em>数据库并带上内存信息</p><p><code>show dbs</code></p><p>创建/进入某个数据库</p><p><code>use DATABASE_NAME</code></p><p>删除数据库(需要先<code>use DATABASE_NAME</code> 进入数据库)</p><p><code>db.dropDatabase()</code></p><p>插入数据</p><p><code>db.DATABASE_NAME.insert({“COLUMN_NAME”:”VALUE”,”COLUMN_NAME_SECOND”:”SECOND_VALUE”})</code></p><p>查询所有数据</p><p><code>db.DATABASE_NAME.find()</code></p><p>查询所有数据并pretty形式打印</p><p><code>db.DATABASE_NAME.find().pretty()</code></p><p>更新满足条件的第一条数据</p><p><code>db.DATABASE_NAME.update({‘条件字段’:’条件值’},{$set:{‘更新字段’:’更新值’,‘更新字段2’:’更新值2’}})</code></p><p>更新满足条件的所有数据</p><p><code>db.DATABASE_NAME.update({‘条件字段’:’条件值’},{$set:{‘更新字段’:’更新值’,‘更新字段2’:’更新值2’},{multi:true}})</code></p><p>替换整条数据的内容(根据ID查找)</p><p><code>db.DATABASE_NAME.save({“_id”:ObjectId(“xxxxx”),”要替换的字段名”:”要替换的字段名”,”要替换的字段名2”:”要替换的字段名2”})</code></p><p>删除数据</p><p><code>db.DATABASE_NAME.remove({‘条件字段’:’条件值’})</code></p><p>删除第一条找到的记录</p><p><code>db.DATABASE_NAME.remove({‘条件字段’:’条件值’},1)</code></p><p>删除所有数据(请空表)</p><p><code>db.DATABASE_NAME.remove({})</code></p>]]></content>
+    
+    <summary type="html">
+    
+      &lt;p&gt;MongoDB笔记&lt;/p&gt;
+    
+    </summary>
+    
+      <category term="MongoDB" scheme="https://arclin.me/categories/MongoDB/"/>
+    
+    
+      <category term="MongoDB" scheme="https://arclin.me/tags/MongoDB/"/>
+    
+  </entry>
+  
+  <entry>
+    <title>使用PHP进行webhook的注意点</title>
+    <link href="https://arclin.me/2018/02/18/cjepiiyqu006k2afyy9mdsqct.html"/>
+    <id>https://arclin.me/2018/02/18/cjepiiyqu006k2afyy9mdsqct.html</id>
+    <published>2018-02-18T13:55:00.000Z</published>
+    <updated>2018-02-18T13:57:39.049Z</updated>
+    
+    <content type="html"><![CDATA[<p>有时会编写PHP脚本进行webhook, 这里有些地方需要注意一下, 否则会导致脚本执行失败</p><a id="more"></a><p>允许某些敏感方法的执行<br>编辑<code>php.ini</code></p><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">disable_functions = scandir,passthru,exec,system,chroot,chgrp,chown,shell_exec,proc_open,proc_get_status,</span><br><span class="line">ini_alter,ini_alter,ini_restore,dl,pfsockopen,openlog,syslog,readlink,symlink,popepassthru,</span><br><span class="line">stream_socket_server,fsocket,fsockopen</span><br></pre></td></tr></table></figure><p>把<code>exec</code>去掉</p><p>检查<code>apache</code>用户的目录权限</p><p>apache用户公钥要配置在项目里面<br>也就是项目里会有两个公钥<br>一个是root的一个是apache的</p>]]></content>
+    
+    <summary type="html">
+    
+      &lt;p&gt;有时会编写PHP脚本进行webhook, 这里有些地方需要注意一下, 否则会导致脚本执行失败&lt;/p&gt;
+    
+    </summary>
+    
+      <category term="PHP" scheme="https://arclin.me/categories/PHP/"/>
+    
+    
+      <category term="php" scheme="https://arclin.me/tags/php/"/>
+    
+      <category term="webhook" scheme="https://arclin.me/tags/webhook/"/>
+    
+  </entry>
+  
+  <entry>
+    <title>Apache强制https </title>
+    <link href="https://arclin.me/2018/02/18/cjepiiyiu001s2afyz8gg65an.html"/>
+    <id>https://arclin.me/2018/02/18/cjepiiyiu001s2afyz8gg65an.html</id>
+    <published>2018-02-18T13:50:00.000Z</published>
+    <updated>2018-02-18T13:54:00.767Z</updated>
+    
+    <content type="html"><![CDATA[<p>当用户访问http的地址的时候，Apache如何强制跳转到https地址</p><a id="more"></a><p>修改httpd.conf</p><ol><li>LoadModule rewrite_module modules/mod_rewrite.so 这个拓展貌似是已经被加载了；</li><li>修改Apache默认项目路径的这个</li></ol><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">&lt;Directory &quot;/var/www/html&quot;&gt;</span><br></pre></td></tr></table></figure><p>其实是修改为项目发布的路径<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">&lt;Directory &quot;/var/www/html/app/src/htdocs_www&quot;&gt;</span><br></pre></td></tr></table></figure></p><p>改为All</p><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">AllowOverride All</span><br></pre></td></tr></table></figure><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br></pre></td><td class="code"><pre><span class="line"># </span><br><span class="line"># Possible values for the Options directive are &quot;None&quot;, &quot;All&quot;, </span><br><span class="line"># or any combination of: </span><br><span class="line"># Indexes Includes FollowSymLinks SymLinksifOwnerMatch ExecCGI MultiViews </span><br><span class="line"># </span><br><span class="line"># Note that &quot;MultiViews&quot; must be named *explicitly* --- &quot;Options All&quot; </span><br><span class="line"># doesn&apos;t give it to you. </span><br><span class="line"># </span><br><span class="line"># The Options directive is both complicated and important. Please see </span><br><span class="line"># http://httpd.apache.org/docs/2.2/mod/core.html</span><br><span class="line"># options </span><br><span class="line"># for more information. </span><br><span class="line"># Options Indexes FollowSymLinks </span><br><span class="line"># </span><br><span class="line"># AllowOverride controls what directives may be placed in .htaccess files. </span><br><span class="line"># It can be &quot;All&quot;, &quot;None&quot;, or any combination of the keywords: </span><br><span class="line"># Options FileInfo AuthConfig Limit </span><br><span class="line"># </span><br><span class="line"># </span><br><span class="line"># Controls who can get stuff from this server. </span><br><span class="line"># </span><br><span class="line">Order allow,deny </span><br><span class="line">Allow from all</span><br></pre></td></tr></table></figure><p>添加三行代码</p><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">RewriteEngine on</span><br><span class="line">RewriteCond %&#123;SERVER_PORT&#125; !^443$</span><br><span class="line">RewriteRule ^(.*)?$ https://%&#123;SERVER_NAME&#125;/$1 [L,R]</span><br></pre></td></tr></table></figure>]]></content>
+    
+    <summary type="html">
+    
+      &lt;p&gt;当用户访问http的地址的时候，Apache如何强制跳转到https地址&lt;/p&gt;
+    
+    </summary>
+    
+      <category term="Linux" scheme="https://arclin.me/categories/Linux/"/>
+    
+    
+      <category term="https" scheme="https://arclin.me/tags/https/"/>
+    
+  </entry>
+  
+  <entry>
+    <title>Let’s Encrypt 免费https</title>
+    <link href="https://arclin.me/2018/02/18/cjepiiyi9000k2afy00g9gaxp.html"/>
+    <id>https://arclin.me/2018/02/18/cjepiiyi9000k2afy00g9gaxp.html</id>
+    <published>2018-02-18T13:34:00.000Z</published>
+    <updated>2018-02-18T13:42:20.776Z</updated>
+    
+    <content type="html"><![CDATA[<p>在服务器配置免费的CA证书</p><a id="more"></a><p>下载源码</p><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">git clone https://github.com/letsencrypt/letsencrypt</span><br></pre></td></tr></table></figure><p>生成证书</p><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">cd letsencrypt/</span><br><span class="line"></span><br><span class="line">./letsencrypt-auto certonly --standalone --email arclin@dankal.cn -d arclin.me -d g.arclin.me</span><br></pre></td></tr></table></figure><p>默认有效期90天</p><p>自动续期</p><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">./letsencrypt-auto certonly --renew-by-default --email arclin@dankal.cn -d arclin.me -d g.arclin.me</span><br></pre></td></tr></table></figure><p>报错及解决</p><ul><li><p>报错<br>Problem binding to port 443: Could not bind to IPv4 or IPv6.</p></li><li><p>解决<br>停止443端口<br>比如 关闭ShadowSocks服务(ssserver)  关闭nginx</p></li><li><p>报错<br>Failed authorization procedure. arclin.me (tls-sni-01): urn:acme:error:connection :: The server could not connect to the client to verify the domain :: Connection refused</p></li><li><p>解决<br>在DNSPod 绑定 arclin.me域名到本服务器</p></li></ul><p>修改Nginx 配置</p><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><span class="line">server &#123;</span><br><span class="line">    server_name g.arclin.me;</span><br><span class="line">    listen 80;</span><br><span class="line">    listen 443 ssl http2; #443这里是https的端口  开启http2服务需要安装http_v2_module模块</span><br><span class="line">    ssl_certificate /etc/letsencrypt/live/arclin.me/fullchain.pem;</span><br><span class="line">    ssl_certificate_key /etc/letsencrypt/live/arclin.me/privkey.pem;</span><br><span class="line">    resolver 8.8.8.8;</span><br><span class="line">    location / &#123;</span><br><span class="line">        google on;</span><br><span class="line">    &#125;</span><br><span class="line">  &#125;</span><br></pre></td></tr></table></figure><p>重启服务</p><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">nginx -c /usr/local/nginx/conf/nginx.conf</span><br><span class="line">nginx -s reload</span><br><span class="line">service nginx restart</span><br></pre></td></tr></table></figure>]]></content>
+    
+    <summary type="html">
+    
+      &lt;p&gt;在服务器配置免费的CA证书&lt;/p&gt;
+    
+    </summary>
+    
+      <category term="Linux" scheme="https://arclin.me/categories/Linux/"/>
+    
+    
+      <category term="Let&#39;s Encrypt" scheme="https://arclin.me/tags/Let-s-Encrypt/"/>
+    
+      <category term="https" scheme="https://arclin.me/tags/https/"/>
+    
+  </entry>
+  
+  <entry>
+    <title>Vue学习笔记</title>
+    <link href="https://arclin.me/2017/08/08/cjepiiypy004f2afyrlabaink.html"/>
+    <id>https://arclin.me/2017/08/08/cjepiiypy004f2afyrlabaink.html</id>
+    <published>2017-08-07T16:10:00.000Z</published>
+    <updated>2018-02-17T15:44:44.746Z</updated>
+    
+    <content type="html"><![CDATA[<p>Vue.js 是一个用于构建用户界面的渐进式前端框架</p><a id="more"></a><h2 id="安装-vue-cli-命令行工具"><a href="#安装-vue-cli-命令行工具" class="headerlink" title="安装 vue-cli 命令行工具"></a>安装 vue-cli 命令行工具</h2><p> 安装Vue<br><code>npm install -g vue-cli</code></p><h2 id="初始化项目"><a href="#初始化项目" class="headerlink" title="初始化项目"></a>初始化项目</h2><p>vue init webpack-simple 项目名</p><p>项目模板有很多种,这里用了webpack-simple webpack-simple 没有包括Eslint检查功能等等功能，webpack有,但是普通项目用webpack-simple就足够了.</p><p>构造Vue实例</p><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">var vm = new Vue(&#123;</span><br><span class="line">  // 选项</span><br><span class="line">&#125;)</span><br></pre></td></tr></table></figure><p>例子</p><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><span class="line">window.onload=function()&#123;</span><br><span class="line"> //在这里面写Vue.js代码</span><br><span class="line"> new Vue(&#123;</span><br><span class="line">  el: &apos;#demo&apos;, // 需要渲染的DOM元素</span><br><span class="line">  data: &#123; // 渲染的数据,key-value方式</span><br><span class="line">    message: &apos;Hello Vue.js!&apos; </span><br><span class="line">  &#125;</span><br><span class="line">&#125;)</span><br><span class="line">//----------------</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure><h2 id="HTML中数据绑定"><a href="#HTML中数据绑定" class="headerlink" title="HTML中数据绑定"></a>HTML中数据绑定</h2><h3 id="单次插值"><a href="#单次插值" class="headerlink" title="单次插值"></a>单次插值</h3><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">&lt;span&gt;Message: &#123;&#123; message &#125;&#125;&lt;/span&gt;</span><br></pre></td></tr></table></figure><p>如果想要单次插值,即今后的数据变化就不会再引起插值更新,加个 *</p><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">&lt;span&gt;This will never change: &#123;&#123;* message &#125;&#125;&lt;/span&gt;</span><br></pre></td></tr></table></figure><p>例子</p><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br></pre></td><td class="code"><pre><span class="line">JS</span><br><span class="line"></span><br><span class="line">var data=&#123;message:&apos;Hello Vue.js!&apos;&#125;;</span><br><span class="line">new Vue(&#123;</span><br><span class="line">  el: &apos;#demo&apos;,</span><br><span class="line">  data: data</span><br><span class="line"> &#125;)</span><br><span class="line">data.message =&quot;Hello World!&quot;;</span><br><span class="line">data.message =&quot;Hello&quot;; // 再次改变时候,第二个元素内的值不会变化</span><br><span class="line"></span><br><span class="line">HTML</span><br><span class="line"></span><br><span class="line">&lt;span&gt;This will never change: &#123;&#123; message &#125;&#125;&lt;/span&gt;&lt;br&gt;</span><br><span class="line">&lt;span&gt;This will never change: &#123;&#123;* message &#125;&#125;&lt;/span&gt;</span><br></pre></td></tr></table></figure><h3 id="嵌入HTML"><a href="#嵌入HTML" class="headerlink" title="嵌入HTML"></a>嵌入HTML</h3><p>三个大括号表示不是插入文本而是html标签</p><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">HTML</span><br><span class="line"></span><br><span class="line">&lt;div&gt;&#123;&#123;&#123; msg &#125;&#125;&#125;&lt;/div&gt;</span><br></pre></td></tr></table></figure><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line">JS</span><br><span class="line"></span><br><span class="line">var data=&#123;msg:&apos;&lt;p&gt;Hello Vue.js!&lt;/p&gt;&apos;&#125;;</span><br><span class="line">new Vue(&#123;</span><br><span class="line">    el: &apos;#demo&apos;,</span><br><span class="line">    data: data</span><br><span class="line">&#125;)</span><br></pre></td></tr></table></figure><h3 id="HTMl特性"><a href="#HTMl特性" class="headerlink" title="HTMl特性"></a>HTMl特性</h3><p>比如说修改某个元素的id属性</p><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">HTML</span><br><span class="line"></span><br><span class="line">&lt;div id=&quot;&#123;&#123; id &#125;&#125;&quot;&gt;&lt;/div&gt;</span><br></pre></td></tr></table></figure><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line">JS</span><br><span class="line"></span><br><span class="line">var data=&#123;id:&apos;demo&apos;&#125;;</span><br><span class="line">new Vue(&#123;</span><br><span class="line">  el: &apos;div&apos;,</span><br><span class="line">  data: data</span><br><span class="line">&#125;)</span><br></pre></td></tr></table></figure><h3 id="JavaScript表达式"><a href="#JavaScript表达式" class="headerlink" title="JavaScript表达式"></a>JavaScript表达式</h3><p>绑定的数据支持JavaScript表达式</p><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><span class="line">JS</span><br><span class="line"></span><br><span class="line">window.onload=function()&#123;</span><br><span class="line"> //在这里面写Vue.js代码</span><br><span class="line"> var data=&#123;message:&apos;Hello &apos;,number:3,ok:true&#125;;</span><br><span class="line"> new Vue(&#123;</span><br><span class="line">  el: &apos;#demo&apos;,</span><br><span class="line">  data: data</span><br><span class="line"> &#125;)</span><br><span class="line"> //----------------</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">&lt;div id=&apos;demo&apos;&gt;</span><br><span class="line">&#123;&#123; number + 1 &#125;&#125;&lt;br/&gt;</span><br><span class="line">&#123;&#123; ok ? &apos;YES&apos; : &apos;NO&apos; &#125;&#125;&lt;br/&gt;</span><br><span class="line">&#123;&#123; message.split(&apos;&apos;).reverse().join(&apos;&apos;) &#125;&#125;</span><br><span class="line">&lt;/div&gt;</span><br></pre></td></tr></table></figure><p>输出</p><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">YES</span><br><span class="line">olleH</span><br></pre></td></tr></table></figure><h3 id="过滤器"><a href="#过滤器" class="headerlink" title="过滤器"></a>过滤器</h3><p>使用管道符 |</p><p>将message内的全部转换为小写字母</p><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">&#123;&#123; message | lowercase &#125;&#125;</span><br></pre></td></tr></table></figure><p>转为小写字母后,首字母大写</p><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">&#123;&#123;msg | lowercase | capitalize&#125;&#125;</span><br></pre></td></tr></table></figure><p>此外还有大写过滤器<code>uppercase</code></p><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line">JS</span><br><span class="line"> var data=&#123;msg:&apos;heLLO!&apos;&#125;;</span><br><span class="line"> new Vue(&#123;</span><br><span class="line">  el: &apos;#demo&apos;,</span><br><span class="line">  data: data</span><br><span class="line"> &#125;)</span><br></pre></td></tr></table></figure><p>输出</p><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">Hello</span><br></pre></td></tr></table></figure><h3 id="指令"><a href="#指令" class="headerlink" title="指令"></a>指令</h3><p>渲染数据的时候的逻辑表达式<br>v-text v-html v-model v-on v-else</p><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line">JS</span><br><span class="line"></span><br><span class="line">var data=&#123;msg:0&#125;;</span><br><span class="line"> new Vue(&#123;</span><br><span class="line">  el: &apos;#demo&apos;,</span><br><span class="line">  data: data</span><br><span class="line"> &#125;)</span><br></pre></td></tr></table></figure><p>当msg的值为1的时候才打印Hello!</p><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">HTML</span><br><span class="line">&lt;p v-if=&quot;msg&quot;&gt;Hello!&lt;/p&gt;</span><br></pre></td></tr></table></figure><h3 id="计算属性"><a href="#计算属性" class="headerlink" title="计算属性"></a>计算属性</h3><p>在模板中表达式非常便利，但是它们实际上只用于简单的操作。模板是为了描述视图的结构。在模板中放入太多的逻辑会让模板过重且难以维护。这就是为什么 Vue.js 将绑定表达式限制为一个表达式。如果需要多于一个表达式的逻辑，应当使用计算属性。</p><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br></pre></td><td class="code"><pre><span class="line">JS</span><br><span class="line"></span><br><span class="line">var vm = new Vue(&#123;</span><br><span class="line">  el: &apos;#example&apos;,</span><br><span class="line">  data: &#123;</span><br><span class="line">    a: 1</span><br><span class="line">  &#125;,</span><br><span class="line">  computed: &#123;</span><br><span class="line">    // 一个计算属性的 getter</span><br><span class="line">    b: function () &#123;</span><br><span class="line">      // `this` 指向 vm 实例</span><br><span class="line">      return this.a + 1</span><br><span class="line">    &#125;</span><br><span class="line">  &#125;</span><br><span class="line">&#125;)</span><br></pre></td></tr></table></figure><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">HTML</span><br><span class="line"></span><br><span class="line">&lt;div id=&quot;example&quot;&gt;</span><br><span class="line">  a=&#123;&#123; a &#125;&#125;, b=&#123;&#123; b &#125;&#125;</span><br><span class="line">&lt;/div&gt;</span><br></pre></td></tr></table></figure><p>输出</p><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">1</span><br><span class="line">a=1, b=2</span><br></pre></td></tr></table></figure>]]></content>
+    
+    <summary type="html">
+    
+      &lt;p&gt;Vue.js 是一个用于构建用户界面的渐进式前端框架&lt;/p&gt;
+    
+    </summary>
+    
+      <category term="前端" scheme="https://arclin.me/categories/%E5%89%8D%E7%AB%AF/"/>
+    
+    
+      <category term="Vue.js" scheme="https://arclin.me/tags/Vue-js/"/>
+    
+  </entry>
+  
+  <entry>
+    <title>解决git status中文问题</title>
+    <link href="https://arclin.me/2017/08/08/cjepiiyqr006c2afyr8vaitc5.html"/>
+    <id>https://arclin.me/2017/08/08/cjepiiyqr006c2afyr8vaitc5.html</id>
+    <published>2017-08-07T16:00:00.000Z</published>
+    <updated>2018-02-16T15:22:00.735Z</updated>
+    
+    <content type="html"><![CDATA[<p>在中文情况下<code>git status</code>是 <code>\344\272\247\345\223\201\351\234\200\346\261\202</code> 差不多这样的。</p><p>解决这个问题方法是：</p><p><code>git config --global core.quotepath false</code></p>]]></content>
+    
+    <summary type="html">
+    
+      
+      
+        &lt;p&gt;在中文情况下&lt;code&gt;git status&lt;/code&gt;是 &lt;code&gt;\344\272\247\345\223\201\351\234\200\346\261\202&lt;/code&gt; 差不多这样的。&lt;/p&gt;
+&lt;p&gt;解决这个问题方法是：&lt;/p&gt;
+&lt;p&gt;&lt;code&gt;git c
+      
+    
+    </summary>
+    
+      <category term="Git" scheme="https://arclin.me/categories/Git/"/>
+    
+    
+      <category term="技巧" scheme="https://arclin.me/tags/%E6%8A%80%E5%B7%A7/"/>
+    
+      <category term="git" scheme="https://arclin.me/tags/git/"/>
+    
+  </entry>
+  
+  <entry>
+    <title>ReactiveCocoa解决异步串行任务执行中多层嵌套/递归的问题</title>
+    <link href="https://arclin.me/2017/03/20/cjepiiyiw001u2afy0eizi04v.html"/>
+    <id>https://arclin.me/2017/03/20/cjepiiyiw001u2afy0eizi04v.html</id>
+    <published>2017-03-19T16:00:00.000Z</published>
+    <updated>2018-02-16T15:29:47.679Z</updated>
+    
+    <content type="html"><![CDATA[<p>因为在项目中遇到了一个异步的串行任务执行的问题,通过ReactiveCocoa解决了,所以在这里记录一下</p><a id="more"></a><p>首先是一个第三方的API,这个API会进行一个网络请求,并且使用block进行回调.批量执行并且是串行执行.<br>如果不用RAC,我们可以通过递归,当任务一结束的时候递归执行任务二,以达到串行的效果,然后判断索引达到最后的时候跳出递归,但这种操作如果一多容易造成栈溢出,所以用RAC的优化如下.</p><p>首先使用一个<code>RACSignal</code>包装API,如下</p><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br></pre></td><td class="code"><pre><span class="line">- (RACSignal *)deleteWithId:(NSString *)identifier</span><br><span class="line">&#123;</span><br><span class="line">    RACSignal *signal = [RACSignal createSignal:^RACDisposable *(id&lt;RACSubscriber&gt; subscriber) &#123;</span><br><span class="line">        GTLQueryDrive *query = [GTLQueryDrive queryForFilesDeleteWithFileId:identifier];</span><br><span class="line">        [self.service executeQuery:query completionHandler:^(GTLServiceTicket *ticket, id object, NSError *error) &#123;</span><br><span class="line">            if(!error) &#123;</span><br><span class="line">                [subscriber sendNext:nil];</span><br><span class="line">                [subscriber sendCompleted];</span><br><span class="line">            &#125;else &#123;</span><br><span class="line">                [subscriber sendError:error]; // 失败的时候抛出异常</span><br><span class="line">            &#125;</span><br><span class="line">        &#125;];</span><br><span class="line">        return nil;</span><br><span class="line">    &#125;];</span><br><span class="line">    return signal;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure><p>接下来把多个任务组装成一个数组</p><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">NSMutableArray *signals = [NSMutableArray array];</span><br><span class="line">for (NSString *identifier in identifiers) &#123;</span><br><span class="line">    RACSignal * signal = [self deleteWithId:identifier];</span><br><span class="line">    [signals addObject:signal];</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure><p>然后使用<code>RACSignal</code>的<code>concat</code>方法</p><p><code>concat</code>会顺序执行数组中的信号内容,上一个signal的信号<code>sendComplete</code>之后下一个信号内容才会开始执行</p><p>因为我们要在任务全部执行完成的时候发送一个回调和任务执行到一半的时候抛出异常停止任务和队列.<br>所以我们顺便加一个<code>doCompleted</code>和<code>catch</code></p><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line">RACSignal *concatSignal = [[[RACSignal concat:signals] doCompleted:^&#123;</span><br><span class="line">       completeBlock(nil); // 回调告诉前台说所有任务都完成了</span><br><span class="line">   &#125;] catch:^RACSignal *(NSError *error) &#123;</span><br><span class="line">       completeBlock(error); // 回调告诉前台说异常了</span><br><span class="line">       return [RACSignal empty]; // 停止当前和接下来的任务的执行</span><br><span class="line">   &#125;];</span><br></pre></td></tr></table></figure><p>如果你要订阅concatSignal信号的时候用到了UI刷新或者其他需要在主线程执行的任务,那么这里可以加多一个<code>deliverOn:[RACScheduler mainThreadScheduler]]</code></p><p>所以最后的信号可能是这样子</p><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line">RACSignal *concatSignal = [[[[RACSignal concat:signals] doCompleted:^&#123;</span><br><span class="line">    completeBlock(nil);</span><br><span class="line">&#125;] catch:^RACSignal *(NSError *error) &#123;</span><br><span class="line">    completeBlock(error);</span><br><span class="line">    return [RACSignal empty];</span><br><span class="line">&#125;] deliverOn:[RACScheduler mainThreadScheduler]];</span><br></pre></td></tr></table></figure><p>那订阅信号就简单了</p><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">[concatSignal subscribeNext:^(id x) &#123;</span><br><span class="line">    DKLog(@&quot;%@&quot;,x);</span><br><span class="line">&#125;];</span><br></pre></td></tr></table></figure><p>执行的时候他会根据数组的顺序一个个执行信号内的内容,这样子写起来也好看了很多.</p>]]></content>
+    
+    <summary type="html">
+    
+      &lt;p&gt;因为在项目中遇到了一个异步的串行任务执行的问题,通过ReactiveCocoa解决了,所以在这里记录一下&lt;/p&gt;
+    
+    </summary>
+    
+      <category term="iOS" scheme="https://arclin.me/categories/iOS/"/>
+    
+    
+      <category term="iOS" scheme="https://arclin.me/tags/iOS/"/>
+    
+      <category term="Reactive Cocoa" scheme="https://arclin.me/tags/Reactive-Cocoa/"/>
+    
+  </entry>
+  
+  <entry>
+    <title>用Swift的框架Vapor写服务端初体验</title>
+    <link href="https://arclin.me/2017/03/16/cjepiiyqe005f2afyzp7ipnps.html"/>
+    <id>https://arclin.me/2017/03/16/cjepiiyqe005f2afyzp7ipnps.html</id>
+    <published>2017-03-15T16:00:00.000Z</published>
+    <updated>2018-02-16T15:41:05.586Z</updated>
+    
+    <content type="html"><![CDATA[<p>咦? 用Swift写后端? 一开始听到的时候懵逼了一秒,一秒自后想了想感觉也没毛病,那就试试看咯.(没看WWDC的后果)</p><a id="more"></a><h2 id="安装Vapor"><a href="#安装Vapor" class="headerlink" title="安装Vapor"></a>安装Vapor</h2><p><code>curl -sL toolbox.vapor.sh | bash</code></p><h2 id="创建项目"><a href="#创建项目" class="headerlink" title="创建项目"></a>创建项目</h2><p><code>vapor new Hello --template=light</code></p><p><code>--template=light</code> 意思是使用light-template模板,如果不指定模板的话默认使用base-template模板</p><p>下载依赖并编译项目<br><code>vapor build</code></p><p>50多M的包,好久…</p><p>配置服务器<br>创建Config文件夹,新建servers.json文件, 指定host地址和端口号</p><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line">&#123;</span><br><span class="line">  &quot;http&quot;: &#123;</span><br><span class="line">    &quot;host&quot;: &quot;0.0.0.0&quot;,</span><br><span class="line">    &quot;port&quot;: 8000</span><br><span class="line">  &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure><p><code>0.0.0.0</code> 和 <code>127.0.0.1</code> 都表示本机，使用 <code>0.0.0.0</code> 的原因是，一个机器可能有多个 IP 地址，<code>0.0.0.0</code> 表示监听每个 IP <code>8000</code> 端口收到的请求。</p><p><code>127.0.0.1</code> 则表示只接受本机发给本机的请求，从网络上其他电脑发过来的请求，不论是请求的哪个 IP，都是不被处理的。</p><h2 id="打包成一个XCode项目"><a href="#打包成一个XCode项目" class="headerlink" title="打包成一个XCode项目"></a>打包成一个XCode项目</h2><p><code>vapor xcode -y</code> 这样子打包之后就会自动打开了</p><h2 id="启动服务器"><a href="#启动服务器" class="headerlink" title="启动服务器"></a>启动服务器</h2><p><code>vapor run</code> 或者在XCode运行</p><p>看到了控制台输出了</p><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">No command supplied, defaulting to serve...</span><br><span class="line">No preparations.</span><br><span class="line">Server &apos;http&apos; starting at 0.0.0.0:8000</span><br></pre></td></tr></table></figure><p>就可以了</p><p>如果说什么<code>Can not bind to xxxx</code> 就应该是端口占用的问题,可以用<code>lsof -i tcp:端口号</code> 和 <code>kill -9</code> 端口号解决这个问题</p><p>如果你在浏览器输入<code>http://localhost:8000</code>可以看到以下信息就证明服务器启动成功了</p><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><span class="line">Request  </span><br><span class="line">- GET / HTTP/1.1</span><br><span class="line">- Headers:</span><br><span class="line">    Host: 0.0.0.0:8000</span><br><span class="line">    Upgrade-Insecure-Requests: 1</span><br><span class="line">    Connection: keep-alive</span><br><span class="line">    User-Agent: Mozilla/5.0 (Macintosh; Intel Mac OS X 10_12_3) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/57.0.2987.98 Safari/537.36</span><br><span class="line">    Accept-Language: en-US,en;q=0.8,zh-CN;q=0.6,zh;q=0.4,zh-TW;q=0.2</span><br><span class="line">    Accept-Encoding: gzip, deflate, sdch</span><br><span class="line">    Accept: text/html,application/xhtml+xml,application/xml;q=0.9,image/webp,*/*;q=0.8</span><br><span class="line">- Body:</span><br></pre></td></tr></table></figure><p>会出现这串东西是因为他执行了<code>Sources/App/main.swift</code>的内容,把请求体返回回来.</p><p>修改<code>Sources/App/main.swift</code><br>把文件改成这样子</p><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br></pre></td><td class="code"><pre><span class="line">import Vapor</span><br><span class="line"></span><br><span class="line">let drop = Droplet()</span><br><span class="line"></span><br><span class="line">drop.get &#123; _ in</span><br><span class="line">    return try JSON(node: [</span><br><span class="line">            &quot;message&quot;:&quot;Hello Vapor&quot;</span><br><span class="line">        ])</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line">drop.get(&quot;Hello&quot;,&quot;There&quot;) &#123; request in</span><br><span class="line">    return try JSON (node:[</span><br><span class="line">            &quot;message&quot;:&quot;Hello There&quot;</span><br><span class="line">        ])</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line">drop.get(&quot;TEST&quot;) &#123; request in</span><br><span class="line">    return try JSON (node:[</span><br><span class="line">            &quot;message&quot;:&quot;Hello Test&quot;</span><br><span class="line">        ])</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line">drop.run()</span><br></pre></td></tr></table></figure><p>然后我们使用Postman测试一下三个地址</p><p><code>http://localhost:8000/</code></p><p><img src="https://ooo.0o0.ooo/2017/03/16/58c9fe803b931.png" alt="WX20170316-105233@2x.png"></p><p>`<a href="http://localhost:8000/Hello/There" target="_blank" rel="noopener">http://localhost:8000/Hello/There</a></p><p><img src="https://ooo.0o0.ooo/2017/03/16/58c9fe7f92afc.png" alt="WX20170316-105315@2x.png"></p><p><code>http://localhost:8000/TEST</code></p><p><img src="https://ooo.0o0.ooo/2017/03/16/58c9fe7fca399.png" alt="WX20170316-105336@2x.png"></p><p>接下来试试接受参数并返回</p><p>继续在<code>drop.run()</code> 上面补充</p><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line">drop.post(&quot;post&quot;) &#123; request in</span><br><span class="line">    guard let name = request.data[&quot;name&quot;]?.string else &#123;</span><br><span class="line">        throw Abort.badRequest</span><br><span class="line">    &#125;</span><br><span class="line">    return try JSON(node: [</span><br><span class="line">        &quot;name&quot;: &quot;Hello \(name)!&quot;</span><br><span class="line">        ])</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure><blockquote><p>guard近似的看做是Assert，但是你可以优雅的退出而非崩溃。</p></blockquote><p>判断如果没有接收到’name’参数的话就会抛出异常Invalid request,有的话就返回Hello + 参数值 + !</p><p>测试一下</p><p><img src="https://ooo.0o0.ooo/2017/03/16/58ca001f306a5.png" alt="WX20170316-110133@2x.png"></p><p>部署服务器<br>Vapor支持Heroku,Ubuntu,Digital Ocean,AWS等等服务器,具体怎么做我还没试过,有时间再去试试看</p><p>为什么要用Swift写服务器?<br>额,看了一下资料,也没发现有谁说这东西有什么特别突出的优点,不过没试过,觉得挺新鲜,就试试嘛.</p><blockquote><p>学习资料 :</p><p><a href="http://www.jianshu.com/p/3fc28570d951" target="_blank" rel="noopener">服务端 Swift - Vapor 篇 （一）</a></p><p><a href="http://tips.producter.io/yong-swift-de-kuang-jia-vapor-xie-fu-wu-qi-zhe-shi-er-zen-yao-yang/" target="_blank" rel="noopener">用 Swift 的框架 Vapor 写服务器这事儿怎么样？</a></p></blockquote>]]></content>
+    
+    <summary type="html">
+    
+      &lt;p&gt;咦? 用Swift写后端? 一开始听到的时候懵逼了一秒,一秒自后想了想感觉也没毛病,那就试试看咯.(没看WWDC的后果)&lt;/p&gt;
+    
+    </summary>
+    
+      <category term="Swift" scheme="https://arclin.me/categories/Swift/"/>
+    
+    
+      <category term="Swift" scheme="https://arclin.me/tags/Swift/"/>
+    
+  </entry>
+  
+  <entry>
+    <title>ReactNative网络请求</title>
+    <link href="https://arclin.me/2017/03/15/cjepiiyin001d2afyvrxragyu.html"/>
+    <id>https://arclin.me/2017/03/15/cjepiiyin001d2afyvrxragyu.html</id>
+    <published>2017-03-14T16:00:00.000Z</published>
+    <updated>2018-02-17T12:45:05.778Z</updated>
+    
+    <content type="html"><![CDATA[<p>关于React Native 的网络请求的总结</p><a id="more"></a><p>因为这里使用的是<code>fetch()</code>方法,返回的是一个<code>Promise</code>对象,所以可以使用<code>then()</code>和<code>catch()</code>方法进行链式调用,也可以用<code>all()</code>,<code>race()</code> 去包装多个请求</p><p>具体的话可以看这里</p><h3 id="GET"><a href="#GET" class="headerlink" title="GET"></a>GET</h3><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line">fetch(&quot;http://localhost:3000/get&quot;)</span><br><span class="line">.then((response) =&gt; response.json()) // 这里取出响应体的JSON数据并返回</span><br><span class="line">.then((responseJSON) =&gt; &#123; // 处理上面返回的JSON数据</span><br><span class="line">// do something</span><br><span class="line"></span><br><span class="line">&#125;)</span><br><span class="line">.catch((err) =&gt; &#123; // 捕获错误</span><br><span class="line">// catch err</span><br><span class="line">&#125;);</span><br></pre></td></tr></table></figure><h3 id="POST"><a href="#POST" class="headerlink" title="POST"></a>POST</h3><p>网上说有两种,不过我一般用第二种比较多</p><h4 id="application-json"><a href="#application-json" class="headerlink" title="application/json"></a>application/json</h4><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br></pre></td><td class="code"><pre><span class="line">var fetchOptions = &#123;</span><br><span class="line">           method: &apos;POST&apos;,</span><br><span class="line">           headers: &#123;</span><br><span class="line">               &apos;Accept&apos;: &apos;application/json&apos;,</span><br><span class="line">               //json形式</span><br><span class="line">               &apos;Content-Type&apos;: &apos;application/json&apos;</span><br><span class="line">           &#125;,</span><br><span class="line">           body:JSON.stringify(&apos;data=test&apos;) // 这里是请求参数,键值对形式</span><br><span class="line">       &#125;;</span><br><span class="line"></span><br><span class="line">fetch(&quot;http://localhost:3000/post&quot;, fetchOptions)</span><br><span class="line">   .then((response) =&gt; response.json())</span><br><span class="line">   .then((responseText) =&gt; &#123;</span><br><span class="line">        console.log(responseText);</span><br><span class="line">   &#125;);</span><br></pre></td></tr></table></figure><h4 id="application-x-www-form-urlencoded"><a href="#application-x-www-form-urlencoded" class="headerlink" title="application/x-www-form-urlencoded"></a>application/x-www-form-urlencoded</h4><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br></pre></td><td class="code"><pre><span class="line"> var fetchOptions = &#123;</span><br><span class="line">           method: &apos;POST&apos;,</span><br><span class="line">           headers: &#123;</span><br><span class="line">               &apos;Accept&apos;: &apos;application/json&apos;,</span><br><span class="line">               //表单</span><br><span class="line">               &apos;Content-Type&apos;: &apos;application/x-www-form-urlencoded&apos;</span><br><span class="line">           &#125;,</span><br><span class="line">           body:&apos;data=test&apos; // 这里是请求参数,键值对形式</span><br><span class="line">       &#125;;</span><br><span class="line"></span><br><span class="line">fetch(&quot;http://localhost:3000/post&quot;, fetchOptions)</span><br><span class="line">   .then((response) =&gt; response.json())</span><br><span class="line">   .then((responseText) =&gt; &#123;</span><br><span class="line">        console.log(responseText);</span><br><span class="line">   &#125;);</span><br></pre></td></tr></table></figure><p>如果使用的是Restful的API的话,那么只要把上面<code>fetchOption</code>里面的<code>method</code>改成对应的方法就好.</p><p>当然,封装一个网络请求工具是有必要的,等我有时间写一下.</p>]]></content>
+    
+    <summary type="html">
+    
+      &lt;p&gt;关于React Native 的网络请求的总结&lt;/p&gt;
+    
+    </summary>
+    
+      <category term="React Native" scheme="https://arclin.me/categories/React-Native/"/>
+    
+    
+      <category term="React Native" scheme="https://arclin.me/tags/React-Native/"/>
+    
+  </entry>
+  
+  <entry>
+    <title>关于App混合开发的介绍</title>
+    <link href="https://arclin.me/2017/03/14/cjepiiyqv006n2afyzob0jccp.html"/>
+    <id>https://arclin.me/2017/03/14/cjepiiyqv006n2afyzob0jccp.html</id>
+    <published>2017-03-13T16:00:00.000Z</published>
+    <updated>2018-02-17T13:35:09.363Z</updated>
+    
+    <content type="html"><![CDATA[<p><img src="https://ooo.0o0.ooo/2017/03/14/58c75bfb373da.png" alt=""></p><h3 id="前言"><a href="#前言" class="headerlink" title="前言"></a>前言</h3><p>Hybrid App 混合开发意思是在web-app、native-app这两者之间的app开发,兼具“Native App良好用户交互体验的优势”和“Web App跨平台开发的优势”, 并且也方便我们进行热修复.</p><a id="more"></a><blockquote><p>跨平台就是你写一套代码,然后iOS和Android都能用,这样子可以大大节省人力成本和开发成本</p><p>热修复就是应用发布之后你还可以通过下发补丁或者直接修改web部分代码去修改app的内容,由于iOS版本应用要上传到应用市场需要经过严格的审核,这将会花费很多时间,如果每次项目一有点小问题就重新发布上架,这将会是一场灾难,所以app的热修复技术在iOS中显得尤为重要</p></blockquote><p>目前比较流行的有Cordova/PhoneGap,HTML 5+,React Native,Weex,AppCan(因为这个平台在很多地方吐槽很严重所以暂时不讨论),接下来我们一个个地讨论这些开发框架.</p><h3 id="Cordova-PhoneGap"><a href="#Cordova-PhoneGap" class="headerlink" title="Cordova/PhoneGap"></a>Cordova/PhoneGap</h3><p><img src="https://ooo.0o0.ooo/2017/03/14/58c7511a7b3cf.png" alt="Cordova logo"></p><p><a href="http://cordova.apache.org/" target="_blank" rel="noopener">Cordova 官网</a></p><h4 id="介绍"><a href="#介绍" class="headerlink" title="介绍"></a>介绍</h4><p>为什么这两个要放在一起呢,因为PhoneGap被Adobe收购了,临走之前把核心代码给了Apache,Apache就把这个项目名作Cordova,所以说PhoneGap和Cordova出自同一家,他们都会被开源社区和Adobe所推动.</p><p>这个框架是作为原生与web之间的中间件,它采用插件的形式调用原生模块,最后成品就是原生页面和web页面的一个混合应用,现在是一个为大多数混合应用所采用的框架,拥有广大的前景</p><h4 id="优点"><a href="#优点" class="headerlink" title="优点"></a>优点</h4><p>用相对简单,学习成本低,对于不熟悉原生开发的前端工程师来说是不错的选择.</p><h4 id="缺点"><a href="#缺点" class="headerlink" title="缺点"></a>缺点</h4><p>说实话这个并不是Cordova的缺点,而是web应用共有的问题,就是页面响应迟钝和操作体验不佳的问题.但是这些问题在现在也已经有了足够多的解决方案,具体想了解可以自行上网查阅.</p><h3 id="HTML-5"><a href="#HTML-5" class="headerlink" title="HTML 5+"></a>HTML 5+</h3><p><img src="https://ooo.0o0.ooo/2017/03/14/58c7511a6ebea.png" alt="HTML5+ logo"></p><p><a href="http://ask.dcloud.net.cn/docs/" target="_blank" rel="noopener">官方文档</a></p><h4 id="介绍-1"><a href="#介绍-1" class="headerlink" title="介绍"></a>介绍</h4><p>DCloud和H5中国产业联盟发起的项目,使用H5+框架自带的各种方法去进行与原生模块之间的沟通,结果产出的依然是web页面,但是性能相对比Cordova好.</p><h4 id="优点-1"><a href="#优点-1" class="headerlink" title="优点"></a>优点</h4><p>上手简单,学习成本低,有完整的中文文档,作为移动端webView上的框架体验是很不错的,前端人员可以优先考虑使用这个框架.</p><h4 id="缺点-1"><a href="#缺点-1" class="headerlink" title="缺点"></a>缺点</h4><p>貌似国外基本没人知道这东西,第三方插件和资源相对较少,要是遇到问题也只能去dcloud社区里面找,stackoverflow是帮不到你的啦,而且就目前看来框架自带的bug还是有的.</p><h3 id="ReactNative"><a href="#ReactNative" class="headerlink" title="ReactNative"></a>ReactNative</h3><p><img src="https://ooo.0o0.ooo/2017/03/14/58c7511a63fec.jpg" alt="ReactNative logo"></p><p><a href="http://reactnative.cn/" target="_blank" rel="noopener">中文官网</a></p><h4 id="介绍-2"><a href="#介绍-2" class="headerlink" title="介绍"></a>介绍</h4><p>Facebook 发布的一个混合开发框架,使用ES5/ES6语法,通过ReactNative自带的框架去调用原生模块,但重点是他虽然写的是前端语言,JSX和ES5/ES6但是可以经过构建渲染,将DOM元素转为原生元素,也就是使用前端语言开发原生app已成为现实,既能保留原生的体验又能体现出跨平台和热修复的优势,所以近两年来这个框架十分火.</p><h4 id="优点-2"><a href="#优点-2" class="headerlink" title="优点"></a>优点</h4><p>既有原生的体验,又能做到跨平台,虽然加载速度还是比纯原生慢一点,但是这个差距已经能达到毫秒级,基本不影响体验,目前像支付宝,手机QQ,淘宝 都已经在部分模块使用了React Native框架,市场前景广阔,拥有丰富的资料.</p><h4 id="缺点-2"><a href="#缺点-2" class="headerlink" title="缺点"></a>缺点</h4><p>因为这个框架还出现不久,目前还是0.x版本阶段,有部分原生模块还没有接入,只能等他更新</p><p>需要一定的学习成本,如果你说你是个会HTML和CSS的前端工程师,那不好意思你还是从入门教程开始看吧╮(╯_╰)╭</p><h3 id="Weex"><a href="#Weex" class="headerlink" title="Weex"></a>Weex</h3><p>官网 … 额… 没官网..只有一个<a href="http://www.weex.help/" target="_blank" rel="noopener">论坛</a></p><h4 id="介绍-3"><a href="#介绍-3" class="headerlink" title="介绍"></a>介绍</h4><p>阿里爸爸推出的跟ReactNative差不多的框架,所以介绍就跟上面差不多,其实我并不是很熟悉这个框架,而且这个框架是16年4月阿里才开放出来内测的,现在支持的原生元素还是不多,现在一年过去了感觉没引起多大关注,如果你学过Vue,那么这个框架你可能会比较好上手</p><p>总之阿里爸爸推出了这个轮子还是很吊的.之后说不定会一鸣惊人呢?</p><h3 id="AppCan"><a href="#AppCan" class="headerlink" title="AppCan"></a>AppCan</h3><p><a href="http://www.appcan.cn/" target="_blank" rel="noopener">官网</a></p><h4 id="介绍-4"><a href="#介绍-4" class="headerlink" title="介绍"></a>介绍</h4><p>国内的混合开发框架</p><p>_(´ཀ`」 ∠) 这个东西是基于他们服务器运行的,所以说如果他们的服务器跪了,你的app就跪了,当然如果你是付费用户,他们就会很快地帮你处理.他们有自己的开发IDE,产出的是也是webView页面,这里就不过多介绍了,具体可以看他们官网.</p><h3 id="关于热修复"><a href="#关于热修复" class="headerlink" title="关于热修复"></a>关于热修复</h3><p>前言就讲了热修复是啥东西,然后说说最近发生的一件事</p><p>今年的三八妇女节那天,苹果发了邮件给使用了热修复的开发者,说你们在应用商店上面的app里面有使用了热修复框架,希望你们以后不要用,因为这会违反什么吧啦吧啦协议条款,然后一群不是很懂英文的程序员就猜来猜去,就说苹果不让用热修复了,JSPatch不能用了啊,ReactNative药丸啊╮(╯_╰)╭,我在V2看到的最多的就是iOS开发者的欢呼23333,感觉真是世态炎凉,原生的优势已经得通过保护才能体现了吗?</p><p>嘛.认真看看邮件,苹果是说你们不能用热修复的手段去改变app的功能,像是调用runtime底层方法之类的,就比如说你这个功能本来是显示一个公司的产品展示的的,但是你通过了应用审核之后,远程下发补丁,然后一打开app就弹出一大堆广告,那这样子肯定是违反协议的,当然你用JSPatch的方式你想做啥就做啥,显然不是很好,所以现在JSPatch官方也说近期不要用(前几天我更新了一个app的新版本,没有移除JSPatch,居然也过审了???),但是RN框架是不会做这些事情的,收到邮件的RN开发者大多是因为里面用了Code Push或Expo之类的第三方.</p><p>那结论就是,JSPatch不给用了,那也许大家会更倾向于RN或者web方案,所以近期RN的发展应该会更加迅速,反正无论如何,大家尝到热修复的甜头,肯定不会就此罢休.</p><hr><p>文: Arclin</p><p>2017.03.14</p>]]></content>
+    
+    <summary type="html">
+    
+      &lt;p&gt;&lt;img src=&quot;https://ooo.0o0.ooo/2017/03/14/58c75bfb373da.png&quot; alt=&quot;&quot;&gt;&lt;/p&gt;
+&lt;h3 id=&quot;前言&quot;&gt;&lt;a href=&quot;#前言&quot; class=&quot;headerlink&quot; title=&quot;前言&quot;&gt;&lt;/a&gt;前言&lt;/h3&gt;&lt;p&gt;Hybrid App 混合开发意思是在web-app、native-app这两者之间的app开发,兼具“Native App良好用户交互体验的优势”和“Web App跨平台开发的优势”, 并且也方便我们进行热修复.&lt;/p&gt;
+    
+    </summary>
+    
+      <category term="杂谈" scheme="https://arclin.me/categories/%E6%9D%82%E8%B0%88/"/>
+    
+    
+      <category term="React Native" scheme="https://arclin.me/tags/React-Native/"/>
+    
+      <category term="Cordova" scheme="https://arclin.me/tags/Cordova/"/>
+    
+      <category term="AppCan" scheme="https://arclin.me/tags/AppCan/"/>
+    
+      <category term="Weex" scheme="https://arclin.me/tags/Weex/"/>
+    
+      <category term="HTML5+" scheme="https://arclin.me/tags/HTML5/"/>
+    
+  </entry>
+  
+  <entry>
+    <title>React Native真机运行</title>
+    <link href="https://arclin.me/2017/03/08/cjepiiyig000z2afyfn1mo9dh.html"/>
+    <id>https://arclin.me/2017/03/08/cjepiiyig000z2afyfn1mo9dh.html</id>
+    <published>2017-03-07T16:00:00.000Z</published>
+    <updated>2018-02-17T13:18:41.982Z</updated>
+    
+    <content type="html"><![CDATA[<p>三步即可</p><p>在项目根目录使用终端执行</p><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">$ curl http://localhost:8081/index.ios.bundle -o main.jsbundle</span><br></pre></td></tr></table></figure><p><code>AppDelegate.m</code> 找到这一行并注释</p><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">jsCodeLocation = [NSURL URLWithString:@&quot;http://localhost:8081/index.ios.bundle?platform=ios&amp;dev=true&quot;];</span><br></pre></td></tr></table></figure><p><code>AppDelegate.m</code> 写上或反注释这一行</p><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">jsCodeLocation = [[NSBundle mainBundle] URLForResource:@&quot;main&quot; withExtension:@&quot;jsbundle&quot;];</span><br></pre></td></tr></table></figure>]]></content>
+    
+    <summary type="html">
+    
+      
+      
+        &lt;p&gt;三步即可&lt;/p&gt;
+&lt;p&gt;在项目根目录使用终端执行&lt;/p&gt;
+&lt;figure class=&quot;highlight plain&quot;&gt;&lt;table&gt;&lt;tr&gt;&lt;td class=&quot;gutter&quot;&gt;&lt;pre&gt;&lt;span class=&quot;line&quot;&gt;1&lt;/span&gt;&lt;br&gt;&lt;/pre&gt;&lt;/td
+      
+    
+    </summary>
+    
+      <category term="React Native" scheme="https://arclin.me/categories/React-Native/"/>
+    
+    
+      <category term="iOS" scheme="https://arclin.me/tags/iOS/"/>
+    
+      <category term="React Native" scheme="https://arclin.me/tags/React-Native/"/>
+    
+  </entry>
+  
+  <entry>
+    <title>Express学习笔记</title>
+    <link href="https://arclin.me/2017/03/07/cjepiiyhw00072afyy8z1ikom.html"/>
+    <id>https://arclin.me/2017/03/07/cjepiiyhw00072afyy8z1ikom.html</id>
+    <published>2017-03-06T16:00:00.000Z</published>
+    <updated>2018-02-17T13:08:49.859Z</updated>
+    
+    <content type="html"><![CDATA[<p>Express 是 Node.js 的一个轻量级web框架,目前使用EJS模板引擎,该笔记持续更新</p><a id="more"></a><h2 id="supervisor"><a href="#supervisor" class="headerlink" title="supervisor"></a>supervisor</h2><p>使用supervisor监听文件改变然后自动重启node服务器,这样子就不用每改一次代码run一遍服务器了</p><p><code>sudo npm install -g supervisor</code></p><h3 id="WebStrom配置supervisor"><a href="#WebStrom配置supervisor" class="headerlink" title="WebStrom配置supervisor"></a>WebStrom配置supervisor</h3><p>文件目录结构<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br></pre></td><td class="code"><pre><span class="line">├── app.js        项目入口及程序启动文件。</span><br><span class="line">├── bin</span><br><span class="line">│   └── www       存放启动项目的脚本文件，默认www。</span><br><span class="line">├── package.json  项目依赖配置及开发者信息。</span><br><span class="line">├── public        静态资源文件夹，默认images、javascripts、stylesheets。</span><br><span class="line">│   ├── images</span><br><span class="line">│   ├── javascripts</span><br><span class="line">│   └── stylesheets</span><br><span class="line">├── routes        路由文件相当于MVC中的Controller，默认index.js、users.js。</span><br><span class="line">│   ├── index.js</span><br><span class="line">│   └── users.js</span><br><span class="line">└── views         页面文件，相当于MVC中的view，Ejs模板默认error.ejs、index.ejs</span><br><span class="line">    ├── error.ejs</span><br><span class="line">    └── index.ejs</span><br></pre></td></tr></table></figure></p><p>项目依赖配置 <code>package.json</code></p><p><code>package.json</code> 里面有项目依赖配置及开发者信息。<br>在dependencies后面写上依赖的包名和版本号,然后在项目根目录执行npm install就可以像cocopods一样一次性安装包依赖</p><h2 id="路由-Routes"><a href="#路由-Routes" class="headerlink" title="路由 Routes"></a>路由 Routes</h2><p>路由用来处理URL的访问</p><p><code>index.js</code></p><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">var express = require(&apos;express&apos;);   获取express对象</span><br><span class="line">var router = express.Router();      获取router对象</span><br></pre></td></tr></table></figure><p>router有get(),post(),put(),delete()对象,代表接受的请求方式,对应查,增,改,删</p><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">router.get(&apos;/getSomething&apos;,function(req,res,next) &#123;&#125;);</span><br><span class="line">router.post(&apos;/post&apos;, function (req,res) &#123;&#125;);</span><br><span class="line">router.put(&apos;/put&apos;,function(req,res,next) &#123;&#125;);</span><br><span class="line">router.delete(&apos;/delete&apos;,function(req,res,next) &#123;&#125;);</span><br></pre></td></tr></table></figure><p>方法中第一个参数意味着请求路径,例如第一个的请求路径是<code>http://localhost:3000/getSomething</code>,第二个参数是获取请求内容和准备返回的响应体.</p><h2 id="Request获取请求参数"><a href="#Request获取请求参数" class="headerlink" title="Request获取请求参数"></a>Request获取请求参数</h2><p>例如请求发送了id参数,则<code>var id = req.params.id;</code>可以取得<br>Response返回响应体</p><p><code>send()</code>方法向浏览器发送一个响应信息<br>例如想返回一个json,则res.send({test:id = ${id},name = ${name}});<br>当参数为一个Number时，并且没有上面提到的任何一条在响应体里，Express会帮你设置一个响应 体，比如：200会返回字符”OK”。<br>res.send(200); // OK<br>res.send(404); // Not Found<br>res.send(500); // Internal Server Error</p><h2 id="Response重定向"><a href="#Response重定向" class="headerlink" title="Response重定向"></a>Response重定向</h2><p><code>res.redirect(&quot;http://www.hubwiz.com&quot;);</code></p><h2 id="Response渲染页面"><a href="#Response渲染页面" class="headerlink" title="Response渲染页面"></a>Response渲染页面</h2><p>如果想渲染<code>hello.ejs</code>页面,<code>res.render(&#39;hello&#39;,{title:&quot;MySQL&quot;,test_params:&#39;aaa&#39;});</code><br><code>hello.ejs</code>页面通过<code>&lt;%= title %&gt;</code>的方式取得title等参数</p><p>Request获取主机名,路径名</p><p><code>req.host</code>获取主机名，<code>req.path</code>获取请求路径名</p><h2 id="restful-方式路由"><a href="#restful-方式路由" class="headerlink" title="restful 方式路由"></a>restful 方式路由</h2><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line">router.post(&apos;/restful/:id/name/:name&apos;, function (req,res) &#123;</span><br><span class="line">  var id  = req.params.id;</span><br><span class="line">  var name = req.params.name;</span><br><span class="line">  console.log(JSON.stringify(req.params));</span><br><span class="line">  res.send(&#123;test:`id = $&#123;id&#125;,name = $&#123;name&#125;`&#125;);</span><br><span class="line">&#125;);</span><br><span class="line">JSON.stringify() 把js对象转成json</span><br></pre></td></tr></table></figure><h2 id="数据库"><a href="#数据库" class="headerlink" title="数据库"></a>数据库</h2><h3 id="MySQL"><a href="#MySQL" class="headerlink" title="MySQL"></a>MySQL</h3><p>安装MySQL</p><p><code>$ npm install mysql</code></p><p>引入MySQL并配置<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line">var mysql      = require(&apos;mysql&apos;);</span><br><span class="line">var connection = mysql.createConnection(&#123;</span><br><span class="line">    host     : &apos;localhost&apos;,</span><br><span class="line">    user     : &apos;root&apos;,</span><br><span class="line">    password : &apos;123456&apos;,</span><br><span class="line">    database : &apos;csdn_test&apos;,</span><br><span class="line">    port     : 3306</span><br><span class="line">&#125;);</span><br></pre></td></tr></table></figure></p><p>连接数据库</p><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">connection.connect()</span><br></pre></td></tr></table></figure><p>这个方法可以接受一个回调用来判断是否连接成功</p><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line">connection.connect(function(err) &#123;</span><br><span class="line">    if (!err) &#123;</span><br><span class="line">   // 连接成功</span><br><span class="line">     &#125; else &#123;</span><br><span class="line">      // 连接失败 </span><br><span class="line">     &#125;</span><br><span class="line">&#125;);</span><br><span class="line">connection.end();</span><br></pre></td></tr></table></figure><h4 id="查询"><a href="#查询" class="headerlink" title="查询"></a>查询</h4><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">connection.query(&apos;SELECT 1 + 1 AS solution&apos;, function(err, rows, fields) &#123;</span><br><span class="line">  if (err) throw err;</span><br><span class="line">  console.log(&apos;The solution is: &apos;, rows[0].solution);</span><br><span class="line">&#125;);</span><br></pre></td></tr></table></figure><p>同上,接受一个回调来判断是否成功关闭连接</p><p><code>connection.end(err =&gt; console.log(</code>连接中断${err}`));’</p><h3 id="MongoDB"><a href="#MongoDB" class="headerlink" title="MongoDB"></a>MongoDB</h3><p>安装</p><p><code>npm install -g mongoose</code><br>配置</p><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line">var mongoose = require(&apos;mongoose&apos;);</span><br><span class="line">var options = &#123;</span><br><span class="line">    db_user: &quot;root&quot;,</span><br><span class="line">    db_pwd: &quot;123456&quot;,</span><br><span class="line">    db_host: &quot;localhost&quot;,</span><br><span class="line">    db_port: 27017,</span><br><span class="line">    db_name: &quot;csdn_test&quot;</span><br><span class="line">&#125;;</span><br></pre></td></tr></table></figure><h4 id="连接"><a href="#连接" class="headerlink" title="连接"></a>连接</h4><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br></pre></td><td class="code"><pre><span class="line">var dbURL = &quot;mongodb://&quot; + options.db_user + &quot;:&quot; + options.db_pwd + &quot;@&quot; + options.db_host + &quot;:&quot; + options.db_port + &quot;/&quot; + options.db_name;</span><br><span class="line"></span><br><span class="line">// 连接</span><br><span class="line">mongoose.connect(dbURL);</span><br><span class="line"></span><br><span class="line">// 监听连接事件</span><br><span class="line">mongoose.connection.on(&apos;connected&apos;, function (err) &#123;</span><br><span class="line">    if (err) logger.error(&apos;Database connection failure&apos;);</span><br><span class="line">&#125;);</span><br><span class="line"></span><br><span class="line">// 监听错误事件</span><br><span class="line">mongoose.connection.on(&apos;error&apos;, function (err) &#123;</span><br><span class="line">    logger.error(&apos;Mongoose connected error &apos; + err);</span><br><span class="line">&#125;);</span><br><span class="line"></span><br><span class="line">// 监听断开事件</span><br><span class="line">mongoose.connection.on(&apos;disconnected&apos;, function () &#123;</span><br><span class="line">    logger.error(&apos;Mongoose disconnected&apos;);</span><br><span class="line">&#125;);</span><br><span class="line">查询</span><br><span class="line"></span><br><span class="line">mongoose.collection(&apos;mamals&apos;).find().toArray(function(err, result) &#123;</span><br><span class="line">  if (err) throw err;</span><br><span class="line">  console.log(result);</span><br><span class="line">&#125;);</span><br></pre></td></tr></table></figure><p>其他方法以后遇到再补充.</p>]]></content>
+    
+    <summary type="html">
+    
+      &lt;p&gt;Express 是 Node.js 的一个轻量级web框架,目前使用EJS模板引擎,该笔记持续更新&lt;/p&gt;
+    
+    </summary>
+    
+      <category term="Node.js" scheme="https://arclin.me/categories/Node-js/"/>
+    
+    
+      <category term="Node.js" scheme="https://arclin.me/tags/Node-js/"/>
+    
+      <category term="Express" scheme="https://arclin.me/tags/Express/"/>
+    
+  </entry>
+  
+</feed>
