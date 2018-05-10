@@ -1,0 +1,1339 @@
+<!DOCTYPE html>
+
+
+
+  
+
+
+<html class="theme-next muse use-motion" lang="zh-Hans">
+<head>
+  <meta charset="UTF-8"/>
+<meta http-equiv="X-UA-Compatible" content="IE=edge" />
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1"/>
+<meta name="theme-color" content="#222">
+
+
+
+
+
+
+
+
+
+
+
+
+<meta http-equiv="Cache-Control" content="no-transform" />
+<meta http-equiv="Cache-Control" content="no-siteapp" />
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<link href="/lib/font-awesome/css/font-awesome.min.css?v=4.6.2" rel="stylesheet" type="text/css" />
+
+<link href="/css/main.css?v=6.0.4" rel="stylesheet" type="text/css" />
+
+
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png?v=6.0.4">
+
+
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32-next.png?v=6.0.4">
+
+
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next.png?v=6.0.4">
+
+
+  <link rel="mask-icon" href="/images/logo.svg?v=6.0.4" color="#222">
+
+
+
+
+
+
+
+
+
+<script type="text/javascript" id="hexo.configurations">
+  var NexT = window.NexT || {};
+  var CONFIG = {
+    root: '/',
+    scheme: 'Muse',
+    version: '6.0.4',
+    sidebar: {"position":"left","display":"post","offset":12,"b2t":false,"scrollpercent":false,"onmobile":false},
+    fancybox: false,
+    fastclick: false,
+    lazyload: false,
+    tabs: true,
+    motion: {"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},
+    algolia: {
+      applicationID: 'USBZY31VMT',
+      apiKey: '67e7b7406e3edb5a9bd8f027abc764b7',
+      indexName: 'indexName',
+      hits: {"per_page":10},
+      labels: {"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}
+    }
+  };
+</script>
+
+
+  
+
+
+
+
+  
+  <meta name="keywords" content="Jenkins,Git,CocoaPods,Fir," />
+
+
+<meta name="description" content="Jenkins 可以定时检测 Git 上的某个分支的代码，打包生成 ipa 后直接上传到 Fir.im">
+<meta name="keywords" content="Jenkins,Git,CocoaPods,Fir">
+<meta property="og:type" content="article">
+<meta property="og:title" content="Jenkins+Git+CocoaPods+Fir.im实现iOS应用持续集成">
+<meta property="og:url" content="https://arclin.me/2017/02/08/cjepirh9e0009azfyqi5wizw8.html">
+<meta property="og:site_name" content="Arclin">
+<meta property="og:description" content="Jenkins 可以定时检测 Git 上的某个分支的代码，打包生成 ipa 后直接上传到 Fir.im">
+<meta property="og:locale" content="zh-Hans">
+<meta property="og:image" content="https://raw.githubusercontent.com/Arc-lin/BlogImage/master/888.png">
+<meta property="og:image" content="https://raw.githubusercontent.com/Arc-lin/BlogImage/master/999.png">
+<meta property="og:image" content="https://raw.githubusercontent.com/Arc-lin/BlogImage/master/1001.png">
+<meta property="og:image" content="https://raw.githubusercontent.com/Arc-lin/BlogImage/master/1002.png">
+<meta property="og:image" content="http://upload-images.jianshu.io/upload_images/1194012-6d1b6f56e4dac318.png?imageMogr2/auto-orient/strip%7CimageView2/2/w/1240">
+<meta property="og:image" content="https://raw.githubusercontent.com/Arc-lin/BlogImage/master/1003.png">
+<meta property="og:image" content="https://wiki.jenkins-ci.org/download/attachments/68386839/codesigning_Key_1.png?version=1&modificationDate=1375867279000">
+<meta property="og:image" content="https://wiki.jenkins-ci.org/download/attachments/68386839/codesigning_Key_2.png?version=2&modificationDate=1375868440000">
+<meta property="og:image" content="https://wiki.jenkins-ci.org/download/attachments/68386839/Screen+Shot+2013-08-07+at+14.17.05.png?version=1&modificationDate=1375877888000">
+<meta property="og:image" content="https://raw.githubusercontent.com/Arc-lin/BlogImage/master/1004.png">
+<meta property="og:image" content="https://raw.githubusercontent.com/Arc-lin/BlogImage/master/1005.png">
+<meta property="og:image" content="https://raw.githubusercontent.com/Arc-lin/BlogImage/master/1006.png">
+<meta property="og:image" content="https://raw.githubusercontent.com/Arc-lin/BlogImage/master/1007.png">
+<meta property="og:image" content="https://raw.githubusercontent.com/Arc-lin/BlogImage/master/1008.png">
+<meta property="og:image" content="https://raw.githubusercontent.com/Arc-lin/BlogImage/master/1009.png">
+<meta property="og:image" content="https://raw.githubusercontent.com/Arc-lin/BlogImage/master/1010.png">
+<meta property="og:updated_time" content="2018-02-18T08:01:08.427Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="Jenkins+Git+CocoaPods+Fir.im实现iOS应用持续集成">
+<meta name="twitter:description" content="Jenkins 可以定时检测 Git 上的某个分支的代码，打包生成 ipa 后直接上传到 Fir.im">
+<meta name="twitter:image" content="https://raw.githubusercontent.com/Arc-lin/BlogImage/master/888.png">
+
+
+
+  <link rel="alternate" href="/atom.xml" title="Arclin" type="application/atom+xml" />
+
+
+
+
+  <link rel="canonical" href="https://arclin.me/2017/02/08/cjepirh9e0009azfyqi5wizw8.html"/>
+
+
+
+<script type="text/javascript" id="page.configurations">
+  CONFIG.page = {
+    sidebar: "",
+  };
+</script>
+  <title>Jenkins+Git+CocoaPods+Fir.im实现iOS应用持续集成 | Arclin</title>
+  
+
+
+
+
+
+
+
+
+
+  <noscript>
+  <style type="text/css">
+    .use-motion .motion-element,
+    .use-motion .brand,
+    .use-motion .menu-item,
+    .sidebar-inner,
+    .use-motion .post-block,
+    .use-motion .pagination,
+    .use-motion .comments,
+    .use-motion .post-header,
+    .use-motion .post-body,
+    .use-motion .collection-title { opacity: initial; }
+
+    .use-motion .logo,
+    .use-motion .site-title,
+    .use-motion .site-subtitle {
+      opacity: initial;
+      top: initial;
+    }
+
+    .use-motion {
+      .logo-line-before i { left: initial; }
+      .logo-line-after i { right: initial; }
+    }
+  </style>
+</noscript>
+
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage" lang="zh-Hans">
+
+  
+  
+    
+  
+
+  <div class="container sidebar-position-left page-post-detail">
+    <div class="headband"></div>
+
+    <header id="header" class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"> <div class="site-brand-wrapper">
+  <div class="site-meta ">
+    
+
+    <div class="custom-logo-site-title">
+      <a href="/"  class="brand" rel="start">
+        <span class="logo-line-before"><i></i></span>
+        <span class="site-title">Arclin</span>
+        <span class="logo-line-after"><i></i></span>
+      </a>
+    </div>
+      
+        <h1 class="site-subtitle" itemprop="description">Advocate Technology. Enjoy Technology.</h1>
+      
+  </div>
+
+  <div class="site-nav-toggle">
+    <button>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+    </button>
+  </div>
+</div>
+
+<nav class="site-nav">
+  
+
+  
+    <ul id="menu" class="menu">
+      
+        
+        <li class="menu-item menu-item-home">
+          <a href="/" rel="section">
+            <i class="menu-item-icon fa fa-fw fa-home"></i> <br />首页</a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-categories">
+          <a href="/categories/" rel="section">
+            <i class="menu-item-icon fa fa-fw fa-th"></i> <br />分类</a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-tags">
+          <a href="/tags/" rel="section">
+            <i class="menu-item-icon fa fa-fw fa-tags"></i> <br />标签</a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-archives">
+          <a href="/archives/" rel="section">
+            <i class="menu-item-icon fa fa-fw fa-archive"></i> <br />归档</a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-about">
+          <a href="/About/" rel="section">
+            <i class="menu-item-icon fa fa-fw fa-user"></i> <br />关于</a>
+        </li>
+      
+
+      
+        <li class="menu-item menu-item-search">
+          
+            <a href="javascript:;" class="popup-trigger">
+          
+            
+              <i class="menu-item-icon fa fa-search fa-fw"></i> <br />搜索</a>
+        </li>
+      
+    </ul>
+  
+
+  
+    <div class="site-search">
+      
+  
+  <div class="algolia-popup popup search-popup">
+    <div class="algolia-search">
+      <div class="algolia-search-input-icon">
+        <i class="fa fa-search"></i>
+      </div>
+      <div class="algolia-search-input" id="algolia-search-input"></div>
+    </div>
+
+    <div class="algolia-results">
+      <div id="algolia-stats"></div>
+      <div id="algolia-hits"></div>
+      <div id="algolia-pagination" class="algolia-pagination"></div>
+    </div>
+
+    <span class="popup-btn-close">
+      <i class="fa fa-times-circle"></i>
+    </span>
+  </div>
+
+
+
+
+    </div>
+  
+</nav>
+
+
+  
+
+
+
+ </div>
+    </header>
+
+    
+
+
+    <main id="main" class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          <div id="content" class="content">
+            
+
+  <div id="posts" class="posts-expand">
+    
+
+  
+
+  
+  
+  
+
+  
+
+  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
+  
+  
+  
+  <div class="post-block">
+    <link itemprop="mainEntityOfPage" href="https://arclin.me/2017/02/08/cjepirh9e0009azfyqi5wizw8.html">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="Arclin">
+      <meta itemprop="description" content="">
+      <meta itemprop="image" content="https://i.loli.net/2018/02/16/5a86f3783f0d9.jpg">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="Arclin">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h2 class="post-title" itemprop="name headline">Jenkins+Git+CocoaPods+Fir.im实现iOS应用持续集成</h2>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">发表于</span>
+              
+              <time title="创建于" itemprop="dateCreated datePublished" datetime="2017-02-08T00:00:00+08:00">2017-02-08</time>
+            
+
+            
+            
+
+            
+          </span>
+
+          
+            <span class="post-category" >
+            
+              <span class="post-meta-divider">|</span>
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">分类于</span>
+              
+              
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing"><a href="/categories/iOS/" itemprop="url" rel="index"><span itemprop="name">iOS</span></a></span>
+
+                
+                
+              
+            </span>
+          
+
+          
+            
+          
+
+          
+          
+
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        <p>Jenkins 可以定时检测 Git 上的某个分支的代码，打包生成 ipa 后直接上传到 Fir.im</p>
+<a id="more"></a>
+<h3 id="安装-Jenkins"><a href="#安装-Jenkins" class="headerlink" title="安装 Jenkins"></a>安装 Jenkins</h3><h4 id="JDK"><a href="#JDK" class="headerlink" title="JDK"></a>JDK</h4><p>Jenkins 是基于 Java 的一个应用，所以你需要先有JDK ，安装 JDK 网上有很多资料这里就跳过了</p>
+<p>使用 Brew 安装 Jenkins</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">brew install jenkins</span><br></pre></td></tr></table></figure>
+<h3 id="启动-Jenkins"><a href="#启动-Jenkins" class="headerlink" title="启动 Jenkins"></a>启动 Jenkins</h3><p><code>jenkins</code> 或者 <code>java -jar /usr/local/opt/jenkins/libexec/jenkins.war --httpPort=8088</code> 这种方法可以指定端口号执行</p>
+<p>如果想自动启动，需要先执行以下命令，创建启动项<br><code>ln -sfv /usr/local/opt/jenkins/*.plist ~/Library/LaunchAgents</code></p>
+<p>可以编辑一下<code>~/Library/LaunchAgents/homebrew.mxcl.jenkins.plist</code>这个文件<br><code>open ~/Library/LaunchAgents/homebrew.mxcl.jenkins.plist</code></p>
+<p>想要让局域网都可以访问，需要把<code>–httpListenAddress=127.0.0.1</code>改成自己的局域网IP</p>
+<p>手动启动启动项可以执行</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">launchctl load ~/Library/LaunchAgents/homebrew.mxcl.jenkins.plist</span><br></pre></td></tr></table></figure>
+<h3 id="配置Xcode项目"><a href="#配置Xcode项目" class="headerlink" title="配置Xcode项目"></a>配置Xcode项目</h3><p>使用 CocoaPods<br>终端进入已有项目的目录下，执行</p>
+<p>填写 podfile 类似下面这样子</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line">target &apos;TestJenkins&apos; do</span><br><span class="line">	pod &apos;MJExtension&apos;</span><br><span class="line">  target &apos;TestJenkinsTests&apos; do</span><br><span class="line">    inherit! :search_paths</span><br><span class="line">  end</span><br><span class="line">end</span><br></pre></td></tr></table></figure>
+<p>然后执行 <code>pod install</code></p>
+<p>执行完成之后打开<code>TestJenkins.xcworkspace</code></p>
+<p>打开 <code>Product - Scheme - Manage Scheme</code></p>
+<p>把 <code>Share</code> 下面的勾都打上</p>
+<p><img src="https://raw.githubusercontent.com/Arc-lin/BlogImage/master/888.png" alt=""></p>
+<h3 id="上传到Git"><a href="#上传到Git" class="headerlink" title="上传到Git"></a>上传到Git</h3><p>在终端进入该项目根目录，执行<code>git init</code></p>
+<p>在 Git托管平台上新建一个项目，得到 git 远程仓库地址，然后在项目中添加该远程地址</p>
+<p><code>git remote add origin git@git.coding.net:Arclin/TestJenkins.git</code></p>
+<p>新的项目或许还需要<code>git pull origin master</code> pull一下Readme等东西</p>
+<ol>
+<li><code>git add .</code> 添加项目文件</li>
+<li><code>git git commit -m &quot;initial&quot;</code> 提交更改</li>
+<li><code>git push origin master</code> 推送到 master远程分支</li>
+</ol>
+<h3 id="配置-Jenkins"><a href="#配置-Jenkins" class="headerlink" title="配置 Jenkins"></a>配置 Jenkins</h3><p>在浏览器中打开 Jenkins,比如我指定了8088端口的话，那就打开<code>http://localhost:8088/</code>,然后根据提示安装，注意里面有一个选择插件的界面，根据需要选择就好。</p>
+<h4 id="安装插件"><a href="#安装插件" class="headerlink" title="安装插件"></a>安装插件</h4><p>系统管理 - 插件管理 可以安装插件,建议安装</p>
+<ul>
+<li>Git Server Plugin  </li>
+<li>Git Client Plugin  </li>
+<li>fir-plugin  （安装教程看 <a href="http://www.jianshu.com/p/9a245918a219）" target="_blank" rel="noopener">http://www.jianshu.com/p/9a245918a219）</a></li>
+<li>Xcode integration</li>
+<li>Keychains and Provisioning Profiles Management</li>
+</ul>
+<p>下面我们就会用上这些插件</p>
+<h4 id="新建一个Job"><a href="#新建一个Job" class="headerlink" title="新建一个Job"></a>新建一个Job</h4><p><img src="https://raw.githubusercontent.com/Arc-lin/BlogImage/master/999.png" alt=""></p>
+<p>进行一系列配置<br>设置包的保留天数还有天数。</p>
+<p><img src="https://raw.githubusercontent.com/Arc-lin/BlogImage/master/1001.png" alt=""></p>
+<p>源码管理</p>
+<p><img src="https://raw.githubusercontent.com/Arc-lin/BlogImage/master/1002.png" alt=""></p>
+<p>要先配置SSH Key，在Jenkins的证书管理中添加SSH。在Jenkins管理页面，选择“Credentials”，然后选择“Global credentials (unrestricted)”，点击“Add Credentials”，如下图所示，我们填写自己的SSH信息，然后点击“Save”，这样就把SSH添加到Jenkins的全局域中去了。</p>
+<p><img src="http://upload-images.jianshu.io/upload_images/1194012-6d1b6f56e4dac318.png?imageMogr2/auto-orient/strip%7CimageView2/2/w/1240" alt=""></p>
+<p>构建触发器<br>构建触发器设置这里是设置自动化测试的地方。这里涉及的内容很多，暂时我也没有深入研究，这里暂时先不设置。有自动化测试需求的可以好好研究研究这里的设置。</p>
+<p>不过这里有两个配置还是需要是配置的</p>
+<p>Poll SCM (poll source code management) 轮询源码管理<br>需要设置源码的路径才能起到轮询的效果。一般设置为类似结果： 0/5 每5分钟轮询一次<br>Build periodically (定时build)<br>一般设置为类似： 00 20 * 每天 20点执行定时build 。当然两者的设置都是一样可以通用的。</p>
+<p>格式是这样的</p>
+<p>分钟(0-59) 小时(0-23) 日期(1-31) 月(1-12) 周几(0-7,0和7都是周日)</p>
+<p>例如 <code>H/10 * * * *</code> 就是每十分钟一次</p>
+<h4 id="构建环境"><a href="#构建环境" class="headerlink" title="构建环境"></a>构建环境</h4><p>iOS打包需要签名文件和证书，所以这部分我们勾选“Keychains and Code Signing Identities”和“Mobile Provisioning Profiles”。</p>
+<p>在这之前</p>
+<p>在系统设置中进入Keychains and Provisioning Profiles Management页面，点击“浏览”按钮，分别上传自己的keychain和证书（是这里需要的Keychain，并不是cer证书文件。这个Keychain其实在/Users/管理员用户名/Library/keychains/login.keychain,当把这个Keychain设置好了之后，Jenkins会把这个Keychain拷贝到/Users/Shared/Jenkins/Library/keychains这里，(Library是隐藏文件)。Provisioning Profiles文件也直接拷贝到/Users/Shared/Jenkins/Library/MobileDevice文件目录下）。上传成功后，我们再为keychain指明签名文件的名称。点击“Add Code Signing Identity”，最后添加成功后如下图所示</p>
+<p><img src="https://raw.githubusercontent.com/Arc-lin/BlogImage/master/1003.png" alt=""></p>
+<p>password 填写你的用户密码</p>
+<p>Code Signing Identity 的内容来源是这里</p>
+<p><img src="https://wiki.jenkins-ci.org/download/attachments/68386839/codesigning_Key_1.png?version=1&amp;modificationDate=1375867279000" alt=""></p>
+<p><img src="https://wiki.jenkins-ci.org/download/attachments/68386839/codesigning_Key_2.png?version=2&amp;modificationDate=1375868440000" alt=""></p>
+<p>Provision Profiles Directory Path 的内容填上</p>
+<p><code>/Users/Shared/Jenkins/Library/MobileDevice</code></p>
+<p><img src="https://wiki.jenkins-ci.org/download/attachments/68386839/Screen+Shot+2013-08-07+at+14.17.05.png?version=1&amp;modificationDate=1375877888000" alt=""></p>
+<p>回到项目配置</p>
+<p>这样子填写</p>
+<p><img src="https://raw.githubusercontent.com/Arc-lin/BlogImage/master/1004.png" alt=""></p>
+<h4 id="构建"><a href="#构建" class="headerlink" title="构建"></a>构建</h4><p>点击”增加构建步骤”,先后选择 XCode 和 Execute Shell</p>
+<p>XCode 配置如下</p>
+<p><img src="https://raw.githubusercontent.com/Arc-lin/BlogImage/master/1005.png" alt=""><br><img src="https://raw.githubusercontent.com/Arc-lin/BlogImage/master/1006.png" alt=""><br><img src="https://raw.githubusercontent.com/Arc-lin/BlogImage/master/1007.png" alt=""></p>
+<p>Execute Shell 只要写入这个命令就好</p>
+<p><code>fir publish /Users/Arclin/.jenkins/workspace/TestJenkins/build/TestJenkins.ipa --token=你的fir.im Token</code></p>
+<p>如果没安装 fir 命令行工具的话</p>
+<p>用<code>gem install fir-cli</code> 安装<br>如果发现问题就看这里</p>
+<p><img src="https://raw.githubusercontent.com/Arc-lin/BlogImage/master/1008.png" alt=""></p>
+<p>然后保存回到Jenkins项目首页，点击立即构建，然后如果成功的话就会像下图那样子</p>
+<p><img src="https://raw.githubusercontent.com/Arc-lin/BlogImage/master/1009.png" alt=""></p>
+<p><img src="https://raw.githubusercontent.com/Arc-lin/BlogImage/master/1010.png" alt=""></p>
+<p>每隔一个触发器设定的时间，他就会检查一下 git 上面的代码，如果有发现更新就会自动 pull然后打包并上传到 fir.im</p>
+<p>结束</p>
+
+      
+    </div>
+
+    
+
+    
+    
+    
+
+    
+
+    
+
+    
+
+    <footer class="post-footer">
+      
+        <div class="post-tags">
+          
+            <a href="/tags/Jenkins/" rel="tag"># Jenkins</a>
+          
+            <a href="/tags/Git/" rel="tag"># Git</a>
+          
+            <a href="/tags/CocoaPods/" rel="tag"># CocoaPods</a>
+          
+            <a href="/tags/Fir/" rel="tag"># Fir</a>
+          
+        </div>
+      
+
+      
+      
+      
+
+      
+        <div class="post-nav">
+          <div class="post-nav-next post-nav-item">
+            
+              <a href="/2017/01/24/cjepirh910000azfyqgxoiu2x.html" rel="next" title="2016-Dankal-iOS-MySummary">
+                <i class="fa fa-chevron-left"></i> 2016-Dankal-iOS-MySummary
+              </a>
+            
+          </div>
+
+          <span class="post-nav-divider"></span>
+
+          <div class="post-nav-prev post-nav-item">
+            
+              <a href="/2017/02/14/cjepirhb7003iazfyfimaldrl.html" rel="prev" title="一句ipack命令解决iOS编译打包上传fir流程">
+                一句ipack命令解决iOS编译打包上传fir流程 <i class="fa fa-chevron-right"></i>
+              </a>
+            
+          </div>
+        </div>
+      
+
+      
+      
+    </footer>
+  </div>
+  
+  
+  
+  </article>
+
+
+
+    <div class="post-spread">
+      
+    </div>
+  </div>
+
+
+          </div>
+          
+
+  
+
+
+
+        </div>
+        
+          
+  
+  <div class="sidebar-toggle">
+    <div class="sidebar-toggle-line-wrap">
+      <span class="sidebar-toggle-line sidebar-toggle-line-first"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-middle"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-last"></span>
+    </div>
+  </div>
+
+  <aside id="sidebar" class="sidebar">
+    
+    <div class="sidebar-inner">
+
+      
+
+      
+        <ul class="sidebar-nav motion-element">
+          <li class="sidebar-nav-toc sidebar-nav-active" data-target="post-toc-wrap">
+            文章目录
+          </li>
+          <li class="sidebar-nav-overview" data-target="site-overview-wrap">
+            站点概览
+          </li>
+        </ul>
+      
+
+      <section class="site-overview-wrap sidebar-panel">
+        <div class="site-overview">
+          <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+            
+              <img class="site-author-image" itemprop="image"
+                src="https://i.loli.net/2018/02/16/5a86f3783f0d9.jpg"
+                alt="Arclin" />
+            
+              <p class="site-author-name" itemprop="name">Arclin</p>
+              <p class="site-description motion-element" itemprop="description">I am a developer from China</p>
+          </div>
+
+          
+            <nav class="site-state motion-element">
+              
+                <div class="site-state-item site-state-posts">
+                
+                  <a href="/archives/">
+                
+                    <span class="site-state-item-count">62</span>
+                    <span class="site-state-item-name">日志</span>
+                  </a>
+                </div>
+              
+
+              
+                
+                
+                <div class="site-state-item site-state-categories">
+                  <a href="/categories/index.html">
+                    
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                    <span class="site-state-item-count">10</span>
+                    <span class="site-state-item-name">分类</span>
+                  </a>
+                </div>
+              
+
+              
+                
+                
+                <div class="site-state-item site-state-tags">
+                  <a href="/tags/index.html">
+                    
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                    <span class="site-state-item-count">35</span>
+                    <span class="site-state-item-name">标签</span>
+                  </a>
+                </div>
+              
+            </nav>
+          
+
+          
+            <div class="feed-link motion-element">
+              <a href="/atom.xml" rel="alternate">
+                <i class="fa fa-rss"></i>
+                RSS
+              </a>
+            </div>
+          
+
+          
+
+          
+          
+
+          
+          
+
+          
+            
+          
+          
+
+        </div>
+      </section>
+
+      
+      <!--noindex-->
+        <section class="post-toc-wrap motion-element sidebar-panel sidebar-panel-active">
+          <div class="post-toc">
+
+            
+              
+            
+
+            
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-3"><a class="nav-link" href="#安装-Jenkins"><span class="nav-number">1.</span> <span class="nav-text">安装 Jenkins</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#JDK"><span class="nav-number">1.1.</span> <span class="nav-text">JDK</span></a></li></ol></li><li class="nav-item nav-level-3"><a class="nav-link" href="#启动-Jenkins"><span class="nav-number">2.</span> <span class="nav-text">启动 Jenkins</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#配置Xcode项目"><span class="nav-number">3.</span> <span class="nav-text">配置Xcode项目</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#上传到Git"><span class="nav-number">4.</span> <span class="nav-text">上传到Git</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#配置-Jenkins"><span class="nav-number">5.</span> <span class="nav-text">配置 Jenkins</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#安装插件"><span class="nav-number">5.1.</span> <span class="nav-text">安装插件</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#新建一个Job"><span class="nav-number">5.2.</span> <span class="nav-text">新建一个Job</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#构建环境"><span class="nav-number">5.3.</span> <span class="nav-text">构建环境</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#构建"><span class="nav-number">5.4.</span> <span class="nav-text">构建</span></a></li></ol></li></ol></div>
+            
+
+          </div>
+        </section>
+      <!--/noindex-->
+      
+
+      
+
+    </div>
+  </aside>
+
+
+        
+      </div>
+    </main>
+
+    <footer id="footer" class="footer">
+      <div class="footer-inner">
+        <div class="copyright">&copy; <span itemprop="copyrightYear">2018</span>
+  <span class="with-love">
+    <i class="fa fa-user"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">Arclin</span>
+
+  
+
+  
+</div>
+
+
+  
+
+
+
+  <div class="powered-by">由 <a class="theme-link" target="_blank" rel="external nofollow" href="https://hexo.io">Hexo</a> 强力驱动</div>
+
+
+
+  <span class="post-meta-divider">|</span>
+
+
+
+  <div class="theme-info">主题 &mdash; <a class="theme-link" target="_blank" rel="external nofollow" href="https://github.com/theme-next/hexo-theme-next">NexT.Muse</a> v6.0.4</div>
+
+
+
+<p>Hosted by <a href="https://pages.coding.me" style="font-weight: bold">Coding Pages</a></p>
+
+        
+
+
+
+
+
+
+
+
+        
+      </div>
+    </footer>
+
+    
+      <div class="back-to-top">
+        <i class="fa fa-arrow-up"></i>
+        
+      </div>
+    
+
+    
+
+  </div>
+
+  
+
+<script type="text/javascript">
+  if (Object.prototype.toString.call(window.Promise) !== '[object Function]') {
+    window.Promise = null;
+  }
+</script>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+    <script type="text/javascript" src="/lib/jquery/index.js?v=2.1.3"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/velocity/velocity.min.js?v=1.2.1"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/velocity/velocity.ui.min.js?v=1.2.1"></script>
+  
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/utils.js?v=6.0.4"></script>
+
+  <script type="text/javascript" src="/js/src/motion.js?v=6.0.4"></script>
+
+
+
+  
+  
+
+  
+  <script type="text/javascript" src="/js/src/scrollspy.js?v=6.0.4"></script>
+<script type="text/javascript" src="/js/src/post-details.js?v=6.0.4"></script>
+
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/bootstrap.js?v=6.0.4"></script>
+
+
+
+  
+
+
+
+	
+
+
+
+
+
+  
+
+
+
+
+
+  
+
+
+
+
+
+
+
+
+
+
+  
+
+  <script type="text/javascript">
+    // Popup Window;
+    var isfetched = false;
+    var isXml = true;
+    // Search DB path;
+    var search_path = "search.xml";
+    if (search_path.length === 0) {
+      search_path = "search.xml";
+    } else if (/json$/i.test(search_path)) {
+      isXml = false;
+    }
+    var path = "/" + search_path;
+    // monitor main search box;
+
+    var onPopupClose = function (e) {
+      $('.popup').hide();
+      $('#local-search-input').val('');
+      $('.search-result-list').remove();
+      $('#no-result').remove();
+      $(".local-search-pop-overlay").remove();
+      $('body').css('overflow', '');
+    }
+
+    function proceedsearch() {
+      $("body")
+        .append('<div class="search-popup-overlay local-search-pop-overlay"></div>')
+        .css('overflow', 'hidden');
+      $('.search-popup-overlay').click(onPopupClose);
+      $('.popup').toggle();
+      var $localSearchInput = $('#local-search-input');
+      $localSearchInput.attr("autocapitalize", "none");
+      $localSearchInput.attr("autocorrect", "off");
+      $localSearchInput.focus();
+    }
+
+    // search function;
+    var searchFunc = function(path, search_id, content_id) {
+      'use strict';
+
+      // start loading animation
+      $("body")
+        .append('<div class="search-popup-overlay local-search-pop-overlay">' +
+          '<div id="search-loading-icon">' +
+          '<i class="fa fa-spinner fa-pulse fa-5x fa-fw"></i>' +
+          '</div>' +
+          '</div>')
+        .css('overflow', 'hidden');
+      $("#search-loading-icon").css('margin', '20% auto 0 auto').css('text-align', 'center');
+
+      
+
+      $.ajax({
+        url: path,
+        dataType: isXml ? "xml" : "json",
+        async: true,
+        success: function(res) {
+          // get the contents from search data
+          isfetched = true;
+          $('.popup').detach().appendTo('.header-inner');
+          var datas = isXml ? $("entry", res).map(function() {
+            return {
+              title: $("title", this).text(),
+              content: $("content",this).text(),
+              url: $("url" , this).text()
+            };
+          }).get() : res;
+          var input = document.getElementById(search_id);
+          var resultContent = document.getElementById(content_id);
+          var inputEventFunction = function() {
+            var searchText = input.value.trim().toLowerCase();
+            var keywords = searchText.split(/[\s\-]+/);
+            if (keywords.length > 1) {
+              keywords.push(searchText);
+            }
+            var resultItems = [];
+            if (searchText.length > 0) {
+              // perform local searching
+              datas.forEach(function(data) {
+                var isMatch = false;
+                var hitCount = 0;
+                var searchTextCount = 0;
+                var title = data.title.trim();
+                var titleInLowerCase = title.toLowerCase();
+                var content = data.content.trim().replace(/<[^>]+>/g,"");
+                
+                var contentInLowerCase = content.toLowerCase();
+                var articleUrl = decodeURIComponent(data.url);
+                var indexOfTitle = [];
+                var indexOfContent = [];
+                // only match articles with not empty titles
+                if(title != '') {
+                  keywords.forEach(function(keyword) {
+                    function getIndexByWord(word, text, caseSensitive) {
+                      var wordLen = word.length;
+                      if (wordLen === 0) {
+                        return [];
+                      }
+                      var startPosition = 0, position = [], index = [];
+                      if (!caseSensitive) {
+                        text = text.toLowerCase();
+                        word = word.toLowerCase();
+                      }
+                      while ((position = text.indexOf(word, startPosition)) > -1) {
+                        index.push({position: position, word: word});
+                        startPosition = position + wordLen;
+                      }
+                      return index;
+                    }
+
+                    indexOfTitle = indexOfTitle.concat(getIndexByWord(keyword, titleInLowerCase, false));
+                    indexOfContent = indexOfContent.concat(getIndexByWord(keyword, contentInLowerCase, false));
+                  });
+                  if (indexOfTitle.length > 0 || indexOfContent.length > 0) {
+                    isMatch = true;
+                    hitCount = indexOfTitle.length + indexOfContent.length;
+                  }
+                }
+
+                // show search results
+
+                if (isMatch) {
+                  // sort index by position of keyword
+
+                  [indexOfTitle, indexOfContent].forEach(function (index) {
+                    index.sort(function (itemLeft, itemRight) {
+                      if (itemRight.position !== itemLeft.position) {
+                        return itemRight.position - itemLeft.position;
+                      } else {
+                        return itemLeft.word.length - itemRight.word.length;
+                      }
+                    });
+                  });
+
+                  // merge hits into slices
+
+                  function mergeIntoSlice(text, start, end, index) {
+                    var item = index[index.length - 1];
+                    var position = item.position;
+                    var word = item.word;
+                    var hits = [];
+                    var searchTextCountInSlice = 0;
+                    while (position + word.length <= end && index.length != 0) {
+                      if (word === searchText) {
+                        searchTextCountInSlice++;
+                      }
+                      hits.push({position: position, length: word.length});
+                      var wordEnd = position + word.length;
+
+                      // move to next position of hit
+
+                      index.pop();
+                      while (index.length != 0) {
+                        item = index[index.length - 1];
+                        position = item.position;
+                        word = item.word;
+                        if (wordEnd > position) {
+                          index.pop();
+                        } else {
+                          break;
+                        }
+                      }
+                    }
+                    searchTextCount += searchTextCountInSlice;
+                    return {
+                      hits: hits,
+                      start: start,
+                      end: end,
+                      searchTextCount: searchTextCountInSlice
+                    };
+                  }
+
+                  var slicesOfTitle = [];
+                  if (indexOfTitle.length != 0) {
+                    slicesOfTitle.push(mergeIntoSlice(title, 0, title.length, indexOfTitle));
+                  }
+
+                  var slicesOfContent = [];
+                  while (indexOfContent.length != 0) {
+                    var item = indexOfContent[indexOfContent.length - 1];
+                    var position = item.position;
+                    var word = item.word;
+                    // cut out 100 characters
+                    var start = position - 20;
+                    var end = position + 80;
+                    if(start < 0){
+                      start = 0;
+                    }
+                    if (end < position + word.length) {
+                      end = position + word.length;
+                    }
+                    if(end > content.length){
+                      end = content.length;
+                    }
+                    slicesOfContent.push(mergeIntoSlice(content, start, end, indexOfContent));
+                  }
+
+                  // sort slices in content by search text's count and hits' count
+
+                  slicesOfContent.sort(function (sliceLeft, sliceRight) {
+                    if (sliceLeft.searchTextCount !== sliceRight.searchTextCount) {
+                      return sliceRight.searchTextCount - sliceLeft.searchTextCount;
+                    } else if (sliceLeft.hits.length !== sliceRight.hits.length) {
+                      return sliceRight.hits.length - sliceLeft.hits.length;
+                    } else {
+                      return sliceLeft.start - sliceRight.start;
+                    }
+                  });
+
+                  // select top N slices in content
+
+                  var upperBound = parseInt('1');
+                  if (upperBound >= 0) {
+                    slicesOfContent = slicesOfContent.slice(0, upperBound);
+                  }
+
+                  // highlight title and content
+
+                  function highlightKeyword(text, slice) {
+                    var result = '';
+                    var prevEnd = slice.start;
+                    slice.hits.forEach(function (hit) {
+                      result += text.substring(prevEnd, hit.position);
+                      var end = hit.position + hit.length;
+                      result += '<b class="search-keyword">' + text.substring(hit.position, end) + '</b>';
+                      prevEnd = end;
+                    });
+                    result += text.substring(prevEnd, slice.end);
+                    return result;
+                  }
+
+                  var resultItem = '';
+
+                  if (slicesOfTitle.length != 0) {
+                    resultItem += "<li><a href='" + articleUrl + "' class='search-result-title'>" + highlightKeyword(title, slicesOfTitle[0]) + "</a>";
+                  } else {
+                    resultItem += "<li><a href='" + articleUrl + "' class='search-result-title'>" + title + "</a>";
+                  }
+
+                  slicesOfContent.forEach(function (slice) {
+                    resultItem += "<a href='" + articleUrl + "'>" +
+                      "<p class=\"search-result\">" + highlightKeyword(content, slice) +
+                      "...</p>" + "</a>";
+                  });
+
+                  resultItem += "</li>";
+                  resultItems.push({
+                    item: resultItem,
+                    searchTextCount: searchTextCount,
+                    hitCount: hitCount,
+                    id: resultItems.length
+                  });
+                }
+              })
+            };
+            if (keywords.length === 1 && keywords[0] === "") {
+              resultContent.innerHTML = '<div id="no-result"><i class="fa fa-search fa-5x" /></div>'
+            } else if (resultItems.length === 0) {
+              resultContent.innerHTML = '<div id="no-result"><i class="fa fa-frown-o fa-5x" /></div>'
+            } else {
+              resultItems.sort(function (resultLeft, resultRight) {
+                if (resultLeft.searchTextCount !== resultRight.searchTextCount) {
+                  return resultRight.searchTextCount - resultLeft.searchTextCount;
+                } else if (resultLeft.hitCount !== resultRight.hitCount) {
+                  return resultRight.hitCount - resultLeft.hitCount;
+                } else {
+                  return resultRight.id - resultLeft.id;
+                }
+              });
+              var searchResultList = '<ul class=\"search-result-list\">';
+              resultItems.forEach(function (result) {
+                searchResultList += result.item;
+              })
+              searchResultList += "</ul>";
+              resultContent.innerHTML = searchResultList;
+            }
+          }
+
+          if ('auto' === 'auto') {
+            input.addEventListener('input', inputEventFunction);
+          } else {
+            $('.search-icon').click(inputEventFunction);
+            input.addEventListener('keypress', function (event) {
+              if (event.keyCode === 13) {
+                inputEventFunction();
+              }
+            });
+          }
+
+          // remove loading animation
+          $(".local-search-pop-overlay").remove();
+          $('body').css('overflow', '');
+
+          proceedsearch();
+        }
+      });
+    }
+
+    // handle and trigger popup window;
+    $('.popup-trigger').click(function(e) {
+      e.stopPropagation();
+      if (isfetched === false) {
+        searchFunc(path, 'local-search-input', 'local-search-result');
+      } else {
+        proceedsearch();
+      };
+    });
+
+    $('.popup-btn-close').click(onPopupClose);
+    $('.popup').click(function(e){
+      e.stopPropagation();
+    });
+    $(document).on('keyup', function (event) {
+      var shouldDismissSearchPopup = event.which === 27 &&
+        $('.search-popup').is(':visible');
+      if (shouldDismissSearchPopup) {
+        onPopupClose();
+      }
+    });
+  </script>
+
+
+
+
+  
+  
+  
+  <link rel="stylesheet" href="/lib/algolia-instant-search/instantsearch.min.css">
+
+  
+  
+  <script src="/lib/algolia-instant-search/instantsearch.min.js"></script>
+  
+
+  <script src="/js/src/algolia-search.js?v=6.0.4"></script>
+
+
+
+  
+
+  
+
+  
+<script>
+(function(){
+    var bp = document.createElement('script');
+    var curProtocol = window.location.protocol.split(':')[0];
+    if (curProtocol === 'https') {
+        bp.src = 'https://zz.bdstatic.com/linksubmit/push.js';        
+    }
+    else {
+        bp.src = 'http://push.zhanzhang.baidu.com/push.js';
+    }
+    var s = document.getElementsByTagName("script")[0];
+    s.parentNode.insertBefore(bp, s);
+})();
+</script>
+
+
+  
+
+  
+  
+
+  
+
+  
+
+  
+
+  
+
+</body>
+</html>
