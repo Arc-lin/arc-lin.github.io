@@ -1,3 +1,4 @@
+---
 title: Express学习笔记
 author: Arclin
 tags:
@@ -5,6 +6,7 @@ tags:
   - Express
 categories:
   - Node.js
+abbrlink: dcb90c85
 date: 2017-03-07 00:00:00
 ---
 Express 是 Node.js 的一个轻量级web框架,目前使用EJS模板引擎,该笔记持续更新

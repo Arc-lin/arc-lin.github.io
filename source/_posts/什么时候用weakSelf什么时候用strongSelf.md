@@ -1,9 +1,11 @@
+---
 title: 什么时候用weakSelf什么时候用strongSelf
 author: Arclin
 tags:
   - iOS
 categories:
   - iOS
+abbrlink: f9b1d95c
 date: 2016-10-17 00:00:00
 ---
 #### 什么时候用weakSelf 什么时候用 strongSelf

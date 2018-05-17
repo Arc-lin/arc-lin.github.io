@@ -1,3 +1,4 @@
+---
 title: 基于DKHTTPTool的业务层设计_尝试版
 author: Arclin
 tags:
@@ -5,6 +6,7 @@ tags:
   - 杂谈
 categories:
   - iOS
+abbrlink: 838ddddd
 date: 2016-11-30 00:00:00
 ---
 基于DKHTTPTool的业务层设计_尝试版

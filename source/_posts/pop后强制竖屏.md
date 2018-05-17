@@ -1,9 +1,11 @@
+---
 title: pop后强制竖屏
 author: Arclin
 tags:
   - iOS
 categories:
   - iOS
+abbrlink: 50c5f6e6
 date: 2016-10-17 00:00:00
 ---
 pop之后强制竖屏

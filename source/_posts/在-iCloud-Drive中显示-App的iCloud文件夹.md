@@ -1,9 +1,11 @@
+---
 title: 在 iCloud Drive中显示 App的iCloud文件夹
 author: Arclin
 tags:
   - iOS
 categories:
   - iOS
+abbrlink: 3eb7dc04
 date: 2016-10-29 00:00:00
 ---
 1. 修改 info.plist

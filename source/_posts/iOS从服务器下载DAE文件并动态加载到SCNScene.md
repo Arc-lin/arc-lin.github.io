@@ -1,3 +1,4 @@
+---
 title: iOS从服务器下载DAE文件并动态加载到SCNScene
 author: Arclin
 tags:
@@ -6,6 +7,7 @@ tags:
   - ''
 categories:
   - iOS
+abbrlink: 8c9c88ab
 date: 2017-02-23 00:00:00
 ---
 ViewController 已有 SCNScene,怎么从服务器下载3D模型文件(DAE)然后加载到这个 SCNScene呢？

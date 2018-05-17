@@ -1,9 +1,11 @@
+---
 title: ' UISplitViewController在竖屏情况下叫出PopoverView后Dissmiss崩溃的问题'
 author: Arclin
 tags:
   - iOS
 categories:
   - iOS
+abbrlink: 1787ee1c
 date: 2016-11-09 00:00:00
 ---
 UISplitViewController在竖屏情况下叫出PopoverView后Dissmiss崩溃

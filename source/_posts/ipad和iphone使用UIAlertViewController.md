@@ -1,9 +1,11 @@
+---
 title: ipad和iphone使用UIAlertViewController
 author: Arclin
 tags:
   - iOS
 categories:
   - iOS
+abbrlink: f0080c3e
 date: 2016-10-17 00:00:00
 ---
 ipad和iphone使用UIAlertViewController

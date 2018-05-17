@@ -1,3 +1,4 @@
+---
 title: WordPress常用函数
 author: Arclin
 tags:
@@ -5,6 +6,7 @@ tags:
   - WordPress
 categories:
   - PHP
+abbrlink: 3fd5c9ca
 date: 2017-03-02 00:00:00
 ---
 wordpress自定义主题的时候需要用到的函数

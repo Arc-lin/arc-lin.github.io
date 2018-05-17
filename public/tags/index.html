@@ -84,8 +84,8 @@
     tabs: true,
     motion: {"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},
     algolia: {
-      applicationID: 'USBZY31VMT',
-      apiKey: '67e7b7406e3edb5a9bd8f027abc764b7',
+      applicationID: 'ZRNFMXOCY7',
+      apiKey: 'cae95980d347cc7eb6b0784e1b0a7664',
       indexName: 'indexName',
       hits: {"per_page":10},
       labels: {"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}
@@ -110,7 +110,7 @@
 <meta property="og:site_name" content="Arclin">
 <meta property="og:description" content="I am a developer from China">
 <meta property="og:locale" content="zh-Hans">
-<meta property="og:updated_time" content="2018-02-16T15:44:05.095Z">
+<meta property="og:updated_time" content="2018-05-11T06:34:31.133Z">
 <meta name="twitter:card" content="summary">
 <meta name="twitter:title" content="标签">
 <meta name="twitter:description" content="I am a developer from China">
@@ -497,18 +497,6 @@
           </div>
           
 
-  
-    <div class="comments" id="comments">
-      
-        <div onclick="showGitment()" id="gitment-display-button">显示 Gitment 评论</div>
-        <div id="gitment-container" style="display:none"></div>
-      
-    </div>
-
-  
-
-
-
         </div>
         
           
@@ -548,7 +536,7 @@
                 
                   <a href="/archives/">
                 
-                    <span class="site-state-item-count">63</span>
+                    <span class="site-state-item-count">64</span>
                     <span class="site-state-item-name">日志</span>
                   </a>
                 </div>
@@ -874,34 +862,6 @@
 
     
 
-    
-      <script type="text/javascript">
-      function renderGitment(){
-        var gitment = new Gitmint({
-            id: window.location.pathname,
-            owner: 'Arc-lin',
-            repo: 'Gitment',
-            
-            lang: "" || navigator.language || navigator.systemLanguage || navigator.userLanguage,
-            
-            oauth: {
-            
-            
-                client_secret: 'b7090ad76c587dc233feea0c639f059a37c4a187# EITHER this or proxy_gateway, Github access secret token for the Gitment',
-            
-                client_id: 'df6d1f33bb4a66f5fa60# MUST HAVE, Github client id for the Gitment'
-            }});
-        gitment.render('gitment-container');
-      }
-
-      
-      function showGitment(){
-        document.getElementById("gitment-display-button").style.display = "none";
-        document.getElementById("gitment-container").style.display = "block";
-        renderGitment();
-      }
-      
-      </script>
     
 
 

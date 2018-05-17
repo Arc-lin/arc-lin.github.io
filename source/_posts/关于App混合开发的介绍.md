@@ -1,3 +1,4 @@
+---
 title: 关于App混合开发的介绍
 author: Arclin
 tags:
@@ -8,6 +9,7 @@ tags:
   - HTML5+
 categories:
   - 杂谈
+abbrlink: b179ff40
 date: 2017-03-14 00:00:00
 ---
 ![](https://ooo.0o0.ooo/2017/03/14/58c75bfb373da.png)

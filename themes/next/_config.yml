@@ -492,13 +492,10 @@ gitment:
   count: true # Show comments count in post meta area
   lazy: true # Comments lazy loading with a button
   cleanly: false # Hide 'Powered by ...' on footer, and more
-  language: # Force language, or auto switch by theme
-  github_user: Arc-lin # MUST HAVE, Your Github Username
-  github_repo: Gitment # MUST HAVE, The name of the repo you use to store Gitment comments
-  client_id: df6d1f33bb4a66f5fa60# MUST HAVE, Github client id for the Gitment
-  client_secret: b7090ad76c587dc233feea0c639f059a37c4a187# EITHER this or proxy_gateway, Github access secret token for the Gitment
-  proxy_gateway: # Address of api proxy, See: https://github.com/aimingoo/intersect
-  redirect_protocol: # Protocol of redirect_uri with force_redirect_protocol when mint enabled
+  github_user: Arc-lin
+  github_repo: Gitment
+  client_id: df6d1f33bb4a66f5fa60
+  client_secret: b7090ad76c587dc233feea0c639f059a37c4a187
 
 # Baidu Share
 # Available value:

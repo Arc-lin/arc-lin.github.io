@@ -1,3 +1,4 @@
+---
 title: 一句ipack命令解决iOS编译打包上传fir流程
 author: Arclin
 tags:
@@ -5,6 +6,7 @@ tags:
   - shell
 categories:
   - iOS
+abbrlink: 4edc914d
 date: 2017-02-14 00:00:00
 ---
 一行命令即可将包含 cocoapods 的iOS 项目编译打包并上传到 fir

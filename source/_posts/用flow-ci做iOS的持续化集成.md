@@ -1,3 +1,4 @@
+---
 title: 用flow.ci做iOS的持续化集成
 author: Arclin
 tags:
@@ -5,6 +6,7 @@ tags:
   - iOS
 categories:
   - iOS
+abbrlink: 2281692e
 date: 2017-02-24 00:00:00
 ---
 听说flow.ci上线公测了,赶紧拿着一把限时免费资格玩一玩体验一下.

@@ -16,9 +16,13 @@ favicon: favicon.ico
 ## If your site is put in a subdirectory, set url as 'http://yoursite.com/child' and root as '/child/'
 url: https://arclin.me
 root: /
-permalink: :year/:month/:day/:id.html
+permalink: post/:abbrlink.html
 permalink_defaults:
    lang: en
+
+abbrlink:
+  alg: crc32
+  rep: hex
 
 # Directory
 source_dir: source
@@ -96,8 +100,8 @@ search:
   limit: 10000
 
 algolia:
-  applicationID: 'USBZY31VMT'
-  apiKey: '67e7b7406e3edb5a9bd8f027abc764b7'
+  applicationID: 'ZRNFMXOCY7'
+  apiKey: 'cae95980d347cc7eb6b0784e1b0a7664'
   indexName: 'indexName'
   chunkSize: 5000
 
@@ -105,4 +109,7 @@ backup:
   type: git
   repo:
     github: git@git.coding.net:Arclin/arclin.me.git,backup
+
+sitemap:
+  path: sitemap.xml
     

@@ -1,9 +1,11 @@
+---
 title: iOS基于Navigation-Base-on-ViewModel的路由搭建——HOOK方式实现
 author: Arclin
 tags:
   - iOS
 categories:
   - iOS
+abbrlink: b111382b
 date: 2017-01-05 00:00:00
 ---
 本文主要讲述的是在 iOS 中使用 MVVM 架构开发的情况下，将 ViewModel 作为行为驱动主体，通过 Hook 的方式，设计一个 App 的路由层

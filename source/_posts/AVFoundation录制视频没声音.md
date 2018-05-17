@@ -1,9 +1,11 @@
+---
 title: AVFoundation录制视频没声音?
 author: Arclin
 tags:
   - iOS
 categories:
   - iOS
+abbrlink: efd905d7
 date: 2017-03-04 00:00:00
 ---
 先说结论 , 加一行代码 

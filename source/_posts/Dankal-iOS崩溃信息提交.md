@@ -1,9 +1,11 @@
+---
 title: Dankal_iOS崩溃信息提交
 author: Arclin
 tags:
   - iOS
 categories:
   - iOS
+abbrlink: afeed214
 date: 2016-11-01 00:00:00
 ---
 Dankal_iOS 崩溃信息提交

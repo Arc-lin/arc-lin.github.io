@@ -1,3 +1,4 @@
+---
 title: 使用RAC+DKHTTPTool实践
 author: Arclin
 tags:
@@ -5,6 +6,7 @@ tags:
   - Reactive Cocoa
 categories:
   - iOS
+abbrlink: 8d52056b
 date: 2016-12-26 00:00:00
 ---
 使用RAC+DKHTTP套件实践

@@ -1,8 +1,10 @@
+---
 title: ReactNative ListView flexWrap不起作用解决办法
 author: Arclin
 tags:
   - React Native
 categories: []
+abbrlink: 11785d19
 date: 2017-03-02 00:00:00
 ---
 `flexWrap:’wrap’ `作用是让超出页面的元素进行换行显示,但是在RN 0.28之后就发生了改变

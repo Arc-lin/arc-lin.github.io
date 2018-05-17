@@ -1,9 +1,11 @@
+---
 title: ReactNative网络请求
 author: Arclin
 tags:
   - React Native
 categories:
   - React Native
+abbrlink: b6bd206a
 date: 2017-03-15 00:00:00
 ---
 关于React Native 的网络请求的总结

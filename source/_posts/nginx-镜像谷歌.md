@@ -1,9 +1,11 @@
+---
 title: nginx 镜像谷歌
 author: Arclin
 tags:
   - nginx
 categories:
   - Linux
+abbrlink: a6a89073
 date: 2018-02-18 22:12:00
 ---
 nginx 镜像谷歌

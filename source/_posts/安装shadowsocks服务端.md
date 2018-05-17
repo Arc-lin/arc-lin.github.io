@@ -1,9 +1,11 @@
+---
 title: 安装shadowsocks服务端
 author: Arclin
 tags:
   - Shadowsocks
 categories:
   - Linux
+abbrlink: eb81866c
 date: 2018-02-18 22:15:00
 ---
 安装shadowsocks服务端

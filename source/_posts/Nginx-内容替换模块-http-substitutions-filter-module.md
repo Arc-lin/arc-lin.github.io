@@ -1,9 +1,11 @@
+---
 title: Nginx 内容替换模块 http_substitutions_filter_module
 author: Arclin
 tags:
   - nginx
 categories:
   - Linux
+abbrlink: e35ccdb6
 date: 2018-02-18 22:16:00
 ---
 在镜像了某个网站之后,想要改变这个网站上某些元素的显示内容, 这是我们可以使用nginx的一个第三方模块`http_substitutions_filter_module`

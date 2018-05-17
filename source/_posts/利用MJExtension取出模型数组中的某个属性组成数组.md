@@ -1,9 +1,11 @@
+---
 title: 利用MJExtension取出模型数组中的某个属性组成数组
 author: Arclin
 tags:
   - iOS
 categories:
   - iOS
+abbrlink: 8e2ebfdf
 date: 2016-10-17 00:00:00
 ---
 利用MJExtension取出模型数组中的某个属性组成数组

@@ -1,3 +1,4 @@
+---
 title: Jenkins+Git+CocoaPods+Fir.im实现iOS应用持续集成
 author: Arclin
 tags:
@@ -7,6 +8,7 @@ tags:
   - Fir
 categories:
   - iOS
+abbrlink: 13ecfb47
 date: 2017-02-08 00:00:00
 ---
 Jenkins 可以定时检测 Git 上的某个分支的代码，打包生成 ipa 后直接上传到 Fir.im

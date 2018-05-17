@@ -1,9 +1,11 @@
+---
 title: MongoDB笔记
 author: Arclin
 tags:
   - MongoDB
 categories:
   - MongoDB
+abbrlink: b3b38c86
 date: 2018-02-18 21:58:00
 ---
 MongoDB笔记

@@ -1,9 +1,11 @@
+---
 title: 记录一些关于iOS的一些小技巧
 author: Arclin
 tags:
   - iOS
 categories:
   - iOS
+abbrlink: 1b8f24c7
 date: 2016-06-12 00:30:00
 ---
 记录一些关于iOS的一些小技巧

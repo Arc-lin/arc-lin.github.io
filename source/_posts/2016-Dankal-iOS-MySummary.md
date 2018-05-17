@@ -1,3 +1,4 @@
+---
 title: 2016-Dankal-iOS-MySummary
 author: Arclin
 tags:
@@ -5,6 +6,7 @@ tags:
   - 杂谈
 categories:
   - iOS
+abbrlink: 61929cc2
 date: 2017-01-24 00:00:00
 ---
 总结2016在 Dankal 工作过程中学习到的东西

@@ -1,3 +1,4 @@
+---
 title: React Native真机运行
 author: Arclin
 tags:
@@ -5,6 +6,7 @@ tags:
   - iOS
 categories:
   - React Native
+abbrlink: 7724d1af
 date: 2017-03-08 00:00:00
 ---
 三步即可

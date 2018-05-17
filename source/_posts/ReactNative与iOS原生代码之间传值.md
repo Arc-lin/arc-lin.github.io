@@ -1,9 +1,11 @@
+---
 title: ReactNative与iOS原生代码之间传值
 author: Arclin
 tags:
   - React Native
 categories:
   - React Native
+abbrlink: a8a5ff12
 date: 2017-02-26 00:00:00
 ---
 本文包含两部分:

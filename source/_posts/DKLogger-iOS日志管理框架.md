@@ -1,9 +1,11 @@
+---
 title: DKLogger--iOS日志管理框架
 author: Arclin
 tags:
   - iOS
 categories:
   - iOS
+abbrlink: abce56f1
 date: 2017-02-23 00:00:00
 ---
 用于管理iOS的Log信息的框架

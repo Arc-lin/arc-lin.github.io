@@ -1,3 +1,4 @@
+---
 title: RACCommand使用注意
 author: Arclin
 tags:
@@ -5,6 +6,7 @@ tags:
   - Reactive Cocoa
 categories:
   - iOS
+abbrlink: 79533f9e
 date: 2016-10-17 00:00:00
 ---
 RACCommand使用注意

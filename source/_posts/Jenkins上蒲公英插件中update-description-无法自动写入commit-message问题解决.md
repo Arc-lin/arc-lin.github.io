@@ -4,9 +4,10 @@ tags:
   - Jenkins
 categories:
   - Jenkins
+abbrlink: 5fcbb764
 date: 2018-05-10 10:46:00
 ---
-花了一天时间解决这个问题，找了好多资料都找到，最后终于想到了办法。
+花了一天时间解决这个问题，找了好多资料都没找到，最后终于想到了办法。
 <!--more-->
 
 ### 背景
@@ -43,4 +44,3 @@ curl -F "file=@${IPANAME}" -F "uKey=USER_KEY" -F "_api_key=API_KEY" -F "updateDe
 
 
 就这样子就可以了，就是把message写到文件中，然后通过文件注入环境变量，然后蒲公英插件再去用就行了。
-

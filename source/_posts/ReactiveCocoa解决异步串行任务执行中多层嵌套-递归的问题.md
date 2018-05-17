@@ -1,3 +1,4 @@
+---
 title: ReactiveCocoa解决异步串行任务执行中多层嵌套/递归的问题
 author: Arclin
 tags:
@@ -5,6 +6,7 @@ tags:
   - Reactive Cocoa
 categories:
   - iOS
+abbrlink: 5f5664e4
 date: 2017-03-20 00:00:00
 ---
 

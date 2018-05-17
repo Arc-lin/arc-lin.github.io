@@ -1,9 +1,11 @@
+---
 title: RAC关于cell上的按钮点击后会重复发送信号的问题
 author: Arclin
 tags:
   - iOS
 categories:
   - iOS
+abbrlink: 452efb32
 date: 2016-10-17 00:00:00
 ---
 关于cell上的按钮点击后会重复发送信号的问题

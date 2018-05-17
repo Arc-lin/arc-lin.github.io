@@ -1,9 +1,11 @@
+---
 title: 使用DKHTTPTool时的异常处理
 author: Arclin
 tags:
   - iOS
 categories:
   - iOS
+abbrlink: 7daccd39
 date: 2017-01-05 00:00:00
 ---
 本文主要讲述的是在使用 DKHTTPTool 时，返回异常数据时的处理

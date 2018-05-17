@@ -1,9 +1,11 @@
+---
 title: Node.js学习笔记
 author: Arclin
 tags:
   - Node.js
 categories:
   - Node.js
+abbrlink: 1aafa723
 date: 2017-03-06 00:00:00
 ---
 Node.js的学习笔记,持续更新

@@ -1,9 +1,11 @@
+---
 title: 给 APP添加外部文件导入功能
 author: Arclin
 tags:
   - iOS
 categories:
   - iOS
+abbrlink: d2301e87
 date: 2016-10-30 00:00:00
 ---
 给 APP添加外部文件导入功能

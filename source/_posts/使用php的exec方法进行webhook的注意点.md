@@ -1,3 +1,4 @@
+---
 title: 使用PHP进行webhook的注意点
 author: Arclin
 tags:
@@ -5,6 +6,7 @@ tags:
   - webhook
 categories:
   - PHP
+abbrlink: f8291fcc
 date: 2018-02-18 21:55:00
 ---
 有时会编写PHP脚本进行webhook, 这里有些地方需要注意一下, 否则会导致脚本执行失败

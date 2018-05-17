@@ -1,9 +1,11 @@
+---
 title: Vue学习笔记
 author: Arclin
 tags:
   - Vue.js
 categories:
   - 前端
+abbrlink: 71513ccb
 date: 2017-08-08 00:10:00
 ---
 Vue.js 是一个用于构建用户界面的渐进式前端框架

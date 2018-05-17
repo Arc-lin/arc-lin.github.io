@@ -1,3 +1,4 @@
+---
 title: XCode 添加Target
 author: Arclin
 tags:
@@ -5,6 +6,7 @@ tags:
   - XCode
 categories:
   - iOS
+abbrlink: 8cafabb2
 date: 2018-02-18 22:08:00
 ---
 在区分开发环境和测试环境或生产环境的时候经常需要在XCode 添加Target, 所以在此记录一下
