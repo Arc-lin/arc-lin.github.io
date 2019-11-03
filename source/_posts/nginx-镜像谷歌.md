@@ -17,7 +17,7 @@ nginx 镜像谷歌
 下载->解压->编译
 
 ```
-wget  http://artfiles.org/openssl.org/source/openssl-1.1.0g.tar.gz
+wget http://artfiles.org/openssl.org/source/old/1.1.0/openssl-1.1.0g.tar.gz
 wget ftp://ftp.csx.cam.ac.uk/pub/software/programming/pcre/pcre-8.39.tar.gz
 wget http://zlib.net/zlib-1.2.11.tar.gz
 
@@ -25,13 +25,17 @@ git clone https://github.com/nginx/nginx.git
 git clone https://github.com/cuber/ngx_http_google_filter_module
 git clone https://github.com/yaoweibin/ngx_http_substitutions_filter_module
 
+cd ngx_http_google_filter_module
+git checkout 77532b9
+cd ..
+
 tar -zxvf openssl-1.1.0g.tar.gz 
 tar -zxvf pcre-8.39.tar.gz 
 tar -zxvf zlib-1.2.11.tar.gz
 
 cd nginx
 
-./auto/configure --with-http_v2_module --with-pcre=../pcre-8.39 --with-openssl=../openssl-1.1.0g --with-zlib=../zlib-1.2.11 --with-http_ssl_module --add-module=../ngx_http_google_filter_module --add-module=../ngx_http_substitutions_filter_module
+./auto/configure --prefix=/usr/local/nginx --conf-path=/usr/local/nginx/conf/nginx.conf --with-http_v2_module --with-pcre=../pcre-8.39 --with-openssl=../openssl-1.1.0g --with-zlib=../zlib-1.2.11 --with-http_ssl_module --add-module=../ngx_http_google_filter_module --add-module=../ngx_http_substitutions_filter_module
 
 make -j 4
 

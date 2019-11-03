@@ -468,7 +468,7 @@
   
   
   <div class="post-block">
-    <link itemprop="mainEntityOfPage" href="https://arclin.me/post/79533f9e.html">
+    <link itemprop="mainEntityOfPage" href="https://arclin.me/post/cacc49a3.html">
 
     <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
       <meta itemprop="name" content="Arclin">
@@ -487,7 +487,7 @@
         
           <h2 class="post-title" itemprop="name headline">
                 
-                <a class="post-title-link" href="/post/79533f9e.html" itemprop="url">RACCommand使用注意</a></h2>
+                <a class="post-title-link" href="/post/cacc49a3.html" itemprop="url">NavigationController的RootViewController和子ViewController的状态栏颜色不一样或者状态栏显示异常</a></h2>
         
 
         <div class="post-meta">
@@ -555,14 +555,11 @@
 
       
         
-          <p>RACCommand使用注意</p>
-          <!--noindex-->
-          <div class="post-button text-center">
-            <a class="btn" href="/post/79533f9e.html#more" rel="contents">
-              阅读全文 &raquo;
-            </a>
-          </div>
-          <!--/noindex-->
+          
+            <p>如果NavigationController的状态栏颜色跟子ViewController的状态栏颜色不一样，那么就像下面这么写</p>
+<p>在UINavigationController的子类写这个</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">- (UIViewController *)childViewControllerForStatusBarStyle&#123;</span><br><span class="line">    return self.topViewController;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+          
         
       
     </div>
