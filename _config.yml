@@ -100,9 +100,9 @@ search:
   limit: 10000
 
 algolia:
-  applicationID: 'ZRNFMXOCY7'
-  apiKey: 'cae95980d347cc7eb6b0784e1b0a7664'
-  indexName: 'indexName'
+  applicationID: 'VOFC7668C9'
+  apiKey: '24c644edc8e7353bf2e8d8e31f03a940'
+  indexName: 'hexo'
   chunkSize: 5000
 
 backup:
