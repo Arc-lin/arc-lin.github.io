@@ -5,7 +5,7 @@ module.exports = function(hljs) {
     relevance: 0
   };
   var TPLABEL = {
-    className: 'symbol',
+    className: 'comment',
     begin: ':[^\\]]+'
   };
   var TPDATA = {
@@ -37,8 +37,8 @@ module.exports = function(hljs) {
         'IF JMP LINEAR_MAX_SPEED LOCK MOD MONITOR OFFSET Offset OR OVERRIDE ' +
         'PAUSE PREG PTH RT_LD RUN SELECT SKIP Skip TA TB TO TOOL_OFFSET ' +
         'Tool_Offset UF UT UFRAME_NUM UTOOL_NUM UNLOCK WAIT X Y Z W P R STRLEN ' +
-        'SUBSTR FINDSTR VOFFSET PROG ATTR MN POS',
-      literal:
+        'SUBSTR FINDSTR VOFFSET',
+      constant:
         'ON OFF max_speed LPOS JPOS ENABLE DISABLE START STOP RESET'
     },
     contains: [

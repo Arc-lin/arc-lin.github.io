@@ -32,12 +32,12 @@ module.exports = function(hljs) {
           returnBegin: true,
           contains: [
             {
-              className: 'doctag',
+              className: 'xmlDocTag',
               begin: '\'\'\'|<!--|-->',
               contains: [hljs.PHRASAL_WORDS_MODE]
             },
             {
-              className: 'doctag',
+              className: 'xmlDocTag',
               begin: '</?', end: '>',
               contains: [hljs.PHRASAL_WORDS_MODE]
             }
@@ -46,9 +46,9 @@ module.exports = function(hljs) {
       ),
       hljs.C_NUMBER_MODE,
       {
-        className: 'meta',
+        className: 'preprocessor',
         begin: '#', end: '$',
-        keywords: {'meta-keyword': 'if else elseif end region externalsource'}
+        keywords: 'if else elseif end region externalsource'
       }
     ]
   };

@@ -8,8 +8,8 @@ module.exports = function(hljs) {
                   'max min parent random range source template_from_string';
 
   var FUNCTIONS = {
+    className: 'function',
     beginKeywords: FUNCTION_NAMES,
-    keywords: {name: FUNCTION_NAMES},
     relevance: 0,
     contains: [
       PARAMS
@@ -17,6 +17,7 @@ module.exports = function(hljs) {
   };
 
   var FILTER = {
+    className: 'filter',
     begin: /\|[A-Za-z_]+:?/,
     keywords:
       'abs batch capitalize convert_encoding date date_modify default ' +
@@ -40,25 +41,15 @@ module.exports = function(hljs) {
     contains: [
       hljs.COMMENT(/\{#/, /#}/),
       {
-        className: 'template-tag',
+        className: 'template_tag',
         begin: /\{%/, end: /%}/,
-        contains: [
-          {
-            className: 'name',
-            begin: /\w+/,
-            keywords: TAGS,
-            starts: {
-              endsWithParent: true,
-              contains: [FILTER, FUNCTIONS],
-              relevance: 0
-            }
-          }
-        ]
+        keywords: TAGS,
+        contains: [FILTER, FUNCTIONS]
       },
       {
-        className: 'template-variable',
+        className: 'variable',
         begin: /\{\{/, end: /}}/,
-        contains: ['self', FILTER, FUNCTIONS]
+        contains: [FILTER, FUNCTIONS]
       }
     ]
   };

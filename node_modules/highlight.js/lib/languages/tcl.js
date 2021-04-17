@@ -22,7 +22,7 @@ module.exports = function(hljs) {
         excludeEnd: true,
         contains: [
           {
-            className: 'title',
+            className: 'symbol',
             begin: '[ \\t\\n\\r]+(::)?[a-zA-Z_]((::)?[a-zA-Z0-9_])*',
             end: '[ \\t\\n\\r]',
             endsWithParent: true,
@@ -31,6 +31,7 @@ module.exports = function(hljs) {
         ]
       },
       {
+        className: 'variable',
         excludeEnd: true,
         variants: [
           {

@@ -1,39 +1,33 @@
 module.exports = function(hljs) {
   var IDENT_RE = '[a-zA-Z-][a-zA-Z0-9_-]*';
+  var FUNCTION = {
+    className: 'function',
+    begin: IDENT_RE + '\\(',
+    returnBegin: true,
+    excludeEnd: true,
+    end: '\\('
+  };
   var RULE = {
+    className: 'rule',
     begin: /[A-Z\_\.\-]+\s*:/, returnBegin: true, end: ';', endsWithParent: true,
     contains: [
       {
         className: 'attribute',
         begin: /\S/, end: ':', excludeEnd: true,
         starts: {
+          className: 'value',
           endsWithParent: true, excludeEnd: true,
           contains: [
-            {
-              begin: /[\w-]+\(/, returnBegin: true,
-              contains: [
-                {
-                  className: 'built_in',
-                  begin: /[\w-]+/
-                },
-                {
-                  begin: /\(/, end: /\)/,
-                  contains: [
-                    hljs.APOS_STRING_MODE,
-                    hljs.QUOTE_STRING_MODE
-                  ]
-                }
-              ]
-            },
+            FUNCTION,
             hljs.CSS_NUMBER_MODE,
             hljs.QUOTE_STRING_MODE,
             hljs.APOS_STRING_MODE,
             hljs.C_BLOCK_COMMENT_MODE,
             {
-              className: 'number', begin: '#[0-9A-Fa-f]+'
+              className: 'hexcolor', begin: '#[0-9A-Fa-f]+'
             },
             {
-              className: 'meta', begin: '!important'
+              className: 'important', begin: '!important'
             }
           ]
         }
@@ -47,40 +41,42 @@ module.exports = function(hljs) {
     contains: [
       hljs.C_BLOCK_COMMENT_MODE,
       {
-        className: 'selector-id', begin: /#[A-Za-z0-9_-]+/
+        className: 'id', begin: /\#[A-Za-z0-9_-]+/
       },
       {
-        className: 'selector-class', begin: /\.[A-Za-z0-9_-]+/
+        className: 'class', begin: /\.[A-Za-z0-9_-]+/
       },
       {
-        className: 'selector-attr',
+        className: 'attr_selector',
         begin: /\[/, end: /\]/,
         illegal: '$'
       },
       {
-        className: 'selector-pseudo',
-        begin: /:(:)?[a-zA-Z0-9\_\-\+\(\)"'.]+/
+        className: 'pseudo',
+        begin: /:(:)?[a-zA-Z0-9\_\-\+\(\)"']+/
       },
       {
+        className: 'at_rule',
         begin: '@(font-face|page)',
         lexemes: '[a-z-]+',
         keywords: 'font-face page'
       },
       {
+        className: 'at_rule',
         begin: '@', end: '[{;]', // at_rule eating first "{" is a good thing
                                  // because it doesn’t let it to be parsed as
                                  // a rule set but instead drops parser into
                                  // the default mode which is how it should be.
-        illegal: /:/, // break on Less variables @var: ...
         contains: [
           {
             className: 'keyword',
-            begin: /\w+/
+            begin: /\S+/
           },
           {
             begin: /\s/, endsWithParent: true, excludeEnd: true,
             relevance: 0,
             contains: [
+              FUNCTION,
               hljs.APOS_STRING_MODE, hljs.QUOTE_STRING_MODE,
               hljs.CSS_NUMBER_MODE
             ]
@@ -88,10 +84,11 @@ module.exports = function(hljs) {
         ]
       },
       {
-        className: 'selector-tag', begin: IDENT_RE,
+        className: 'tag', begin: IDENT_RE,
         relevance: 0
       },
       {
+        className: 'rules',
         begin: '{', end: '}',
         illegal: /\S/,
         contains: [

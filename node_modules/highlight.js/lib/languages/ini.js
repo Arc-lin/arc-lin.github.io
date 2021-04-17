@@ -24,25 +24,18 @@ module.exports = function(hljs) {
       hljs.COMMENT(';', '$'),
       hljs.HASH_COMMENT_MODE,
       {
-        className: 'section',
+        className: 'title',
         begin: /^\s*\[+/, end: /\]+/
       },
       {
+        className: 'setting',
         begin: /^[a-z0-9\[\]_-]+\s*=\s*/, end: '$',
-        returnBegin: true,
         contains: [
           {
-            className: 'attr',
-            begin: /[a-z0-9\[\]_-]+/
-          },
-          {
-            begin: /=/, endsWithParent: true,
-            relevance: 0,
+            className: 'value',
+            endsWithParent: true,
+            keywords: 'on off true false yes no',
             contains: [
-              {
-                className: 'literal',
-                begin: /\bon|off|true|false|yes|no\b/
-              },
               {
                 className: 'variable',
                 variants: [
@@ -56,7 +49,8 @@ module.exports = function(hljs) {
                 begin: /([\+\-]+)?[\d]+_[\d_]+/
               },
               hljs.NUMBER_MODE
-            ]
+            ],
+            relevance: 0
           }
         ]
       }

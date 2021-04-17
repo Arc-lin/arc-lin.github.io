@@ -1,9 +1,9 @@
 module.exports = function(hljs) {
   var VARIABLE = {
-    begin: '\\$+[a-zA-Z_\x7f-\xff][a-zA-Z0-9_\x7f-\xff]*'
+    className: 'variable', begin: '\\$+[a-zA-Z_\x7f-\xff][a-zA-Z0-9_\x7f-\xff]*'
   };
   var PREPROCESSOR = {
-    className: 'meta', begin: /<\?(php)?|\?>/
+    className: 'preprocessor', begin: /<\?(php)?|\?>/
   };
   var STRING = {
     className: 'string',
@@ -33,8 +33,8 @@ module.exports = function(hljs) {
       'trait goto instanceof insteadof __DIR__ __NAMESPACE__ ' +
       'yield finally',
     contains: [
+      hljs.C_LINE_COMMENT_MODE,
       hljs.HASH_COMMENT_MODE,
-      hljs.COMMENT('//', '$', {contains: [PREPROCESSOR]}),
       hljs.COMMENT(
         '/\\*',
         '\\*/',
@@ -43,7 +43,8 @@ module.exports = function(hljs) {
             {
               className: 'doctag',
               begin: '@[A-Za-z]+'
-            }
+            },
+            PREPROCESSOR
           ]
         }
       ),
@@ -71,9 +72,6 @@ module.exports = function(hljs) {
         ]
       },
       PREPROCESSOR,
-      {
-        className: 'keyword', begin: /\$this\b/
-      },
       VARIABLE,
       {
         // swallow composed identifiers to avoid parsing them as keywords

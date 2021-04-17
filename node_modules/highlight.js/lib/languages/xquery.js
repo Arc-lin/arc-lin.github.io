@@ -8,7 +8,9 @@ module.exports = function(hljs) {
     'replace value rename copy modify update';
   var LITERAL = 'false true xs:string xs:integer element item xs:date xs:datetime xs:float xs:double xs:decimal QName xs:anyURI xs:long xs:int xs:short xs:byte attribute';
   var VAR = {
-    begin: /\$[a-zA-Z0-9\-]+/
+    className: 'variable',
+    begin: /\$[a-zA-Z0-9\-]+/,
+    relevance: 5
   };
 
   var NUMBER = {
@@ -26,7 +28,7 @@ module.exports = function(hljs) {
   };
 
   var ANNOTATION = {
-    className: 'meta',
+    className: 'decorator',
     begin: '%\\w+'
   };
 
@@ -36,7 +38,7 @@ module.exports = function(hljs) {
     relevance: 10,
     contains: [
       {
-        className: 'doctag', begin: '@\\w+'
+        className: 'doc', begin: '@\\w+'
       }
     ]
   };

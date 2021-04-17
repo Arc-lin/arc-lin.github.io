@@ -14,7 +14,7 @@ favicon: favicon.ico
 
 # URL
 ## If your site is put in a subdirectory, set url as 'http://yoursite.com/child' and root as '/child/'
-url: https://arclin.me
+url: https://arclin.github.io
 root: /
 permalink: post/:abbrlink.html
 permalink_defaults:
@@ -84,7 +84,7 @@ theme: next
 ## Docs: https://hexo.io/docs/deployment.html
 deploy:
   type: git
-  repo: git@git.coding.net:Arclin/arclin.me.git
+  repo: git@github.com:Arc-lin/arclin.github.io.git
 
 
 # hexo-admin authentification
@@ -108,7 +108,7 @@ algolia:
 backup:
   type: git
   repo:
-    github: git@git.coding.net:Arclin/arclin.me.git,backup
+    github: git@github.com:Arc-lin/arclin.github.io.git,backup
 
 sitemap:
   path: sitemap.xml

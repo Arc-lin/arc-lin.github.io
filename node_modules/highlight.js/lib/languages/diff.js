@@ -3,7 +3,7 @@ module.exports = function(hljs) {
     aliases: ['patch'],
     contains: [
       {
-        className: 'meta',
+        className: 'chunk',
         relevance: 10,
         variants: [
           {begin: /^@@ +\-\d+,\d+ +\+\d+,\d+ +@@$/},
@@ -12,13 +12,13 @@ module.exports = function(hljs) {
         ]
       },
       {
-        className: 'comment',
+        className: 'header',
         variants: [
           {begin: /Index: /, end: /$/},
-          {begin: /={3,}/, end: /$/},
-          {begin: /^\-{3}/, end: /$/},
+          {begin: /=====/, end: /=====$/},
+          {begin: /^\-\-\-/, end: /$/},
           {begin: /^\*{3} /, end: /$/},
-          {begin: /^\+{3}/, end: /$/},
+          {begin: /^\+\+\+/, end: /$/},
           {begin: /\*{5}/, end: /\*{5}$/}
         ]
       },
@@ -31,7 +31,7 @@ module.exports = function(hljs) {
         begin: '^\\-', end: '$'
       },
       {
-        className: 'addition',
+        className: 'change',
         begin: '^\\!', end: '$'
       }
     ]
