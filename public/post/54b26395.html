@@ -487,13 +487,13 @@
 NexT.utils.loadComments(document.querySelector('#gitalk-container'), () => {
   NexT.utils.getScript('//cdn.jsdelivr.net/npm/gitalk@1/dist/gitalk.min.js', () => {
     var gitalk = new Gitalk({
-      clientID    : 'df6d1f33bb4a66f5fa60# GitHub Application Client ID',
-      clientSecret: '5fcc9fb756ac9d4b16381288da7b29f691b45e0a# GitHub Application Client Secret',
-      repo        : 'arc-lin.github.io# Repository name to store issues',
-      owner       : 'Arc-lin# GitHub repo owner',
-      admin       : ['Arc-lin# GitHub repo owner and collaborators, only these guys can initialize gitHub issues'],
+      clientID    : 'df6d1f33bb4a66f5fa60',
+      clientSecret: '5fcc9fb756ac9d4b16381288da7b29f691b45e0a',
+      repo        : 'arc-lin.github.io',
+      owner       : 'Arc-lin',
+      admin       : ['Arc-lin'],
       id          : '119072a0f5c29f6fdfd869f2cb096496',
-        language: '',
+        language: 'zh-CN',
       distractionFreeMode: false
     });
     gitalk.render('gitalk-container');
