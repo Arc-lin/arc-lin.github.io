@@ -109,7 +109,7 @@ algolia:
 backup:
   type: git
   repository:
-    origin: https://github.com/Arc-lin/arc-lin.github.io.git,backup
+    github: https://github.com/Arc-lin/arc-lin.github.io.git,backup
 
 sitemap:
   path: sitemap.xml
