@@ -1,0 +1,526 @@
+<!DOCTYPE html>
+<html lang="zh-Hans">
+<head>
+  <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=2">
+<meta name="theme-color" content="#222">
+<meta name="generator" content="Hexo 5.4.0">
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png">
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32-next.png">
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next.png">
+  <link rel="mask-icon" href="/images/logo.svg" color="#222">
+
+<link rel="stylesheet" href="/css/main.css">
+
+
+<link rel="stylesheet" href="/lib/font-awesome/css/all.min.css">
+
+<script id="hexo-configurations">
+    var NexT = window.NexT || {};
+    var CONFIG = {"hostname":"www.arclin.cn","root":"/","scheme":"Muse","version":"7.8.0","exturl":false,"sidebar":{"position":"left","display":"post","padding":18,"offset":12,"onmobile":false},"copycode":{"enable":false,"show_result":false,"style":null},"back2top":{"enable":true,"sidebar":false,"scrollpercent":false},"bookmark":{"enable":false,"color":"#222","save":"auto"},"fancybox":false,"mediumzoom":false,"lazyload":false,"pangu":false,"comments":{"style":"tabs","active":null,"storage":true,"lazyload":false,"nav":null},"algolia":{"appID":"VOFC7668C9","apiKey":"24c644edc8e7353bf2e8d8e31f03a940","indexName":"hexo","hits":{"per_page":10},"labels":{"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}},"localsearch":{"enable":true,"trigger":"auto","top_n_per_article":1,"unescape":false,"preload":false},"motion":{"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},"path":"search.xml"};
+  </script>
+
+  <meta name="description" content="介绍升级iOS12之后可以在设置-Siri与搜索 中发现一个 捷径 功能, 所谓ShortCut就是其英文翻译其作用就是让用户自定义一个一句话或者短语, 然后可以触发app做一系列动作">
+<meta property="og:type" content="article">
+<meta property="og:title" content="iOS12 新玩具ShortCut(捷径)使用">
+<meta property="og:url" content="https://www.arclin.cn/post/0.html">
+<meta property="og:site_name" content="Arclin">
+<meta property="og:description" content="介绍升级iOS12之后可以在设置-Siri与搜索 中发现一个 捷径 功能, 所谓ShortCut就是其英文翻译其作用就是让用户自定义一个一句话或者短语, 然后可以触发app做一系列动作">
+<meta property="og:locale">
+<meta property="article:published_time" content="2018-09-28T05:05:00.000Z">
+<meta property="article:modified_time" content="2021-04-12T06:07:04.039Z">
+<meta property="article:author" content="Arclin">
+<meta property="article:tag" content="iOS">
+<meta name="twitter:card" content="summary">
+
+<link rel="canonical" href="https://www.arclin.cn/post/0.html">
+
+
+<script id="page-configurations">
+  // https://hexo.io/docs/variables.html
+  CONFIG.page = {
+    sidebar: "",
+    isHome : false,
+    isPost : true,
+    lang   : 'zh-Hans'
+  };
+</script>
+
+  <title>iOS12 新玩具ShortCut(捷径)使用 | Arclin</title>
+  
+
+
+
+
+
+
+  <noscript>
+  <style>
+  .use-motion .brand,
+  .use-motion .menu-item,
+  .sidebar-inner,
+  .use-motion .post-block,
+  .use-motion .pagination,
+  .use-motion .comments,
+  .use-motion .post-header,
+  .use-motion .post-body,
+  .use-motion .collection-header { opacity: initial; }
+
+  .use-motion .site-title,
+  .use-motion .site-subtitle {
+    opacity: initial;
+    top: initial;
+  }
+
+  .use-motion .logo-line-before i { left: initial; }
+  .use-motion .logo-line-after i { right: initial; }
+  </style>
+</noscript>
+
+<link rel="alternate" href="/atom.xml" title="Arclin" type="application/atom+xml">
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage">
+  <div class="container use-motion">
+    <div class="headband"></div>
+
+    <header class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-container">
+  <div class="site-nav-toggle">
+    <div class="toggle" aria-label="Toggle navigation bar">
+      <span class="toggle-line toggle-line-first"></span>
+      <span class="toggle-line toggle-line-middle"></span>
+      <span class="toggle-line toggle-line-last"></span>
+    </div>
+  </div>
+
+  <div class="site-meta">
+
+    <a href="/" class="brand" rel="start">
+      <span class="logo-line-before"><i></i></span>
+      <h1 class="site-title">Arclin</h1>
+      <span class="logo-line-after"><i></i></span>
+    </a>
+      <p class="site-subtitle" itemprop="description">Advocate Technology. Enjoy Technology.</p>
+  </div>
+
+  <div class="site-nav-right">
+    <div class="toggle popup-trigger">
+        <i class="fa fa-search fa-fw fa-lg"></i>
+    </div>
+  </div>
+</div>
+
+
+
+
+<nav class="site-nav">
+  <ul id="menu" class="main-menu menu">
+        <li class="menu-item menu-item-home">
+
+    <a href="/" rel="section"><i class="fa fa-home fa-fw"></i>Home</a>
+
+  </li>
+        <li class="menu-item menu-item-tags">
+
+    <a href="/tags/" rel="section"><i class="fa fa-tags fa-fw"></i>Tags</a>
+
+  </li>
+        <li class="menu-item menu-item-categories">
+
+    <a href="/categories/" rel="section"><i class="fa fa-th fa-fw"></i>Categories</a>
+
+  </li>
+        <li class="menu-item menu-item-archives">
+
+    <a href="/archives/" rel="section"><i class="fa fa-archive fa-fw"></i>Archives</a>
+
+  </li>
+        <li class="menu-item menu-item-about">
+
+    <a href="/about/" rel="section"><i class="fa fa-user fa-fw"></i>About</a>
+
+  </li>
+      <li class="menu-item menu-item-search">
+        <a role="button" class="popup-trigger"><i class="fa fa-search fa-fw"></i>Search
+        </a>
+      </li>
+  </ul>
+</nav>
+
+
+
+  <div class="search-pop-overlay">
+    <div class="popup search-popup">
+        <div class="search-header">
+  <span class="search-icon">
+    <i class="fa fa-search"></i>
+  </span>
+  <div class="search-input-container">
+    <input autocomplete="off" autocapitalize="off"
+           placeholder="Searching..." spellcheck="false"
+           type="search" class="search-input">
+  </div>
+  <span class="popup-btn-close">
+    <i class="fa fa-times-circle"></i>
+  </span>
+</div>
+<div id="search-result">
+  <div id="no-result">
+    <i class="fa fa-spinner fa-pulse fa-5x fa-fw"></i>
+  </div>
+</div>
+
+    </div>
+  </div>
+
+</div>
+    </header>
+
+    
+  <div class="back-to-top">
+    <i class="fa fa-arrow-up"></i>
+    <span>0%</span>
+  </div>
+
+
+    <main class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          
+
+          <div class="content post posts-expand">
+            
+
+    
+  
+  
+  <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="zh-Hans">
+    <link itemprop="mainEntityOfPage" href="https://www.arclin.cn/post/0.html">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="https://avatars.githubusercontent.com/u/12107804?v=4">
+      <meta itemprop="name" content="Arclin">
+      <meta itemprop="description" content="Stay hungry,stay foolish">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="Arclin">
+    </span>
+      <header class="post-header">
+        <h1 class="post-title" itemprop="name headline">
+          iOS12 新玩具ShortCut(捷径)使用
+        </h1>
+
+        <div class="post-meta">
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-calendar"></i>
+              </span>
+              <span class="post-meta-item-text">Posted on</span>
+
+              <time title="Created: 2018-09-28 13:05:00" itemprop="dateCreated datePublished" datetime="2018-09-28T13:05:00+08:00">2018-09-28</time>
+            </span>
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-folder"></i>
+              </span>
+              <span class="post-meta-item-text">In</span>
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/iOS/" itemprop="url" rel="index"><span itemprop="name">iOS</span></a>
+                </span>
+            </span>
+
+          
+            <span class="post-meta-item" title="Views" id="busuanzi_container_page_pv" style="display: none;">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-eye"></i>
+              </span>
+              <span class="post-meta-item-text">Views: </span>
+              <span id="busuanzi_value_page_pv"></span>
+            </span>
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+        <h3 id="介绍"><a href="#介绍" class="headerlink" title="介绍"></a>介绍</h3><p>升级iOS12之后可以在<code>设置-Siri</code>与搜索 中发现一个 <code>捷径</code> 功能, 所谓ShortCut就是其英文翻译<br>其作用就是让用户自定义一个一句话或者短语, 然后可以触发app做一系列动作</p>
+<span id="more"></span>
+
+<h3 id="接入"><a href="#接入" class="headerlink" title="接入"></a>接入</h3><p>ShortCut分为两种, 一种是在手机的<code>Spotlight</code>上搜索某个关键字的时候可以搜索到你的app, 这个关键字就是ShortCut的一种(文字输入), 你需要使用<code>NSUserActivity</code>去实现这个功能</p>
+<blockquote>
+<p>依赖 <code>CoreSpotlight</code> <code>CoreServices</code></p>
+</blockquote>
+<p>另外一种叫做 <code>Intent</code>(语音输入), 需要添加一个IntentExtension和IntentExtensionUI, 然后在主Target添加一个intentdefinition文件, 详细的配置大家可以参考<br><a target="_blank" rel="noopener" href="https://juejin.im/post/5b2077d8f265da6e45549c68">文章1</a><br><a target="_blank" rel="noopener" href="http://www.cnblogs.com/czjie2010/p/czjie.html">文章2</a></p>
+<blockquote>
+<p>依赖<code>Intents</code> <code>IntentsUI</code></p>
+</blockquote>
+<h3 id="最简单的配置操作步骤"><a href="#最简单的配置操作步骤" class="headerlink" title="最简单的配置操作步骤"></a>最简单的配置操作步骤</h3><ol>
+<li><p>项目的<code>Capabilities</code>打开<code>Siri</code></p>
+</li>
+<li><p>授权</p>
+ <figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br></pre></td><td class="code"><pre><span class="line">if (@available(iOS 10.0, *)) &#123;</span><br><span class="line">	[INPreferences requestSiriAuthorization:^(INSiriAuthorizationStatus status) &#123;</span><br><span class="line">		switch (status) &#123;</span><br><span class="line">			case INSiriAuthorizationStatusNotDetermined:</span><br><span class="line">				NSLog(@&quot;用户尚未对该应用程序作出选择。&quot;);</span><br><span class="line">				break;</span><br><span class="line">			case INSiriAuthorizationStatusRestricted:</span><br><span class="line">				NSLog(@&quot;此应用程序无权使用Siri服务&quot;);</span><br><span class="line">				break;</span><br><span class="line">			case INSiriAuthorizationStatusDenied:</span><br><span class="line">				NSLog(@&quot;用户已明确拒绝此应用程序的授权&quot;);</span><br><span class="line">				break;</span><br><span class="line">			case INSiriAuthorizationStatusAuthorized:</span><br><span class="line">				NSLog(@&quot;用户可以使用此应用程序的授权&quot;);</span><br><span class="line">				break;</span><br><span class="line">			default:</span><br><span class="line">				break;</span><br><span class="line">		&#125;</span><br><span class="line">	&#125;];</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<ul>
+<li>新建一个<code>intentdefinition</code>，比如<code>A.intentdefinition</code></li>
+<li>新建一个<code>Target</code>,<code>Intent Extension</code>有需要的话把<code>Intent UI Extension</code>也加上，<code>General</code>中配置相关证书</li>
+<li>进入<code>A.intentdefinition</code>，界面左下角<code>+</code>号点一下，点击<code>new intent</code></li>
+<li>界面右边<code>Target Membership</code>，把<code>步骤2</code>中新增的<code>Target</code>给勾上</li>
+<li> 界面中间<code>Title</code>填写需要展示的标题，<code>Descripion</code> 写描述</li>
+<li>Build一下，系统自动生成头文件，头文件名字在界面右测的导航页的第三个按钮的<code>Custom Class</code>里</li>
+<li>找个控制器，导入<code>步骤8</code>生成的头文件，添加个按钮，比如</li>
+</ul>
+ <figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">self.navigationItem.rightBarButtonItem &#x3D; [[UIBarButtonItem alloc] initWithTitle:@&quot;捷径&quot; style:UIBarButtonItemStylePlain target:self action:@selector(siri:)];</span><br></pre></td></tr></table></figure></li>
+<li><p>点击按钮召唤添加Shortcut的控制器</p>
+ <figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br></pre></td><td class="code"><pre><span class="line">- (void)siri:(UIBarButtonItem *)item &#123;</span><br><span class="line">    if (@available(iOS 12.0, *)) &#123;</span><br><span class="line">    	 &#x2F;&#x2F; 这个类名具体看你生成了叫什么名字的头文件</span><br><span class="line">        ZeRiIntent *intent &#x3D; [[ZeRiIntent alloc] init];</span><br><span class="line">        intent.suggestedInvocationPhrase &#x3D; @&quot;打开xxx&quot;; &#x2F;&#x2F; 引导用户说的语句</span><br><span class="line">        INShortcut *shortCur &#x3D; [[INShortcut alloc] initWithIntent:intent];</span><br><span class="line">        INUIAddVoiceShortcutViewController *vc &#x3D; [[INUIAddVoiceShortcutViewController alloc] initWithShortcut:shortCur];</span><br><span class="line">        vc.delegate &#x3D; self;</span><br><span class="line">        [self presentViewController:vc animated:YES completion:nil];</span><br><span class="line">    &#125; else &#123;</span><br><span class="line">        &#x2F;&#x2F; Fallback on earlier versions</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure></li>
+<li><p>同个地方实现代理方法</p>
+ <figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line">#pragma mark - INUIAddVoiceShortcutViewControllerDelegate</span><br><span class="line">- (void)addVoiceShortcutViewControllerDidCancel:(INUIAddVoiceShortcutViewController *)controller  API_AVAILABLE(ios(12.0))&#123;</span><br><span class="line">	[controller dismissViewControllerAnimated:YES completion:nil];</span><br><span class="line">&#125;</span><br><span class="line">- (void)addVoiceShortcutViewController:(INUIAddVoiceShortcutViewController *)controller didFinishWithVoiceShortcut:(INVoiceShortcut *)voiceShortcut error:(NSError *)error  API_AVAILABLE(ios(12.0))&#123;</span><br><span class="line">	[controller dismissViewControllerAnimated:YES completion:nil];</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure></li>
+<li><p>进入<code>Intent</code> target中的<code>IntentHandler</code>类，导入<code>步骤8</code>生成的头文件，要是头文件找不到，在这个target的<code>info.plist</code>中<code>NSExtension</code>下的<code>IntentsSupported</code>下添加一个名为那个头文件的值，主target的<code>info.plist</code>的<code>NSUserActivityTypes</code>下也加一个一样的</p>
+</li>
+<li><p><code>IntentHandler.m</code>遵循协议<code>XXXIntentHandling</code>（具体协议名看你的类名），实现两个方法</p>
+ <figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line">	&#x2F;&#x2F; 用户说了那句话之后要Siri做什么事情</span><br><span class="line">- (void)handleZeRiIntent:(ZeRiIntent *)intent completion:(void (^)(ZeRiIntentResponse * _Nonnull))completion &#123;</span><br><span class="line">	completion([[ZeRiIntentResponse alloc] initWithCode:ZeRiIntentResponseCodeContinueInApp userActivity:nil]);</span><br><span class="line">&#125;</span><br><span class="line">  &#x2F;&#x2F; 用户确认了之后要Siri做什么事情</span><br><span class="line">- (void)confirmZeRiIntent:(ZeRiIntent *)intent completion:(void (^)(ZeRiIntentResponse * _Nonnull))completion &#123;</span><br><span class="line">	completion([[ZeRiIntentResponse alloc] initWithCode:ZeRiIntentResponseCodeContinueInApp userActivity:nil]);</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>   <code>ZeRiIntentResponseCodeContinueInApp</code>只是枚举中其中一个值，使用不同的值会有不同     效果，自己探索一下，这里的值指的是打开app(具体方法名看协议)</p>
+</li>
+<li><p>进入<code>AppDelegate</code>，实现方法如下，根据<code>Intent</code>类名判断用户想要的操作</p>
+ <figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">	- (BOOL)application:(UIApplication *)application continueUserActivity:(nonnull NSUserActivity *)userActivity restorationHandler:(nonnull void (^)(NSArray&lt;id&lt;UIUserActivityRestoring&gt;&gt; * _Nullable))restorationHandler &#123;</span><br><span class="line">	if ([userActivity.activityType isEqualToString:@&quot;XXXIntent&quot;]) &#123;</span><br><span class="line">	&#125;</span><br><span class="line">    return YES;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure></li>
+<li><p>结束</p>
+</li>
+</ol>
+
+    </div>
+
+    
+    
+    
+
+      <footer class="post-footer">
+          <div class="post-tags">
+              <a href="/tags/iOS/" rel="tag"># iOS</a>
+          </div>
+
+        
+
+
+        
+    <div class="post-nav">
+      <div class="post-nav-item">
+    <a href="/post/undefined.html" rel="prev" title="Application Loader / Fastlane pilot 通过代理上传方案">
+      <i class="fa fa-chevron-left"></i> Application Loader / Fastlane pilot 通过代理上传方案
+    </a></div>
+      <div class="post-nav-item">
+    <a href="/post/f9a964a9.html" rel="next" title="C++基础">
+      C++基础 <i class="fa fa-chevron-right"></i>
+    </a></div>
+    </div>
+      </footer>
+    
+  </article>
+  
+  
+  
+
+
+
+          </div>
+          
+
+<script>
+  window.addEventListener('tabs:register', () => {
+    let { activeClass } = CONFIG.comments;
+    if (CONFIG.comments.storage) {
+      activeClass = localStorage.getItem('comments_active') || activeClass;
+    }
+    if (activeClass) {
+      let activeTab = document.querySelector(`a[href="#comment-${activeClass}"]`);
+      if (activeTab) {
+        activeTab.click();
+      }
+    }
+  });
+  if (CONFIG.comments.storage) {
+    window.addEventListener('tabs:click', event => {
+      if (!event.target.matches('.tabs-comment .tab-content .tab-pane')) return;
+      let commentClass = event.target.classList[1];
+      localStorage.setItem('comments_active', commentClass);
+    });
+  }
+</script>
+
+        </div>
+          
+  
+  <div class="toggle sidebar-toggle">
+    <span class="toggle-line toggle-line-first"></span>
+    <span class="toggle-line toggle-line-middle"></span>
+    <span class="toggle-line toggle-line-last"></span>
+  </div>
+
+  <aside class="sidebar">
+    <div class="sidebar-inner">
+
+      <ul class="sidebar-nav motion-element">
+        <li class="sidebar-nav-toc">
+          Table of Contents
+        </li>
+        <li class="sidebar-nav-overview">
+          Overview
+        </li>
+      </ul>
+
+      <!--noindex-->
+      <div class="post-toc-wrap sidebar-panel">
+          <div class="post-toc motion-element"><ol class="nav"><li class="nav-item nav-level-3"><a class="nav-link" href="#%E4%BB%8B%E7%BB%8D"><span class="nav-number">1.</span> <span class="nav-text">介绍</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E6%8E%A5%E5%85%A5"><span class="nav-number">2.</span> <span class="nav-text">接入</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E6%9C%80%E7%AE%80%E5%8D%95%E7%9A%84%E9%85%8D%E7%BD%AE%E6%93%8D%E4%BD%9C%E6%AD%A5%E9%AA%A4"><span class="nav-number">3.</span> <span class="nav-text">最简单的配置操作步骤</span></a></li></ol></div>
+      </div>
+      <!--/noindex-->
+
+      <div class="site-overview-wrap sidebar-panel">
+        <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+    <img class="site-author-image" itemprop="image" alt="Arclin"
+      src="https://avatars.githubusercontent.com/u/12107804?v=4">
+  <p class="site-author-name" itemprop="name">Arclin</p>
+  <div class="site-description" itemprop="description">Stay hungry,stay foolish</div>
+</div>
+<div class="site-state-wrap motion-element">
+  <nav class="site-state">
+      <div class="site-state-item site-state-posts">
+          <a href="/archives/">
+        
+          <span class="site-state-item-count">71</span>
+          <span class="site-state-item-name">posts</span>
+        </a>
+      </div>
+      <div class="site-state-item site-state-categories">
+            <a href="/categories/">
+          
+        <span class="site-state-item-count">12</span>
+        <span class="site-state-item-name">categories</span></a>
+      </div>
+      <div class="site-state-item site-state-tags">
+            <a href="/tags/">
+          
+        <span class="site-state-item-count">36</span>
+        <span class="site-state-item-name">tags</span></a>
+      </div>
+  </nav>
+</div>
+  <div class="links-of-author motion-element">
+      <span class="links-of-author-item">
+        <a href="https://github.com/Arc-lin" title="GitHub → https://github.com/Arc-lin" rel="noopener" target="_blank"><i class="fab fa-github fa-fw"></i>GitHub</a>
+      </span>
+      <span class="links-of-author-item">
+        <a href="mailto:arclin325@gmail.com" title="E-Mail → mailto:arclin325@gmail.com" rel="noopener" target="_blank"><i class="fa fa-envelope fa-fw"></i>E-Mail</a>
+      </span>
+  </div>
+
+
+
+      </div>
+
+    </div>
+  </aside>
+  <div id="sidebar-dimmer"></div>
+
+
+      </div>
+    </main>
+
+    <footer class="footer">
+      <div class="footer-inner">
+        
+
+        
+
+<div class="copyright">
+  
+  &copy; 
+  <span itemprop="copyrightYear">2021</span>
+  <span class="with-love">
+    <i class="fa fa-heart"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">Arclin</span>
+</div>
+  <div class="powered-by">Powered by <a href="https://hexo.io" class="theme-link" rel="noopener" target="_blank">Hexo</a> & <a href="https://muse.theme-next.org" class="theme-link" rel="noopener" target="_blank">NexT.Muse</a>
+  </div>
+
+        
+<div class="busuanzi-count">
+  <script async src="https://busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js"></script>
+    <span class="post-meta-item" id="busuanzi_container_site_uv" style="display: none;">
+      <span class="post-meta-item-icon">
+        <i class="fa fa-user"></i>
+      </span>
+      <span class="site-uv" title="Total Visitors">
+        <span id="busuanzi_value_site_uv"></span>
+      </span>
+    </span>
+    <span class="post-meta-divider">|</span>
+    <span class="post-meta-item" id="busuanzi_container_site_pv" style="display: none;">
+      <span class="post-meta-item-icon">
+        <i class="fa fa-eye"></i>
+      </span>
+      <span class="site-pv" title="Total Views">
+        <span id="busuanzi_value_site_pv"></span>
+      </span>
+    </span>
+</div>
+
+
+
+
+
+
+
+
+      </div>
+    </footer>
+  </div>
+
+  
+  <script src="/lib/anime.min.js"></script>
+  <script src="/lib/velocity/velocity.min.js"></script>
+  <script src="/lib/velocity/velocity.ui.min.js"></script>
+
+<script src="/js/utils.js"></script>
+
+<script src="/js/motion.js"></script>
+
+
+<script src="/js/schemes/muse.js"></script>
+
+
+<script src="/js/next-boot.js"></script>
+
+
+
+
+  
+
+
+
+
+  
+<script src="/js/local-search.js"></script>
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+  
+
+</body>
+</html>

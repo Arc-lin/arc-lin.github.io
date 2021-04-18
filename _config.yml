@@ -6,7 +6,7 @@
 title: Arclin
 subtitle: Advocate Technology. Enjoy Technology.
 avatar: https://i.loli.net/2018/02/16/5a86f3783f0d9.jpg
-description: I am a developer from China
+description: Stay hungry,stay foolish
 author: Arclin 
 language: zh-Hans
 timezonei: Asia/Shanghai
@@ -14,7 +14,7 @@ favicon: favicon.ico
 
 # URL
 ## If your site is put in a subdirectory, set url as 'http://yoursite.com/child' and root as '/child/'
-url: https://arclin.github.io
+url: https://www.arclin.cn
 root: /
 permalink: post/:abbrlink.html
 permalink_defaults:
@@ -84,7 +84,7 @@ theme: next
 ## Docs: https://hexo.io/docs/deployment.html
 deploy:
   type: git
-  repo: git@github.com:Arc-lin/arclin.github.io.git
+  repo: https://github.com/Arc-lin/arc-lin.github.io.git
 
 
 # hexo-admin authentification
@@ -98,6 +98,7 @@ search:
   field: post
   format: html
   limit: 10000
+  content: true
 
 algolia:
   applicationID: 'VOFC7668C9'
@@ -108,8 +109,7 @@ algolia:
 backup:
   type: git
   repo:
-    github: git@github.com:Arc-lin/arclin.github.io.git,backup
+    github: git@github.com:Arc-lin/arc-lin.github.io.git,backup
 
 sitemap:
   path: sitemap.xml
-    

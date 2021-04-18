@@ -1,0 +1,624 @@
+<!DOCTYPE html>
+<html lang="zh-Hans">
+<head>
+  <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=2">
+<meta name="theme-color" content="#222">
+<meta name="generator" content="Hexo 5.4.0">
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png">
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32-next.png">
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next.png">
+  <link rel="mask-icon" href="/images/logo.svg" color="#222">
+
+<link rel="stylesheet" href="/css/main.css">
+
+
+<link rel="stylesheet" href="/lib/font-awesome/css/all.min.css">
+
+<script id="hexo-configurations">
+    var NexT = window.NexT || {};
+    var CONFIG = {"hostname":"www.arclin.cn","root":"/","scheme":"Muse","version":"7.8.0","exturl":false,"sidebar":{"position":"left","display":"post","padding":18,"offset":12,"onmobile":false},"copycode":{"enable":false,"show_result":false,"style":null},"back2top":{"enable":true,"sidebar":false,"scrollpercent":false},"bookmark":{"enable":false,"color":"#222","save":"auto"},"fancybox":false,"mediumzoom":false,"lazyload":false,"pangu":false,"comments":{"style":"tabs","active":null,"storage":true,"lazyload":false,"nav":null},"algolia":{"appID":"VOFC7668C9","apiKey":"24c644edc8e7353bf2e8d8e31f03a940","indexName":"hexo","hits":{"per_page":10},"labels":{"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}},"localsearch":{"enable":true,"trigger":"auto","top_n_per_article":1,"unescape":false,"preload":false},"motion":{"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},"path":"search.xml"};
+  </script>
+
+  <meta name="description" content="wordpress自定义主题的时候需要用到的函数">
+<meta property="og:type" content="article">
+<meta property="og:title" content="WordPress常用函数">
+<meta property="og:url" content="https://www.arclin.cn/post/3fd5c9ca.html">
+<meta property="og:site_name" content="Arclin">
+<meta property="og:description" content="wordpress自定义主题的时候需要用到的函数">
+<meta property="og:locale">
+<meta property="article:published_time" content="2017-03-01T16:00:00.000Z">
+<meta property="article:modified_time" content="2021-04-12T06:07:04.038Z">
+<meta property="article:author" content="Arclin">
+<meta property="article:tag" content="PHP">
+<meta property="article:tag" content="WordPress">
+<meta name="twitter:card" content="summary">
+
+<link rel="canonical" href="https://www.arclin.cn/post/3fd5c9ca.html">
+
+
+<script id="page-configurations">
+  // https://hexo.io/docs/variables.html
+  CONFIG.page = {
+    sidebar: "",
+    isHome : false,
+    isPost : true,
+    lang   : 'zh-Hans'
+  };
+</script>
+
+  <title>WordPress常用函数 | Arclin</title>
+  
+
+
+
+
+
+
+  <noscript>
+  <style>
+  .use-motion .brand,
+  .use-motion .menu-item,
+  .sidebar-inner,
+  .use-motion .post-block,
+  .use-motion .pagination,
+  .use-motion .comments,
+  .use-motion .post-header,
+  .use-motion .post-body,
+  .use-motion .collection-header { opacity: initial; }
+
+  .use-motion .site-title,
+  .use-motion .site-subtitle {
+    opacity: initial;
+    top: initial;
+  }
+
+  .use-motion .logo-line-before i { left: initial; }
+  .use-motion .logo-line-after i { right: initial; }
+  </style>
+</noscript>
+
+<link rel="alternate" href="/atom.xml" title="Arclin" type="application/atom+xml">
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage">
+  <div class="container use-motion">
+    <div class="headband"></div>
+
+    <header class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-container">
+  <div class="site-nav-toggle">
+    <div class="toggle" aria-label="Toggle navigation bar">
+      <span class="toggle-line toggle-line-first"></span>
+      <span class="toggle-line toggle-line-middle"></span>
+      <span class="toggle-line toggle-line-last"></span>
+    </div>
+  </div>
+
+  <div class="site-meta">
+
+    <a href="/" class="brand" rel="start">
+      <span class="logo-line-before"><i></i></span>
+      <h1 class="site-title">Arclin</h1>
+      <span class="logo-line-after"><i></i></span>
+    </a>
+      <p class="site-subtitle" itemprop="description">Advocate Technology. Enjoy Technology.</p>
+  </div>
+
+  <div class="site-nav-right">
+    <div class="toggle popup-trigger">
+        <i class="fa fa-search fa-fw fa-lg"></i>
+    </div>
+  </div>
+</div>
+
+
+
+
+<nav class="site-nav">
+  <ul id="menu" class="main-menu menu">
+        <li class="menu-item menu-item-home">
+
+    <a href="/" rel="section"><i class="fa fa-home fa-fw"></i>Home</a>
+
+  </li>
+        <li class="menu-item menu-item-tags">
+
+    <a href="/tags/" rel="section"><i class="fa fa-tags fa-fw"></i>Tags</a>
+
+  </li>
+        <li class="menu-item menu-item-categories">
+
+    <a href="/categories/" rel="section"><i class="fa fa-th fa-fw"></i>Categories</a>
+
+  </li>
+        <li class="menu-item menu-item-archives">
+
+    <a href="/archives/" rel="section"><i class="fa fa-archive fa-fw"></i>Archives</a>
+
+  </li>
+        <li class="menu-item menu-item-about">
+
+    <a href="/about/" rel="section"><i class="fa fa-user fa-fw"></i>About</a>
+
+  </li>
+      <li class="menu-item menu-item-search">
+        <a role="button" class="popup-trigger"><i class="fa fa-search fa-fw"></i>Search
+        </a>
+      </li>
+  </ul>
+</nav>
+
+
+
+  <div class="search-pop-overlay">
+    <div class="popup search-popup">
+        <div class="search-header">
+  <span class="search-icon">
+    <i class="fa fa-search"></i>
+  </span>
+  <div class="search-input-container">
+    <input autocomplete="off" autocapitalize="off"
+           placeholder="Searching..." spellcheck="false"
+           type="search" class="search-input">
+  </div>
+  <span class="popup-btn-close">
+    <i class="fa fa-times-circle"></i>
+  </span>
+</div>
+<div id="search-result">
+  <div id="no-result">
+    <i class="fa fa-spinner fa-pulse fa-5x fa-fw"></i>
+  </div>
+</div>
+
+    </div>
+  </div>
+
+</div>
+    </header>
+
+    
+  <div class="back-to-top">
+    <i class="fa fa-arrow-up"></i>
+    <span>0%</span>
+  </div>
+
+
+    <main class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          
+
+          <div class="content post posts-expand">
+            
+
+    
+  
+  
+  <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="zh-Hans">
+    <link itemprop="mainEntityOfPage" href="https://www.arclin.cn/post/3fd5c9ca.html">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="https://avatars.githubusercontent.com/u/12107804?v=4">
+      <meta itemprop="name" content="Arclin">
+      <meta itemprop="description" content="Stay hungry,stay foolish">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="Arclin">
+    </span>
+      <header class="post-header">
+        <h1 class="post-title" itemprop="name headline">
+          WordPress常用函数
+        </h1>
+
+        <div class="post-meta">
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-calendar"></i>
+              </span>
+              <span class="post-meta-item-text">Posted on</span>
+
+              <time title="Created: 2017-03-02 00:00:00" itemprop="dateCreated datePublished" datetime="2017-03-02T00:00:00+08:00">2017-03-02</time>
+            </span>
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-folder"></i>
+              </span>
+              <span class="post-meta-item-text">In</span>
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/PHP/" itemprop="url" rel="index"><span itemprop="name">PHP</span></a>
+                </span>
+            </span>
+
+          
+            <span class="post-meta-item" title="Views" id="busuanzi_container_page_pv" style="display: none;">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-eye"></i>
+              </span>
+              <span class="post-meta-item-text">Views: </span>
+              <span id="busuanzi_value_page_pv"></span>
+            </span>
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+        <p>wordpress自定义主题的时候需要用到的函数</p>
+<span id="more"></span>
+
+<p><a target="_blank" rel="noopener" href="https://codex.wordpress.org/zh-cn:%E6%A8%A1%E6%9D%BF%E6%A0%87%E7%AD%BE">参考文档</a></p>
+<table>
+<thead>
+<tr>
+<th>函数名</th>
+<th>作用</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>bloginfo()</td>
+<td>可以拿到博客的信息,name,description,version,特别注意bloginfo(‘stylesheet_url’);会直接找到根目录下的style.css文件,这个页面的样式表</td>
+</tr>
+<tr>
+<td>wp_head()</td>
+<td>一般放在header.php,会有很多东西引入进去</td>
+</tr>
+<tr>
+<td>wp_title()</td>
+<td>网站标题</td>
+</tr>
+<tr>
+<td>get_header()</td>
+<td>检查同目录下是否有header.php,有的话就会调用这个文件作为页面头部</td>
+</tr>
+<tr>
+<td>get_sidebar()</td>
+<td>检查sidebar.php,调用作为侧边栏</td>
+</tr>
+<tr>
+<td>get_footer()</td>
+<td>检查footer.php,调用作为底部栏</td>
+</tr>
+<tr>
+<td>have_posts()</td>
+<td>判断是否有日志</td>
+</tr>
+<tr>
+<td>the_post()</td>
+<td>调用一篇具体的日志,和主循环配合使用</td>
+</tr>
+<tr>
+<td>the_permalink()</td>
+<td>每篇日志地址</td>
+</tr>
+<tr>
+<td>the_title()</td>
+<td>日志标题</td>
+</tr>
+<tr>
+<td>the_content()</td>
+<td>日志内容</td>
+</tr>
+<tr>
+<td>_e()</td>
+<td>框架里面有语言文件,这里是调用语言文件内对应文字,使用类似这样子_e(“Archives”),中文页面下显示归档,英文页面下显示Archives</td>
+</tr>
+<tr>
+<td>the_category()</td>
+<td>分类,这个函数里面有一个参数,可以表示用什么符号去分割多个分类名,例如the_category(‘,’)</td>
+</tr>
+<tr>
+<td>the_author()</td>
+<td>作者名</td>
+</tr>
+<tr>
+<td>the_excerpt()</td>
+<td>日志摘要</td>
+</tr>
+<tr>
+<td>comments_popup_link(‘No Comments »’, ‘1 Comment »’, ‘% Comments »’);</td>
+<td>当弹出留言的功能激活的话，comments_popup_link() 调用一个弹出的留言窗口，如果没有激活，comments_popup_link() 则只是简单的显示留言列表。No Comments » 是在没有留言的时候显示的。1 Comment » 是用于当刚好只有1条留言时候。% Comments &187; 是用于当有多于一条留言的时候。比如：8 Comments »。百分号 % 用来显示数字。» 是用来显示一个双层箭头 »。</td>
+</tr>
+<tr>
+<td>edit_post_link(‘Edit’, ‘&amp;124’, ”);</td>
+<td>这个只有当我们以管理员或者作者身份登录的的时候才可见。</td>
+</tr>
+<tr>
+<td>edit_post_link()</td>
+<td>只是简单显示一个可以用来编辑当前日志的编辑链接，这样就可以让我们不必去管理界面搜寻该日志就能直接编辑。</td>
+</tr>
+<tr>
+<td>edit_post_link()</td>
+<td>有三个参数。第一个是用来确定哪个词你将用在编辑链接的链接标题。如果你使用 Edit post，那么将显示 Edit post 而不是 Edit。第二个参数是用来显示在链接前面的字符，在这里是竖线，代码就是&124;。第三个参数是用于显示在编辑链接后面的字符，在这里没有使用。登录 WordPress 之后，再返回到首页就可以看到“Edit”的链接和一条竖线。</td>
+</tr>
+<tr>
+<td>posts_nav_link(‘中间页’, ‘&lt;&lt;上一页’, ‘下一页&gt;&gt;’)</td>
+<td>调用后一页和前一页的链接,3个参数，分别给链接的中间，前面和后面的设置字符</td>
+</tr>
+<tr>
+<td>previous_post_link(‘%link’)</td>
+<td>上一篇日志</td>
+</tr>
+<tr>
+<td>next_post_link(‘%link’)</td>
+<td>下一篇日志</td>
+</tr>
+<tr>
+<td>wp_list_pages()</td>
+<td>展示页面列表,如果参数里面填<code>title_li=&lt;h2&gt;Pages&lt;/h2&gt;&amp;depth=3</code>,可以设置title的样式,depth指的是页面的展示深度</td>
+</tr>
+<tr>
+<td>wp_list_cats()</td>
+<td>展示分类列表,参数可填<code>sort_column=name&amp;optioncount=1&amp;hierarchical=0</code>,分别是设置排序根据,是否显示文章个数,以分层缩进的方式显示分类列表</td>
+</tr>
+<tr>
+<td>get_links_list();</td>
+<td>友情链接列表,在后台装插件之后就可以用了</td>
+</tr>
+<tr>
+<td>wp_get_archives()</td>
+<td>意思跟上面的差不多,也是有参数,获取的是文章归档列表,参数填type=daily的话就是按日期分,monthly按月分,yearly按年分,format=link以链接形式显示</td>
+</tr>
+<tr>
+<td>wp_loginout()</td>
+<td>退出登录链接</td>
+</tr>
+<tr>
+<td>wp_register()</td>
+<td>注册链接</td>
+</tr>
+<tr>
+<td>wp_meta()</td>
+<td>显示管理员的相关控制信息</td>
+</tr>
+<tr>
+<td>get_calendar()</td>
+<td>显示一个日历</td>
+</tr>
+<tr>
+<td>include(TEMPLATEPATH . ‘/searchform.php’)</td>
+<td>导入某个自定义文件,像左边就是/searchform.php文件</td>
+</tr>
+</tbody></table>
+<h3 id="判断是否有日志并循环输出日志"><a href="#判断是否有日志并循环输出日志" class="headerlink" title="判断是否有日志并循环输出日志"></a>判断是否有日志并循环输出日志</h3><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br></pre></td><td class="code"><pre><span class="line">&lt;?php if(have_posts()) : ?&gt; &lt;!--检查是否有日志--&gt;</span><br><span class="line">	&lt;?php while(have_posts()) : the_post(); ?&gt; &lt;!--循环输出日志--&gt;</span><br><span class="line">			&lt;div class&#x3D;&quot;post&quot; id&#x3D;&quot;post-&lt;?php the_ID(); ?&gt;&quot;&gt;</span><br><span class="line">				&lt;h2&gt;&lt;a href&#x3D;&quot;&lt;?php the_permalink(); ?&gt;&quot; title&#x3D;&quot;&lt;?php the_title(); ?&gt;&quot;&gt;&lt;?php the_title(); ?&gt;&lt;&#x2F;a&gt;&lt;&#x2F;h2&gt;&lt;!--日志标题--&gt;</span><br><span class="line">				&lt;div class&#x3D;&#39;entry&#39;&gt;</span><br><span class="line">				&lt;?php the_content(); ?&gt;</span><br><span class="line">			&lt;&#x2F;div&gt;</span><br><span class="line">			&lt;p class&#x3D;&quot;postmetadata&quot;&gt;</span><br><span class="line">			&lt;?php _e(&#39;Filed under&amp;#58;&#39;); ?&gt; &lt;?php the_category(&#39;, &#39;) ?&gt; &lt;?php _e(&#39;by&#39;); ?&gt; &lt;?php  the_author(); ?&gt;&lt;br &#x2F;&gt;</span><br><span class="line">			&lt;?php comments_popup_link(&#39;No Comments &amp;#187;&#39;, &#39;1 Comment &amp;#187;&#39;, &#39;% Comments &amp;#187;&#39;); ?&gt; &lt;?php edit_post_link(&#39;Edit&#39;, &#39; &amp;#124; &#39;, &#39;&#39;); ?&gt;</span><br><span class="line">			&lt;&#x2F;p&gt;</span><br><span class="line">			&lt;&#x2F;div&gt;</span><br><span class="line">	&lt;?php endwhile; ?&gt;</span><br><span class="line">	&lt;div class&#x3D;&quot;navigation&quot;&gt;</span><br><span class="line">			&lt;?php posts_nav_link(&#39;index&#39;, &#39;&lt;&lt;上一页&#39;, &#39;下一页&gt;&gt;&#39;); ?&gt;</span><br><span class="line">	&lt;&#x2F;div&gt;</span><br><span class="line">	&lt;?php else : ?&gt; &lt;!--如果没有日志--&gt;</span><br><span class="line">	&lt;div class &#x3D; &quot;post&quot;&gt;</span><br><span class="line">		&lt;h2&gt;&lt;?php _e(&quot;Not Found&quot;); ?&gt;&lt;&#x2F;h2&gt;</span><br><span class="line">	&lt;&#x2F;div&gt;</span><br><span class="line">&lt;?php endif; ?&gt;</span><br></pre></td></tr></table></figure>
+
+<h3 id="搜索框"><a href="#搜索框" class="headerlink" title="搜索框"></a>搜索框</h3><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><span class="line">&lt;form method&#x3D;&quot;get&quot; id&#x3D;&quot;searchform&quot; action&#x3D;&quot;&lt;?php bloginfo(&#39;home&#39;); ?&gt;&#x2F;&quot;&gt;</span><br><span class="line"></span><br><span class="line">&lt;div&gt;</span><br><span class="line"></span><br><span class="line">	&lt;input type&#x3D;&quot;text&quot; value&#x3D;&quot;&lt;?php echo wp_specialchars($s, 1); ?&gt;&quot; name&#x3D;&quot;s&quot; id&#x3D;&quot;s&quot; size&#x3D;&quot;15&quot; &#x2F;&gt;&lt;br &#x2F;&gt;</span><br><span class="line"></span><br><span class="line">	&lt;input type&#x3D;&quot;submit&quot; id&#x3D;&quot;searchsubmit&quot; value&#x3D;&quot;Search&quot; &#x2F;&gt;</span><br><span class="line"></span><br><span class="line">&lt;&#x2F;div&gt;</span><br><span class="line"></span><br><span class="line">&lt;&#x2F;form&gt;</span><br></pre></td></tr></table></figure>
+    </div>
+
+    
+    
+    
+
+      <footer class="post-footer">
+          <div class="post-tags">
+              <a href="/tags/PHP/" rel="tag"># PHP</a>
+              <a href="/tags/WordPress/" rel="tag"># WordPress</a>
+          </div>
+
+        
+
+
+        
+    <div class="post-nav">
+      <div class="post-nav-item">
+    <a href="/post/a8a5ff12.html" rel="prev" title="ReactNative与iOS原生代码之间传值">
+      <i class="fa fa-chevron-left"></i> ReactNative与iOS原生代码之间传值
+    </a></div>
+      <div class="post-nav-item">
+    <a href="/post/11785d19.html" rel="next" title="ReactNative ListView flexWrap不起作用解决办法">
+      ReactNative ListView flexWrap不起作用解决办法 <i class="fa fa-chevron-right"></i>
+    </a></div>
+    </div>
+      </footer>
+    
+  </article>
+  
+  
+  
+
+
+
+          </div>
+          
+
+<script>
+  window.addEventListener('tabs:register', () => {
+    let { activeClass } = CONFIG.comments;
+    if (CONFIG.comments.storage) {
+      activeClass = localStorage.getItem('comments_active') || activeClass;
+    }
+    if (activeClass) {
+      let activeTab = document.querySelector(`a[href="#comment-${activeClass}"]`);
+      if (activeTab) {
+        activeTab.click();
+      }
+    }
+  });
+  if (CONFIG.comments.storage) {
+    window.addEventListener('tabs:click', event => {
+      if (!event.target.matches('.tabs-comment .tab-content .tab-pane')) return;
+      let commentClass = event.target.classList[1];
+      localStorage.setItem('comments_active', commentClass);
+    });
+  }
+</script>
+
+        </div>
+          
+  
+  <div class="toggle sidebar-toggle">
+    <span class="toggle-line toggle-line-first"></span>
+    <span class="toggle-line toggle-line-middle"></span>
+    <span class="toggle-line toggle-line-last"></span>
+  </div>
+
+  <aside class="sidebar">
+    <div class="sidebar-inner">
+
+      <ul class="sidebar-nav motion-element">
+        <li class="sidebar-nav-toc">
+          Table of Contents
+        </li>
+        <li class="sidebar-nav-overview">
+          Overview
+        </li>
+      </ul>
+
+      <!--noindex-->
+      <div class="post-toc-wrap sidebar-panel">
+          <div class="post-toc motion-element"><ol class="nav"><li class="nav-item nav-level-3"><a class="nav-link" href="#%E5%88%A4%E6%96%AD%E6%98%AF%E5%90%A6%E6%9C%89%E6%97%A5%E5%BF%97%E5%B9%B6%E5%BE%AA%E7%8E%AF%E8%BE%93%E5%87%BA%E6%97%A5%E5%BF%97"><span class="nav-number">1.</span> <span class="nav-text">判断是否有日志并循环输出日志</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E6%90%9C%E7%B4%A2%E6%A1%86"><span class="nav-number">2.</span> <span class="nav-text">搜索框</span></a></li></ol></div>
+      </div>
+      <!--/noindex-->
+
+      <div class="site-overview-wrap sidebar-panel">
+        <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+    <img class="site-author-image" itemprop="image" alt="Arclin"
+      src="https://avatars.githubusercontent.com/u/12107804?v=4">
+  <p class="site-author-name" itemprop="name">Arclin</p>
+  <div class="site-description" itemprop="description">Stay hungry,stay foolish</div>
+</div>
+<div class="site-state-wrap motion-element">
+  <nav class="site-state">
+      <div class="site-state-item site-state-posts">
+          <a href="/archives/">
+        
+          <span class="site-state-item-count">71</span>
+          <span class="site-state-item-name">posts</span>
+        </a>
+      </div>
+      <div class="site-state-item site-state-categories">
+            <a href="/categories/">
+          
+        <span class="site-state-item-count">12</span>
+        <span class="site-state-item-name">categories</span></a>
+      </div>
+      <div class="site-state-item site-state-tags">
+            <a href="/tags/">
+          
+        <span class="site-state-item-count">36</span>
+        <span class="site-state-item-name">tags</span></a>
+      </div>
+  </nav>
+</div>
+  <div class="links-of-author motion-element">
+      <span class="links-of-author-item">
+        <a href="https://github.com/Arc-lin" title="GitHub → https://github.com/Arc-lin" rel="noopener" target="_blank"><i class="fab fa-github fa-fw"></i>GitHub</a>
+      </span>
+      <span class="links-of-author-item">
+        <a href="mailto:arclin325@gmail.com" title="E-Mail → mailto:arclin325@gmail.com" rel="noopener" target="_blank"><i class="fa fa-envelope fa-fw"></i>E-Mail</a>
+      </span>
+  </div>
+
+
+
+      </div>
+
+    </div>
+  </aside>
+  <div id="sidebar-dimmer"></div>
+
+
+      </div>
+    </main>
+
+    <footer class="footer">
+      <div class="footer-inner">
+        
+
+        
+
+<div class="copyright">
+  
+  &copy; 
+  <span itemprop="copyrightYear">2021</span>
+  <span class="with-love">
+    <i class="fa fa-heart"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">Arclin</span>
+</div>
+  <div class="powered-by">Powered by <a href="https://hexo.io" class="theme-link" rel="noopener" target="_blank">Hexo</a> & <a href="https://muse.theme-next.org" class="theme-link" rel="noopener" target="_blank">NexT.Muse</a>
+  </div>
+
+        
+<div class="busuanzi-count">
+  <script async src="https://busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js"></script>
+    <span class="post-meta-item" id="busuanzi_container_site_uv" style="display: none;">
+      <span class="post-meta-item-icon">
+        <i class="fa fa-user"></i>
+      </span>
+      <span class="site-uv" title="Total Visitors">
+        <span id="busuanzi_value_site_uv"></span>
+      </span>
+    </span>
+    <span class="post-meta-divider">|</span>
+    <span class="post-meta-item" id="busuanzi_container_site_pv" style="display: none;">
+      <span class="post-meta-item-icon">
+        <i class="fa fa-eye"></i>
+      </span>
+      <span class="site-pv" title="Total Views">
+        <span id="busuanzi_value_site_pv"></span>
+      </span>
+    </span>
+</div>
+
+
+
+
+
+
+
+
+      </div>
+    </footer>
+  </div>
+
+  
+  <script src="/lib/anime.min.js"></script>
+  <script src="/lib/velocity/velocity.min.js"></script>
+  <script src="/lib/velocity/velocity.ui.min.js"></script>
+
+<script src="/js/utils.js"></script>
+
+<script src="/js/motion.js"></script>
+
+
+<script src="/js/schemes/muse.js"></script>
+
+
+<script src="/js/next-boot.js"></script>
+
+
+
+
+  
+
+
+
+
+  
+<script src="/js/local-search.js"></script>
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+  
+
+</body>
+</html>
