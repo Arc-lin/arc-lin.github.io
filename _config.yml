@@ -108,7 +108,6 @@ algolia:
 
 backup:
   type: git
-  theme: material-x-1.2.1
   repository:
     github: git@github.com:Arc-lin/arc-lin.github.io.git,backup
 
