@@ -47,9 +47,9 @@
 <meta property="article:modified_time" content="2021-04-12T06:07:04.036Z">
 <meta property="article:author" content="Arclin">
 <meta property="article:tag" content="Jenkins">
+<meta property="article:tag" content="Fir">
 <meta property="article:tag" content="Git">
 <meta property="article:tag" content="CocoaPods">
-<meta property="article:tag" content="Fir">
 <meta name="twitter:card" content="summary">
 <meta name="twitter:image" content="https://raw.githubusercontent.com/Arc-lin/BlogImage/master/888.png">
 
@@ -361,9 +361,9 @@
       <footer class="post-footer">
           <div class="post-tags">
               <a href="/tags/Jenkins/" rel="tag"># Jenkins</a>
+              <a href="/tags/Fir/" rel="tag"># Fir</a>
               <a href="/tags/Git/" rel="tag"># Git</a>
               <a href="/tags/CocoaPods/" rel="tag"># CocoaPods</a>
-              <a href="/tags/Fir/" rel="tag"># Fir</a>
           </div>
 
         
@@ -391,6 +391,7 @@
 
           </div>
           
+    <div class="comments" id="gitalk-container"></div>
 
 <script>
   window.addEventListener('tabs:register', () => {
@@ -584,6 +585,26 @@
   
 
   
+
+<link rel="stylesheet" href="//cdn.jsdelivr.net/npm/gitalk@1/dist/gitalk.min.css">
+
+<script>
+NexT.utils.loadComments(document.querySelector('#gitalk-container'), () => {
+  NexT.utils.getScript('//cdn.jsdelivr.net/npm/gitalk@1/dist/gitalk.min.js', () => {
+    var gitalk = new Gitalk({
+      clientID    : 'df6d1f33bb4a66f5fa60# GitHub Application Client ID',
+      clientSecret: '5fcc9fb756ac9d4b16381288da7b29f691b45e0a# GitHub Application Client Secret',
+      repo        : 'arc-lin.github.io# Repository name to store issues',
+      owner       : 'Arc-lin# GitHub repo owner',
+      admin       : ['Arc-lin# GitHub repo owner and collaborators, only these guys can initialize gitHub issues'],
+      id          : '86260d5ce22b28f0a1f89674fb869342',
+        language: '',
+      distractionFreeMode: false
+    });
+    gitalk.render('gitalk-container');
+  }, window.Gitalk);
+});
+</script>
 
 </body>
 </html>

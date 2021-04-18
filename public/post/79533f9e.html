@@ -296,12 +296,12 @@
         
     <div class="post-nav">
       <div class="post-nav-item">
-    <a href="/post/890a3088.html" rel="prev" title="URLWithString返回空">
-      <i class="fa fa-chevron-left"></i> URLWithString返回空
+    <a href="/post/452efb32.html" rel="prev" title="RAC关于cell上的按钮点击后会重复发送信号的问题">
+      <i class="fa fa-chevron-left"></i> RAC关于cell上的按钮点击后会重复发送信号的问题
     </a></div>
       <div class="post-nav-item">
-    <a href="/post/452efb32.html" rel="next" title="RAC关于cell上的按钮点击后会重复发送信号的问题">
-      RAC关于cell上的按钮点击后会重复发送信号的问题 <i class="fa fa-chevron-right"></i>
+    <a href="/post/a8ea2211.html" rel="next" title="ALAsset-Type:Unknown的问题">
+      ALAsset-Type:Unknown的问题 <i class="fa fa-chevron-right"></i>
     </a></div>
     </div>
       </footer>
@@ -315,6 +315,7 @@
 
           </div>
           
+    <div class="comments" id="gitalk-container"></div>
 
 <script>
   window.addEventListener('tabs:register', () => {
@@ -507,6 +508,26 @@
   
 
   
+
+<link rel="stylesheet" href="//cdn.jsdelivr.net/npm/gitalk@1/dist/gitalk.min.css">
+
+<script>
+NexT.utils.loadComments(document.querySelector('#gitalk-container'), () => {
+  NexT.utils.getScript('//cdn.jsdelivr.net/npm/gitalk@1/dist/gitalk.min.js', () => {
+    var gitalk = new Gitalk({
+      clientID    : 'df6d1f33bb4a66f5fa60# GitHub Application Client ID',
+      clientSecret: '5fcc9fb756ac9d4b16381288da7b29f691b45e0a# GitHub Application Client Secret',
+      repo        : 'arc-lin.github.io# Repository name to store issues',
+      owner       : 'Arc-lin# GitHub repo owner',
+      admin       : ['Arc-lin# GitHub repo owner and collaborators, only these guys can initialize gitHub issues'],
+      id          : '92b7b30dafaada93deefe75ad45dc51a',
+        language: '',
+      distractionFreeMode: false
+    });
+    gitalk.render('gitalk-container');
+  }, window.Gitalk);
+});
+</script>
 
 </body>
 </html>

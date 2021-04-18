@@ -1,9 +1,9 @@
 
 username="Arc-lin" # GitHub 用户名
 token="1387c45badf63c8334142c74fc6dc2470752ef70"  # GitHub Token
-repo_name="Gitment" # 存放 issues
+repo_name="gitalk" # 存放 issues
 sitemap_url="https://arclin.me/sitemap.xml"
-kind="gitment" # "Gitalk" or "gitment"
+kind="Gitalk" # "Gitalk" or "gitment"
 
 require 'open-uri'
 require 'faraday'
@@ -21,7 +21,7 @@ end
 
 urls.each_with_index do |url, index|
   title = open(url).read.scan(/<title>(.*?)<\/title>/).first.first.force_encoding('UTF-8')
-  new_url = url.gsub("https://arclin.me",'')
+  new_url = url.gsub("https://arclin.cn",'')
   response = conn.post do |req|
     req.body = { body: url, labels: [kind, new_url], title: title }.to_json
   end
