@@ -1548,6 +1548,7 @@
       </categories>
       <tags>
         <tag>iOS</tag>
+        <tag>feature</tag>
       </tags>
   </entry>
   <entry>
@@ -1990,7 +1991,7 @@
       </tags>
   </entry>
   <entry>
-    <title>Jenkins+Git+CocoaPods+Fir.im实现iOS应用持续集成</title>
+    <title>Jenkins+Git+Cocoapods+Fir.im实现iOS应用持续集成</title>
     <url>/post/13ecfb47.html</url>
     <content><![CDATA[<p>Jenkins 可以定时检测 Git 上的某个分支的代码，打包生成 ipa 后直接上传到 Fir.im</p>
 <span id="more"></span>
@@ -2082,7 +2083,7 @@
         <tag>Jenkins</tag>
         <tag>Fir</tag>
         <tag>Git</tag>
-        <tag>CocoaPods</tag>
+        <tag>Cocoapods</tag>
       </tags>
   </entry>
   <entry>
@@ -3639,8 +3640,8 @@
         <category>Git</category>
       </categories>
       <tags>
+        <tag>Git</tag>
         <tag>技巧</tag>
-        <tag>git</tag>
       </tags>
   </entry>
   <entry>
@@ -3776,6 +3777,372 @@
       </categories>
       <tags>
         <tag>iOS</tag>
+      </tags>
+  </entry>
+  <entry>
+    <title>iOS14 App Clips</title>
+    <url>/post/a44df9c3.html</url>
+    <content><![CDATA[<blockquote>
+<p>本文将主要探讨App Clips开发流程 和 组件化、非组件化两种开发方式下如何复用代码的问题。</p>
+</blockquote>
+<span id="more"></span>
+
+<p>App Clips是iOS14系统的新特性之一，类似于小程序，用户可以在不下载App的情况下体验到App的部分功能，如网易严选的商品详情功能（<a href="https://m.you.163.com/item/detail?id=1615007#/?_k=yz97vw">https://m.you.163.com/item/detail?id=1615007#/?_k=yz97vw</a>），该功能适合做一些推广和引流的运营工作，另外苹果也提供的原生的浮窗样式，可以引导用户下载完整版App。</p>
+<p>苹果官方文档：<a href="https://developer.apple.com/app-clips/">https://developer.apple.com/app-clips/</a></p>
+<h3 id="目前已知的触发方式"><a href="#目前已知的触发方式" class="headerlink" title="目前已知的触发方式"></a>目前已知的触发方式</h3><ul>
+<li><p>二维码</p>
+<p>  必须使用iOS 14系统相机或者使用控制中心的读取二维码组件来扫码才能触发App Clips。</p>
+</li>
+<li><p>NFC Tags</p>
+<p>  NFC标签感应，比如星巴克桌面内嵌的NFC Tags。</p>
+</li>
+<li><p>Safari App Banner</p>
+<p>  当用户用iOS的Safari浏览器浏览相应的网址后，页面顶部会出现一个横幅，提示用户有App Clips可以用。</p>
+</li>
+<li><p>信息</p>
+<p>  iOS系统自带的iMessage，当你在iMessage发送一个App Clips链接时，系统会自动把信息显示成一个App Clips的卡片。</p>
+</li>
+</ul>
+<p><img src="https://p3-juejin.byteimg.com/tos-cn-i-k3u1fbpfcp/a13d29c7a17d471dbc551c416ce2ed57~tplv-k3u1fbpfcp-watermark.image"></p>
+<h3 id="开发前置工作"><a href="#开发前置工作" class="headerlink" title="开发前置工作"></a>开发前置工作</h3><h4 id="申请证书"><a href="#申请证书" class="headerlink" title="申请证书"></a>申请证书</h4><h5 id="创建App-Clips-ID"><a href="#创建App-Clips-ID" class="headerlink" title="创建App Clips ID"></a>创建App Clips ID</h5><ol>
+<li>点击新增APP ID</li>
+</ol>
+<img src="https://p3-juejin.byteimg.com/tos-cn-i-k3u1fbpfcp/d62145df226549428f600ace6f1b44cb~tplv-k3u1fbpfcp-zoom-1.image" >
+
+<ol start="2">
+<li>选择App Clip <img src="https://p3-juejin.byteimg.com/tos-cn-i-k3u1fbpfcp/f93a07c34f7249b982f0cbca84bfcafe~tplv-k3u1fbpfcp-zoom-1.image" >
+<img src="https://p3-juejin.byteimg.com/tos-cn-i-k3u1fbpfcp/1da0c96044db46bb897aab6f71543c8d~tplv-k3u1fbpfcp-zoom-1.image" ></li>
+</ol>
+<ol start="3">
+<li>输入一串英文名，用于拼接在主工程的bundle id的后面，生成该clip的bundle id <img src="https://p3-juejin.byteimg.com/tos-cn-i-k3u1fbpfcp/a2ae0fb422f149d98589f36c80123315~tplv-k3u1fbpfcp-zoom-1.image" >
+ </li>
+<li>在Description内输入描述（不能使用特殊符号），并且在下方勾选App Clip能力，比如Apple Pay，Sign in with Apple，Push等等，<strong>Associated Domains必须勾选</strong><img src="https://p3-juejin.byteimg.com/tos-cn-i-k3u1fbpfcp/33e78440190242efaa8dac9b47004393~tplv-k3u1fbpfcp-zoom-1.image" >
+ </li>
+<li>最后确认并点击右上方Register即可</li>
+</ol>
+<h5 id="创建Profiles"><a href="#创建Profiles" class="headerlink" title="创建Profiles"></a>创建Profiles</h5><p>流程跟创建App的Profiles一样，就是选择bundle id的时候改成Clip的bundle id 即可，同样有Development、AdHoc、Distribution三种类型</p>
+<img src="https://p3-juejin.byteimg.com/tos-cn-i-k3u1fbpfcp/68bfe6ee218047b7a3232058dcc2e006~tplv-k3u1fbpfcp-zoom-1.image" >
+
+<h5 id="其他配置"><a href="#其他配置" class="headerlink" title="其他配置"></a>其他配置</h5><p>如果需要其他NFC、地点等等的一些方式触发App Clip配置的话，参考这个苹果的文档<a href="https://help.apple.com/app-store-connect/#/dev5b665db74">https://help.apple.com/app-store-connect/#/dev5b665db74</a></p>
+<h4 id="Apple-Store-Connect-配置图片和标题，描述"><a href="#Apple-Store-Connect-配置图片和标题，描述" class="headerlink" title="Apple Store Connect 配置图片和标题，描述"></a>Apple Store Connect 配置图片和标题，描述</h4><ol>
+<li>需要一张1800 * 1200 的图片，用于显示在Clip的卡片上</li>
+<li>副标题用于显示在卡片标题下的小字，如图所示<img src="https://p3-juejin.byteimg.com/tos-cn-i-k3u1fbpfcp/4b3e18f56f6d49219fc46f77dab1cef2~tplv-k3u1fbpfcp-zoom-1.image" width=30%></li>
+<li>操作包括“打开”“查看”“开始游戏”，体现在卡片右边的蓝色按钮内的文案，根据你的产品类型进行选择就好</li>
+</ol>
+<img src="https://p3-juejin.byteimg.com/tos-cn-i-k3u1fbpfcp/0c14c35967084886bc3f4fce6e985fcb~tplv-k3u1fbpfcp-zoom-1.image" >
+
+
+<h4 id="配置apple-app-site-association-json"><a href="#配置apple-app-site-association-json" class="headerlink" title="配置apple-app-site-association.json"></a>配置apple-app-site-association.json</h4><p>假设你的开发者账号的Team Id是<code>A123</code>，Clips的bundle id是<code>com.abc.def.clips</code>，主工程的bundle id 是<code>com.abc.def</code>，则配置如下</p>
+<figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">&#123;</span><br><span class="line">    &quot;appclips&quot;:&#123;</span><br><span class="line">        &quot;apps&quot;:[&quot;A123.com.abc.def.clips&quot;]</span><br><span class="line">    &#125;,</span><br><span class="line">    &quot;applinks&quot;:&#123;</span><br><span class="line">        &quot;apps&quot;:[</span><br><span class="line">        ],</span><br><span class="line">        &quot;details&quot;:&#123;</span><br><span class="line">            &quot;A123.com.abc.def&quot;:&#123;</span><br><span class="line">                &quot;paths&quot;:[</span><br><span class="line">                    &quot;*&quot; &#x2F;&#x2F; 这里的Path根据实际情况配置即可</span><br><span class="line">                ]</span><br><span class="line">            &#125;</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;,</span><br><span class="line">    &quot;webcredentials&quot;:&#123;</span><br><span class="line">        &quot;apps&quot;:[</span><br><span class="line">            &quot;A123.com.abc.def&quot;,</span><br><span class="line">        ]</span><br><span class="line">    &#125;,</span><br><span class="line">    &quot;activitycontinuation&quot;:&#123;</span><br><span class="line">        &quot;apps&quot;:[</span><br><span class="line">            &quot;A123.com.abc.def&quot;,</span><br><span class="line">        ]</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>配置完成后部署到你自己域名的根目录下，配置方法网上很多教程，这里贴上<a href="https://developer.apple.com/documentation/safariservices/supporting_associated_domains?language=objc">苹果官方文档</a></p>
+<p>如果配置错了，那么上传包到苹果后台之后，就会显示无效域名<br><img src="https://p3-juejin.byteimg.com/tos-cn-i-k3u1fbpfcp/05ddb4d106a349d28c1504762697a9eb~tplv-k3u1fbpfcp-zoom-1.image"></p>
+<p>如果是json配置错误，那么配置正确后不用重新传包，等待苹果那边刷新缓存就好。</p>
+<p>App Clip支持最多在三个域名的网页显示入口，到后面的工程配置那里会说明。</p>
+<h4 id="前端页面添加meta标签"><a href="#前端页面添加meta标签" class="headerlink" title="前端页面添加meta标签"></a>前端页面添加meta标签</h4><p>如果要在H5页面显示Clips入口，加上一段meta标签即可</p>
+<p>如果你的应用市场App id是 <code>123456</code>, Clips的bundle id 是 <code>com.abc.clips</code> 则应该配置</p>
+<figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">&lt;meta name&#x3D;&quot;apple-itunes-app&quot; content&#x3D;&quot;app-id&#x3D;123456,app-clip-bundle-id&#x3D;com.abc.clips&quot;&gt;</span><br></pre></td></tr></table></figure>
+
+<h3 id="开发工作"><a href="#开发工作" class="headerlink" title="开发工作"></a>开发工作</h3><h4 id="新建App-Clip-Target"><a href="#新建App-Clip-Target" class="headerlink" title="新建App Clip Target"></a>新建App Clip Target</h4><p>这里以OC工程为例</p>
+<img src="https://p3-juejin.byteimg.com/tos-cn-i-k3u1fbpfcp/9edc6108c0b64885b708ef5c9de8e1d0~tplv-k3u1fbpfcp-zoom-1.image" >
+<img src="https://p3-juejin.byteimg.com/tos-cn-i-k3u1fbpfcp/fa5c9c1032174d77a4db0518029b78dd~tplv-k3u1fbpfcp-zoom-1.image" >
+
+<h4 id="配置证书和Associated-Domains"><a href="#配置证书和Associated-Domains" class="headerlink" title="配置证书和Associated Domains"></a>配置证书和Associated Domains</h4><p>用刚才生成的证书去配置一下即可</p>
+<img src="https://p3-juejin.byteimg.com/tos-cn-i-k3u1fbpfcp/5fbccb4eee1445ca9b680200358535e0~tplv-k3u1fbpfcp-zoom-1.image" >
+
+<p>添加Associated Domains，目的是打开对应域名网页后，页面上方能够出现Clip的入口。</p>
+<p><strong>这里可以添加多个域名，注意每个域名都需要配置apple-app-site-association！！！</strong></p>
+<p><strong>主工程的Target和Clip的Target都需要配置！！！</strong></p>
+<img src="https://p3-juejin.byteimg.com/tos-cn-i-k3u1fbpfcp/a5125ca96f15433b8205294e48906e13~tplv-k3u1fbpfcp-zoom-1.image" >
+
+<h4 id="编写代码"><a href="#编写代码" class="headerlink" title="编写代码"></a>编写代码</h4><p>创建完之后就会生成一个文件夹，里面就是我们熟悉的AppDelegate、SecneDelegate、Main.storyboard、Info.plist等文件，如果你不使用Storyboard进行界面搭建，那么也是跟之前的开发模式一样，删除info.plist内Application Scene Manifest，修改General-Deployment info - Main interface 为空，修改AppDelegate.m，在里面创建根控制器。</p>
+<p>之后的操作就跟普通开发一样了，调试的话可以直接在Xcode上左上角选择Clip的target，然后就可以跑起来了。</p>
+<p>另外，AppIcon是需要独立配置的，同样也是在Clip项目工程文件夹内Assets.xcassets。</p>
+<h5 id="非组件化开发模式"><a href="#非组件化开发模式" class="headerlink" title="非组件化开发模式"></a>非组件化开发模式</h5><p>一般情况下我们是需要复用代码的，将代码内某些模块功能进行复用，然后直接用在Clip，这时候我们只需要在右侧Target Membership勾选新建的Clip Target即可。</p>
+<img src="https://p3-juejin.byteimg.com/tos-cn-i-k3u1fbpfcp/0c2847eb910740229f410d0aa29f7bb5~tplv-k3u1fbpfcp-zoom-1.image" width=30%>
+
+<p>同样的 相关的依赖到的文件也需要勾选Clip Target</p>
+<h5 id="组件化开发模式-和-Podfile的配置"><a href="#组件化开发模式-和-Podfile的配置" class="headerlink" title="组件化开发模式 和 Podfile的配置"></a>组件化开发模式 和 Podfile的配置</h5><p>如果是在组件化开发模式下，那么就需要配置Podfile</p>
+<p>在Podfile 底部新增代码</p>
+<figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">source &#39;https:&#x2F;&#x2F;github.com&#x2F;CocoaPods&#x2F;Specs.git&#39;</span><br><span class="line"># 你的私有pod仓库</span><br><span class="line">source &#39;https:&#x2F;&#x2F;git.xxx.com&#x2F;yourprivatepodspec&#x2F;Podspec.git&#39;</span><br><span class="line"></span><br><span class="line">target &#39;YourApp’ do</span><br><span class="line">    platform :ios, &#39;10.3&#39;</span><br><span class="line">    pod &quot;AFNetworking&quot;</span><br><span class="line">    pod &quot;SDWebImage&quot;</span><br><span class="line">    # 等等</span><br><span class="line">end</span><br><span class="line"></span><br><span class="line">target &#39;YourApp_Clips&#39; do</span><br><span class="line">    platform :ios, &#39;10.3&#39;</span><br><span class="line">    pod &#39;ComponentA&#39;,           :path&#x3D;&gt; &#39;..&#x2F;ComponentA&#39;</span><br><span class="line">    pod &quot;ComponentB&quot;,           :path&#x3D;&gt;&quot;..&#x2F;ComponentB&quot;</span><br><span class="line">    pod &quot;AFNetworking&quot;</span><br><span class="line">    pod &quot;SDWebImage&quot;</span><br><span class="line">    # 等等</span><br><span class="line">end</span><br><span class="line"></span><br></pre></td></tr></table></figure>
+
+<p>但是这样子相同的第三方pod会写两遍，所以我们可以优化成</p>
+<figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">source &#39;https:&#x2F;&#x2F;github.com&#x2F;CocoaPods&#x2F;Specs.git&#39;</span><br><span class="line"># 你的私有pod仓库</span><br><span class="line">source &#39;https:&#x2F;&#x2F;git.xxx.com&#x2F;yourprivatepodspec&#x2F;Podspec.git&#39;</span><br><span class="line"></span><br><span class="line">def common_pods</span><br><span class="line">    pod &quot;AFNetworking&quot;</span><br><span class="line">    pod &quot;SDWebImage&quot;</span><br><span class="line">end</span><br><span class="line"></span><br><span class="line">target &#39;YourApp’ do</span><br><span class="line">    platform :ios, &#39;10.3&#39;</span><br><span class="line">    common_pods</span><br><span class="line">end</span><br><span class="line"></span><br><span class="line">target &#39;YourApp_Clips&#39; do</span><br><span class="line">    platform :ios, &#39;14.0&#39;</span><br><span class="line">    pod &#39;ComponentA&#39;,           :path&#x3D;&gt; &#39;..&#x2F;ComponentA&#39;</span><br><span class="line">    pod &quot;ComponentB&quot;,           :path&#x3D;&gt;&quot;..&#x2F;ComponentB&quot;</span><br><span class="line">    common_pods</span><br><span class="line">end</span><br><span class="line"></span><br></pre></td></tr></table></figure>
+
+<h5 id="抽离模块时不同环境的代码复用问题"><a href="#抽离模块时不同环境的代码复用问题" class="headerlink" title="抽离模块时不同环境的代码复用问题"></a>抽离模块时不同环境的代码复用问题</h5><p>假如说A功能需要抽离出来放到Clip，但是A模块里面有需求是会跳转到B模块的，但是我并不希望Clip引入B模块，希望他能在这个地方提示用户下载完整App，那应该怎么做呢？</p>
+<p>首先第一个事情，苹果提供了一个Api可以引导弹窗引导用户下载APP</p>
+<img src="https://p3-juejin.byteimg.com/tos-cn-i-k3u1fbpfcp/3fec69fde9e64618819b1b526034d23b~tplv-k3u1fbpfcp-zoom-1.image" width=40%>
+
+<figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">UIWindowScene *scene &#x3D; (UIWindowScene *)[[UIApplication sharedApplication].connectedScenes.allObjects firstObject];</span><br><span class="line">SKOverlayAppConfiguration *config &#x3D; [[SKOverlayAppConfiguration alloc] initWithAppIdentifier:@&quot;你的AppID&quot; position:SKOverlayPositionBottomRaised];</span><br><span class="line">SKOverlay *overlay &#x3D; [[SKOverlay alloc] initWithConfiguration:config];</span><br><span class="line">overlay.delegate &#x3D; self; &#x2F;&#x2F; 添加代理后可以监听弹窗的弹出和消失，可以在代理内添加埋点。</span><br><span class="line">[overlay presentInScene:scene];</span><br><span class="line"></span><br><span class="line">&#x2F;&#x2F; 主动让弹窗消失</span><br><span class="line">&#x2F;&#x2F; [SKOverlay dismissOverlayInScene:scene];</span><br></pre></td></tr></table></figure>
+
+<p>第二. 如何在模块内划分环境，区分是主App还是Clip</p>
+<p>方法一：设计一个单例，添加一个枚举属性，分别在<code>主工程</code>的AppDelegate和<code>Clip</code>的AppDelegate内给单例的属性赋值，标记当前环境。然后在业务代码中获取单例的环境属性后进行判断。</p>
+<p>方法二：有时候我们在Clip复用的模块代码内不需要import某些头文件，因为我们不需要这个功能，这时候单例的方法就不管用了，我们需要通过宏去判断。</p>
+<p>如果代码不在pod组件内的话，只需要在Clip Target的<code>Build Settings</code> - <code>Preprocessor Macros</code>添加<code>APP_CLIPS</code>宏即可。</p>
+<img src="https://p3-juejin.byteimg.com/tos-cn-i-k3u1fbpfcp/7708c16f9c4247a9ab9ec393d01420b1~tplv-k3u1fbpfcp-zoom-1.image" >
+
+<p>如果是组件化的开发模式，代码在pod内部，那么就稍微有点麻烦，需要在对应podspec新增一个subspec，专门提供给clip使用，然后配置上宏定义</p>
+<p><code>ComponentA.podspec</code></p>
+<figure class="highlight plain"><table><tr><td class="code"><pre><span class="line"></span><br><span class="line">s.subspec &quot;App&quot; do |ss|</span><br><span class="line">    ss.source_files &#x3D; &quot;xxxxxx&quot;</span><br><span class="line">end</span><br><span class="line"></span><br><span class="line">s.subspec &quot;AppClip&quot; do |ss|</span><br><span class="line">    ss.source_files &#x3D; &quot;xxxxxx&quot;</span><br><span class="line">    ss.pod_target_xcconfig &#x3D; &#123; &#39;GCC_PREPROCESSOR_DEFINITIONS&#39; &#x3D;&gt; &#39;APP_CLIPS&#x3D;1&#39;&#125;</span><br><span class="line">end</span><br></pre></td></tr></table></figure>
+
+<blockquote>
+<p>这里为什么要弄多一个App的subspec，因为如果主工程直接<code>pod ComponentA</code>的话，所有的subspec都会被引入，所以这里为了区分开，就加多了一个专门给主工程用的subspec</p>
+</blockquote>
+<p><code>Podfile</code></p>
+<figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">def common_pods</span><br><span class="line">    pod &quot;AFNetworking&quot;</span><br><span class="line">    pod &quot;SDWebImage&quot;</span><br><span class="line">end</span><br><span class="line"></span><br><span class="line">target &#39;YourApp’ do</span><br><span class="line">    platform :ios, &#39;10.3&#39;</span><br><span class="line">    common_pods</span><br><span class="line">    pod &#39;ComponentA&#x2F;App&#39;,           :path&#x3D;&gt; &#39;..&#x2F;ComponentA&#39;</span><br><span class="line">end</span><br><span class="line"></span><br><span class="line">target &#39;YourApp_Clips&#39; do</span><br><span class="line">    platform :ios, &#39;14.0&#39;</span><br><span class="line">    pod &#39;ComponentA&#x2F;AppClip&#39;,   :path&#x3D;&gt; &#39;..&#x2F;ComponentA&#39;</span><br><span class="line">    pod &quot;ComponentB&quot;,           :path&#x3D;&gt;&quot;..&#x2F;ComponentB&quot;</span><br><span class="line">    common_pods</span><br><span class="line">end</span><br></pre></td></tr></table></figure>
+
+<p>通过以上方法，就可以用如下方式进行宏判断，区分当前环境</p>
+<figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">#ifdef APP_CLIPS</span><br><span class="line"></span><br><span class="line">#else</span><br><span class="line"></span><br><span class="line">#endif</span><br></pre></td></tr></table></figure>
+
+<h3 id="测试工作"><a href="#测试工作" class="headerlink" title="测试工作"></a>测试工作</h3><h4 id="开发调试"><a href="#开发调试" class="headerlink" title="开发调试"></a>开发调试</h4><ul>
+<li><p>可以选择Clip Target直接使用Xcode编译运行</p>
+</li>
+<li><p>可以使用真机扫描二维码，调起Clip卡片，但是前提是Clip要先在真机跑一遍。</p>
+<ol>
+<li>手机点击<code>设置-开发者-Local Experiences-Register Local Experience</code></li>
+<li>输入域名、Clip的bundle id、标题、子标题，选择按钮标题、选择Clip弹出的卡片上的图片，然后点击存储即可。</li>
+<li>将刚才输入的域名，去草料二维码等二维码生成网站生成一个二维码，然后手机相机扫描即可弹出卡片样式。</li>
+<li>具体内容可以参考<a href="https://developer.apple.com/documentation/app_clips/testing_your_app_clip_s_launch_experience?language=objc">官方文档</a></li>
+</ol>
+</li>
+</ul>
+<h4 id="外部测试"><a href="#外部测试" class="headerlink" title="外部测试"></a>外部测试</h4><ol>
+<li>可以通过Archive打Release环境的包（Debug状态下没有选择导出Clip ipa的选项，不知道是哪里配置问题，如果有知道的小伙伴可以评论区分享一下），然后单独导出Clip的ipa，上传到蒲公英或者Fir等分发平台，测试同事就可以下载安装测试了。</li>
+<li>如果已经传到了TestFlight，那么也可以在TestFlight上直接点击打开小程序进行测试。</li>
+</ol>
+<h3 id="苹果官方提及的产品要求"><a href="#苹果官方提及的产品要求" class="headerlink" title="苹果官方提及的产品要求"></a>苹果官方提及的产品要求</h3><p>原文：<a href="https://developer.apple.com/design/human-interface-guidelines/app-clips/overview/">https://developer.apple.com/design/human-interface-guidelines/app-clips/overview/</a></p>
+<p>划重点：</p>
+<ol>
+<li><p>请勿仅将App Clip用作营销用途，不能显示广告。</p>
+</li>
+<li><p>避免登录，避免不了的话尽可能使用Apple id登录</p>
+</li>
+<li><p>Clips启动后只有在8小时内才能接收推送</p>
+</li>
+</ol>
+<h3 id="Q-amp-A"><a href="#Q-amp-A" class="headerlink" title="Q&amp;A"></a>Q&amp;A</h3><ol>
+<li><p>苹果文档说的App Clips 10M限制指的是哪个文件的10M</p>
+<p> 经过测试后发现，应该是Release环境下Archive后，导出的Clips的ipa的大小，如果有误欢迎评论区指正。</p>
+</li>
+<li><p>Clips可以有登录功能吗？</p>
+<p> 可以，但是苹果希望用户能不登录就使用App，如果要登录也首选Sign in with Apple登录的方式(iOS13特性)，但是我们可以学网易严选那样子苹果ID登录之后再弹出手机验证码绑定功能。</p>
+</li>
+<li><p>可以有内购吗？</p>
+<p> 可以。</p>
+</li>
+<li><p>用户使用完Clips后，如果想再次进入，入口在哪儿？</p>
+<p> 假如是网页打开的Clips，那么离开网页后，在桌面的”资源库”里可以找到这个Clips并重新打开。如果找不到就搜索资源库，总能搜到的。</p>
+</li>
+</ol>
+]]></content>
+      <categories>
+        <category>iOS</category>
+      </categories>
+      <tags>
+        <tag>iOS</tag>
+        <tag>feature</tag>
+      </tags>
+  </entry>
+  <entry>
+    <title>iOS14新API</title>
+    <url>/post/36f1cd4f.html</url>
+    <content><![CDATA[<p>iOS 14 新API</p>
+<span id="more"></span>
+
+<h3 id="Control-Appearance-update"><a href="#Control-Appearance-update" class="headerlink" title="Control Appearance update"></a>Control Appearance update</h3><p>控件外观更新，比如UISlider、 UIProgressView、UIActivityIndicatorView，长得稍微有点不一样，不影响适配。</p>
+<p><img src="https://s1.ax1x.com/2020/06/29/NfJ6zt.png"></p>
+<p>UIPageControl样式改变并且可以自定义icon</p>
+<p><img src="https://s1.ax1x.com/2020/06/29/NfYs7F.png"></p>
+<p>自定义小心心icon和书签icon</p>
+<p><img src="https://s1.ax1x.com/2020/06/29/NfYO1I.png"></p>
+<h3 id="Color-Picker"><a href="#Color-Picker" class="headerlink" title="Color Picker"></a>Color Picker</h3><p>新增颜色选择器<code>UIColorPickerViewController</code></p>
+<p>支持取色器 收藏常用颜色等等</p>
+<p>可以配置是否支持调整透明度等等，具体配置项目参考api文档</p>
+<p>建议Present弹出</p>
+<p><a href="https://sm.ms/image/iz1WnGFImlUvkty" target="_blank"><img src="https://i.loli.net/2020/06/29/iz1WnGFImlUvkty.png" width=50% ></a></p>
+<h3 id="Date-Picker"><a href="#Date-Picker" class="headerlink" title="Date Picker"></a>Date Picker</h3><p>UIDatePicker更新UI</p>
+<p>两种样式</p>
+<p>支持农历</p>
+<p><a href="https://sm.ms/image/wMmTIykghRNqWQn" target="_blank"><img src="https://i.loli.net/2020/06/29/wMmTIykghRNqWQn.png" width=50% ></a></p>
+<p><a href="https://sm.ms/image/uF3WonxPAsDyXaO" target="_blank"><img src="https://i.loli.net/2020/06/29/uF3WonxPAsDyXaO.png" width=50% ></a></p>
+<h3 id="Menus"><a href="#Menus" class="headerlink" title="Menus"></a>Menus</h3><p>貌似可以替代我们常有的角标弹窗列表按钮需求</p>
+<p>基于<code>UIButton</code>和<code>UIBarButtonItem</code>的新增的<code>menu</code>属性，可以配置长按或者单击(配置 <code>button.showsMenuAsPrimaryAction = true</code>)弹出菜单列表</p>
+<p><a href="https://sm.ms/image/L1XmoD2d7EKj49Y" target="_blank"><img src="https://i.loli.net/2020/06/29/L1XmoD2d7EKj49Y.png" width=50% ></a></p>
+<p><a href="https://sm.ms/image/ZflMaksQFDuKp3T" target="_blank"><img src="https://i.loli.net/2020/06/29/ZflMaksQFDuKp3T.png" width=50% ></a></p>
+<p>UINavigationBar 的原生返回按钮长按会弹出菜单，可以跳回导航栏栈中的任意一个页面，按钮标题为前面控制器的标题</p>
+<p><a href="https://sm.ms/image/FVdgXvpGeTBfYKZ" target="_blank"><img src="https://i.loli.net/2020/06/29/FVdgXvpGeTBfYKZ.png" width=50% ></a></p>
+<p>更新弹出菜单内容，将会实时更新并自带系统动画：</p>
+<p><code>updateVisibleMenu(_ block: (UIMenu) -&gt; UIMenu)</code></p>
+<h3 id="UIActions"><a href="#UIActions" class="headerlink" title="UIActions"></a>UIActions</h3><p>UIBarButtonItem 新增 fixedSpace(width:) 和 flexibleSpace方法 去调节item之间的间隔，不用像之前那样子创建一个fixedSpace类型的UIBarButtonItem去占位</p>
+<p>UIButton新增了一个初始化方法init(type:primaryAction:) type默认为.system 标题为primaryAction.title ，图片为 primaryAction.image</p>
+<h3 id="WidgetKit"><a href="#WidgetKit" class="headerlink" title="WidgetKit"></a>WidgetKit</h3><p>iOS14 重大新特性之一 支持三种宽度的widget，具体内容另外开篇再讲<br><a href="https://sm.ms/image/eiXyvjhfgAqQURr" target="_blank"><img src="https://i.loli.net/2020/06/29/eiXyvjhfgAqQURr.png" width=50% ></a></p>
+<h3 id="让你的app支持物理键盘"><a href="#让你的app支持物理键盘" class="headerlink" title="让你的app支持物理键盘"></a>让你的app支持物理键盘</h3><p><a href="https://developer.apple.com/documentation/uikit/keyboards_and_input/adding_hardware_keyboard_support_to_your_app">具体内容查看文档</a></p>
+<h3 id="Asynchronously-Loading-Images-into-Table-and-Collection-Views"><a href="#Asynchronously-Loading-Images-into-Table-and-Collection-Views" class="headerlink" title="Asynchronously Loading Images into Table and Collection Views"></a>Asynchronously Loading Images into Table and Collection Views</h3><p><a href="https://developer.apple.com/documentation/uikit/uiimage/asynchronously_loading_images_into_table_and_collection_views">文档</a></p>
+<p>tableView和CollectionView异步加载网络图片的API</p>
+<h3 id="PHPicker-图片选择器"><a href="#PHPicker-图片选择器" class="headerlink" title="PHPicker 图片选择器"></a>PHPicker 图片选择器</h3><p>新的图片选择器，支持多选，不需要用户允许相册访问权限，可以选择图片（包括livePhoto）和视频</p>
+<p><a href="https://sm.ms/image/R9fc3SZIlpLhuwB" target="_blank"><img src="https://i.loli.net/2020/06/29/R9fc3SZIlpLhuwB.png" width=50% ></a></p>
+<h3 id="定位权限更新"><a href="#定位权限更新" class="headerlink" title="定位权限更新"></a>定位权限更新</h3><p>旧的定位权限弹窗如下：</p>
+<p><a href="https://sm.ms/image/kSgBdY3hjRWG21E" target="_blank"><img src="https://i.loli.net/2020/06/29/kSgBdY3hjRWG21E.png" width=50% ></a></p>
+<p>新的定位权限弹窗如下：</p>
+<p><a href="https://sm.ms/image/svo9OnAS1BZdLDP" target="_blank"><img src="https://i.loli.net/2020/06/29/svo9OnAS1BZdLDP.png" width=50% ></a></p>
+<p>多了个小地图，并且小地图的左上角多了个按钮，点击选择是否允许准确定位。</p>
+<p>若不允许的话，开发者获取的定位会变成一个±5公里的范围，并且只能持续定位最多20分钟</p>
+<p>通过一个枚举值得知是否用户选择了模糊定位：</p>
+<p><a href="https://sm.ms/image/9gh6mbKL7VWe3uH" target="_blank"><img src="https://i.loli.net/2020/06/29/9gh6mbKL7VWe3uH.png" ></a></p>
+<p>用户可以改变设置，是否允许app获取准确定位</p>
+<p><a href="https://sm.ms/image/jsQr4xoevXNa2Ju" target="_blank"><img src="https://i.loli.net/2020/06/29/jsQr4xoevXNa2Ju.png" ></a></p>
+<p>开发者可以通过在<code>info.plist</code>里面配置信息解释为何需要用户选择准确定位</p>
+<p><a href="https://sm.ms/image/X5CRUopcnOHG3I2" target="_blank"><img src="https://i.loli.net/2020/06/29/X5CRUopcnOHG3I2.png" ></a></p>
+<p>让隐私弹窗默认选择模糊定位</p>
+<p><a href="https://sm.ms/image/UeLtJhGXOvbKmns" target="_blank"><img src="https://i.loli.net/2020/06/29/UeLtJhGXOvbKmns.png" width=50%></a></p>
+<h3 id="UICollectionView重大更新"><a href="#UICollectionView重大更新" class="headerlink" title="UICollectionView重大更新"></a>UICollectionView重大更新</h3><p>UICollection从数据源协议到Cell都有了新的API，开发者可以为cell添加各种“附件”，已适配复杂的列表样式，如下第二张图，另外可以在collectionView上使用类似tableView的样式，如下图</p>
+<p><a href="https://sm.ms/image/Iaho8TuHE1P4iRx" target="_blank"><img src="https://i.loli.net/2020/06/30/Iaho8TuHE1P4iRx.png" ></a></p>
+<p><a href="https://sm.ms/image/taEDOVHfAk2LnQe" target="_blank"><img src="https://i.loli.net/2020/06/30/taEDOVHfAk2LnQe.png"  width=50% ></a></p>
+<p>通过新的配置类，可以做成如下效果</p>
+<p><a href="https://sm.ms/image/nlrR8VBkzqy2SdP" target="_blank"><img src="https://i.loli.net/2020/06/30/nlrR8VBkzqy2SdP.png"  width=50% ></a></p>
+<p><a href="https://sm.ms/image/PhtUgJrCR2OTQwY" target="_blank"><img src="https://i.loli.net/2020/06/30/PhtUgJrCR2OTQwY.png"  width=50% ></a></p>
+<p>新增一个UICollectionListViewCell，可以做出如下样式的cell</p>
+<p><a href="https://sm.ms/image/jlZKFpCybNJPoET" target="_blank"><img src="https://i.loli.net/2020/06/30/jlZKFpCybNJPoET.png" width=50%  ></a></p>
+<p>Cell的注册方式也有所改变，可以看出苹果从API层面已经进入MVVM架构模式了，注册cell需要带上对应的CellViewModel</p>
+<p><a href="https://sm.ms/image/2awdL6yOmUzIGrZ" target="_blank"><img src="https://i.loli.net/2020/06/30/2awdL6yOmUzIGrZ.jpg" width=50% ></a></p>
+<p>另外也支持像UITableViewCell的侧滑操作等等，详细内容将会另外开篇讲述。</p>
+<p>具体查看<a href="https://developer.apple.com/videos/play/wwdc2020/10097/">视频</a></p>
+]]></content>
+      <categories>
+        <category>iOS</category>
+      </categories>
+      <tags>
+        <tag>iOS</tag>
+        <tag>feature</tag>
+      </tags>
+  </entry>
+  <entry>
+    <title>SwiftUI指南</title>
+    <url>/post/f6762f39.html</url>
+    <content><![CDATA[<p>iOS 13 SwiftUI 指南</p>
+<span id="more"></span>
+
+<h3 id="布局方向"><a href="#布局方向" class="headerlink" title="布局方向"></a>布局方向</h3><h4 id="VStack-垂直布局"><a href="#VStack-垂直布局" class="headerlink" title="VStack 垂直布局"></a>VStack 垂直布局</h4><p>默认垂直方向居中布局</p>
+<figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">VStack &#123;</span><br><span class="line">	Text(&quot;默认居中&quot;)</span><br><span class="line">	Text(&quot;Hello, World!&quot;)</span><br><span class="line">	Text(&quot;Hello, World Again!&quot;)</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>对齐方向参数可选(<code>.leading</code>,<code>.trailing</code>,<code>.center</code>)</p>
+<figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">VStack(alignment:.leading) &#123;</span><br><span class="line">	Text(&quot;左对齐&quot;)</span><br><span class="line">	Text(&quot;Hello, World!&quot;)</span><br><span class="line">	Text(&quot;Hello, World Again!&quot;)</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<h4 id="HStack-水平布局"><a href="#HStack-水平布局" class="headerlink" title="HStack 水平布局"></a>HStack 水平布局</h4><p>默认水平方向居中布局</p>
+<figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">HStack &#123;</span><br><span class="line">	Text(&quot;默认居中&quot;)</span><br><span class="line">	Text(&quot;Hello, World!&quot;)</span><br><span class="line">	Text(&quot;Hello, World Again!&quot;)</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>对齐方向参数可选(<code>.top</code>,<code>.bottom</code>,<code>.center</code>)</p>
+<figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">HStack(alignment:.bottom) &#123;</span><br><span class="line">	Text(&quot;左对齐&quot;)</span><br><span class="line">	Text(&quot;Hello, World!&quot;)</span><br><span class="line">	Text(&quot;Hello, World Again!&quot;)</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<h3 id="ZStack-前后布局"><a href="#ZStack-前后布局" class="headerlink" title="ZStack 前后布局"></a>ZStack 前后布局</h3><p>代码下面内容的盖住上面的内容</p>
+<p>默认水平居中&amp;垂直居中</p>
+<figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">ZStack &#123;</span><br><span class="line">	Text(&quot;默认居中&quot;)</span><br><span class="line">	Text(&quot;Hello, World!&quot;)</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>对齐方向参数可选(<code>.leading</code>,<code>.trailing</code>,<code>.top</code>,<code>.bottom</code>,<code>.topLeading</code>,<code>.topTrailing</code>,<code>.bottomLeading</code>,<code>.bottomTrailing</code>)</p>
+<figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">ZStack(alignment:.bottom) &#123;</span><br><span class="line">	Text(&quot;底部对齐&quot;)</span><br><span class="line">	Text(&quot;Hello, World!&quot;)</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<h3 id="Padding"><a href="#Padding" class="headerlink" title="Padding"></a>Padding</h3><p>内边距，用来撑开你的布局</p>
+<p>默认撑开上下左右各16pt</p>
+<figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">ZStack&#123;</span><br><span class="line">	Text(&quot;默认居中&quot;).padding()</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>可以指定哪个位置撑开和数值大小</p>
+<figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">ZStack&#123;</span><br><span class="line">	Text(&quot;默认居中&quot;).padding(20) &#x2F;&#x2F; 上下左右均撑开20</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">ZStack&#123;</span><br><span class="line">	Text(&quot;默认居中&quot;).padding(.leading: 20) &#x2F;&#x2F; 左边撑开20，其他同理</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">ZStack&#123;</span><br><span class="line">	Text(&quot;默认居中&quot;).padding([.leading,.trailing],50).fixedSize() &#x2F;&#x2F; 左边和右边都撑开50，其他同理，fixedSize意思等同于UILabel的sizeToFit</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">ZStack&#123;</span><br><span class="line">	Text(&quot;默认居中&quot;).padding(.leading, 10).padding(.top, 20) &#x2F;&#x2F; 左边10，上边20，其他同理</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<h3 id="Spacer"><a href="#Spacer" class="headerlink" title="Spacer"></a>Spacer</h3><p>用来填充空位。</p>
+<p>因为SwiftUI不像原来的UI开发，是先设置好frame,再往里面添加东西，相反，他是一种先紧紧包住控件，然后通过padding、spacer等元素去“撑开”视图的思想。所以，Spacer在这里有点类似于UIBarButtonItem里的那个<code>UIBarButtonSystemItemFlexibleSpace</code>,就是把东西给撑开。</p>
+<p>举个例子</p>
+<p>水平界面这时候布局紧紧包裹着Text控件</p>
+<figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">HStack &#123;</span><br><span class="line">	Text(&quot;Hello, World!&quot;)</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>如果这时候加一个Spacer,那么Text控件就会靠左，右边部分会被Spacer把剩余空隙填满</p>
+<figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">HStack &#123;</span><br><span class="line">	Text(&quot;Hello, World!&quot;)</span><br><span class="line">	Spacer()</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>同理如果是<code>VStack</code>，写在下面的话，自然就会把Text控件往上顶，然后把剩余屏幕部分填满。</p>
+<h3 id="Image"><a href="#Image" class="headerlink" title="Image"></a>Image</h3><p>直接输入图片名就可以引用本地图片<br><code>Image(&quot;bg_nuanxin_mask&quot;)</code></p>
+<h4 id="resizeable"><a href="#resizeable" class="headerlink" title="resizeable"></a>resizeable</h4><p><code>Image(&quot;bg_nuanxin_mask&quot;).resizable()</code></p>
+<p>把图片撑开</p>
+<h3 id="隐藏NavigationBar"><a href="#隐藏NavigationBar" class="headerlink" title="隐藏NavigationBar"></a>隐藏NavigationBar</h3><figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">NavigationView &#123;</span><br><span class="line">	ZStack &#123;</span><br><span class="line">		&#x2F;&#x2F;...</span><br><span class="line">	&#125;</span><br><span class="line">	.navigationBarHidden(true)</span><br><span class="line">	.navigationBarTitle(&quot;&quot;)</span><br><span class="line">	.navigationBarBackButtonHidden(true)</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<h4 id="这个界面不显示，下个界面要显示导航栏"><a href="#这个界面不显示，下个界面要显示导航栏" class="headerlink" title="这个界面不显示，下个界面要显示导航栏"></a>这个界面不显示，下个界面要显示导航栏</h4><p>当前页面声明一个属性</p>
+<figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">@State private var navBarHidden &#x3D; true</span><br></pre></td></tr></table></figure>
+
+<p>目标页面加一个属性</p>
+<figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">@Binding var navBarHidden : Bool</span><br></pre></td></tr></table></figure>
+
+<p>传值过去</p>
+<figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">NavigationLink(destination:xxxx, navBarHidden: $navBarHidden)) &#123;</span><br><span class="line">   xxxxx</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>目标页面处理</p>
+<figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">var body: some View &#123;</span><br><span class="line">	WebView(webUrl:&quot;https:&#x2F;&#x2F;www.baidu.com&quot;,title: $title)</span><br><span class="line">	.onAppear &#123;</span><br><span class="line">		self.navBarHidden &#x3D; false</span><br><span class="line">	&#125;</span><br><span class="line">	.onDisappear &#123;</span><br><span class="line">		self.navBarHidden &#x3D; true</span><br><span class="line">	&#125;</span><br><span class="line">	.navigationBarTitle(Text(title),displayMode: .inline)</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<h4 id="导航栏标题样式"><a href="#导航栏标题样式" class="headerlink" title="导航栏标题样式"></a>导航栏标题样式</h4><p>普通</p>
+<figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">.navigationBarTitle(Text(title),displayMode: .inline)</span><br></pre></td></tr></table></figure>
+
+<p>特大</p>
+<figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">.navigationBarTitle(Text(title),displayMode: .large)</span><br></pre></td></tr></table></figure>
+
+<p>随滚动自动变化</p>
+<figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">.navigationBarTitle(Text(title),displayMode: .automatic)</span><br></pre></td></tr></table></figure>
+
+<h3 id="需要用到的一些快捷键"><a href="#需要用到的一些快捷键" class="headerlink" title="需要用到的一些快捷键"></a>需要用到的一些快捷键</h3><p>cmd + ctrl + 鼠标左键+控件/布局  =  调出菜单<br>ctrl + i = 代码缩进调整    </p>
+<p>待续</p>
+]]></content>
+      <categories>
+        <category>iOS</category>
+      </categories>
+      <tags>
+        <tag>iOS</tag>
+      </tags>
+  </entry>
+  <entry>
+    <title>pod install速度慢的终极解决方案</title>
+    <url>/post/826fbbdd.html</url>
+    <content><![CDATA[<p>相信大家已经感受到pod install速度越来越慢了，网上提供了几种解决方案，但是都没有完全解决速度慢的问题。</p>
+<span id="more"></span>
+
+<p><a href="https://blog.csdn.net/iotjin/article/details/81604034">原博文</a>已经被删掉了，所以我自己copy并整理了一份</p>
+<p>相信大家已经感受到pod install速度越来越慢了，网上提供了几种解决方案，但是都没有完全解决速度慢的问题。</p>
+<p>使用国内镜像的Specs<br>在pod install时使用命令<br><code>pod install --no-repo-update</code></p>
+<p>使用proxychains使终端命令走代理<br>下面就来说明一下这几种方法为何没有完全解决问题</p>
+<p>使用国内镜像的Specs<br>这个只是加快了Specs下载更新速度，而且如果使用国内镜像Specs，那么Podfile中就必须指明使用这个Specs。</p>
+<p>在pod install时使用命令<br><code>pod install --no-repo-update</code></p>
+<p>install时不更新本地库，但如果第一次install还是要去github clone代码</p>
+<p>使用proxychains使终端命令走代理</p>
+<p>这个只是使pod命令走代理，git download的时候不会走代理<br>其实真正慢的原因并不在pod命令，而是在于github上的代码库访问速度慢，那么就知道真正的解决方案就是要加快git命令的速度。</p>
+<p>我使用Shadowsocks代理，默认代理端口为1080，配置好代理之后去终端输入git配置命令，命令如下</p>
+<p><code>git config --global http.proxy socks5://127.0.0.1:1080</code></p>
+<blockquote>
+<p>注意这里的 socks5:// 协议 如果你用的是http/https协议 这里要改成 http:// 或https://</p>
+</blockquote>
+<blockquote>
+<p>这里的http.proxy 一般不用改</p>
+</blockquote>
+<blockquote>
+<p>查看端口号的方式可以在小飞机那里或者其他翻墙软件点击配置信息查看，看本地端口号一项</p>
+</blockquote>
+<p>上面的命令是给git设置全局代理，但是我们并不希望国内git库也走代理，而是只需要github上的代码库走代理，命令如下</p>
+<p><code>git config --global http.https://github.com.proxy socks5://127.0.0.1:1080</code></p>
+<blockquote>
+<p>这里的socks5:// 协议 跟上面说的同理</p>
+</blockquote>
+<p>（ps：如果要恢复/移除上面设置的git代理，使用如下命令<br><code>git config --global --unset http.proxy</code><br><code>git config --global --unset http.https://github.com.proxy</code>)</p>
+<p>（如果不恢复的话，你一旦关掉代理（小飞机），那么之后git命令都跑不了网络了）</p>
+<blockquote>
+<p>注意这里的 http.proxy 其实就是上面的<code>git config --global http.proxy socks5://127.0.0.1:1080</code>中的 http.proxy, 如果你写的是https.proxy，那么这里unset的时候应该也写https.proxy</p>
+</blockquote>
+]]></content>
+      <categories>
+        <category>iOS</category>
+      </categories>
+      <tags>
+        <tag>iOS</tag>
+        <tag>技巧</tag>
+        <tag>Cocoapods</tag>
       </tags>
   </entry>
 </search>

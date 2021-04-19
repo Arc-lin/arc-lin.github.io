@@ -1,10 +1,10 @@
 ---
-title: Jenkins+Git+CocoaPods+Fir.im实现iOS应用持续集成
+title: Jenkins+Git+Cocoapods+Fir.im实现iOS应用持续集成
 author: Arclin
 tags:
   - Jenkins
   - Git
-  - CocoaPods
+  - Cocoapods
   - Fir
 categories:
   - iOS

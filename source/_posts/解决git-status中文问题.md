@@ -3,7 +3,7 @@ title: 解决git status中文问题
 author: Arclin
 tags:
   - 技巧
-  - git
+  - Git
 categories:
   - Git
 abbrlink: 93da1b70
