@@ -4342,4 +4342,89 @@
         <tag>iOS</tag>
       </tags>
   </entry>
+  <entry>
+    <title>AppDelegate事件分发</title>
+    <url>/post/7e5c9fa9.html</url>
+    <content><![CDATA[<h2 id="引言"><a href="#引言" class="headerlink" title="引言"></a>引言</h2><p>当App发展庞大的时候，势必会导致AppDelegate类的庞大，所以如何去优化AppDelegate成为组件化工作中的主要部分之一。</p>
+<span id="more"></span>
+
+<h2 id="现状"><a href="#现状" class="headerlink" title="现状"></a>现状</h2><p>举个例子，比如App中拥有</p>
+<ol>
+<li>用户管理组件</li>
+<li>首页组件</li>
+<li>消息组件</li>
+</ol>
+<p>那么他们分别需要在<code>- (BOOL)application:(UIApplication *)application didFinishLaunchingWithOptions:(NSDictionary *)launchOptions</code>中实现</p>
+<ol>
+<li>访问接口更新用户信息</li>
+<li>配置首页弹窗</li>
+<li>访问接口获取用户未读消息数</li>
+</ol>
+<p>假设这三个事件之间无关联，只是在初始化自己的模块后做准备工作，但是同时他们堆叠在同一个方法内，必然会导致方法臃肿。设想另外一个场景，假如开发者A只负责维护AppDelegate及主工程项目，开发者B只负责维护用户管理组件，那么开发者B要在App初始化的时候，再加入一个<code>将用户信息传到大数据中心统计</code>的功能，那么由于他不拥有<code>AppDelegate</code>的修改权限，只能让A排期去协助工作，同理可得，当组件变多，团队庞大的时候，开发者A将会有很多协助工作要做，这就是这次要讨论的问题。</p>
+<h2 id="想法"><a href="#想法" class="headerlink" title="想法"></a>想法</h2><p>是否可以将组件的初始化安排到组件内部中，而不在AppDelegate类中直接进行维护呢？</p>
+<p>想法1. 组件新增一个类，然后在该类里面进行初始化。AppDelegate import 这个类，调用这个类中的方法。</p>
+<p>缺点：AppDelegate需要耦合该组件，如果要去掉该组件或者新增别的组件，AppDelegate需要增加维护成本。</p>
+<p>想法2. AppDelegate主动分发事件，用通知的形式分发给每个组件消息。</p>
+<p>缺点：由于组件无法依赖主工程，所以通知名无法维护，另外通知会分发到不需要在AppDelgate初始化的组件，属于通知滥用。</p>
+<p>想法3. AppDelegate主动分发事件，组件新增一个类，将AppDelegate事件通过协议的方式分发到这个类中，类遵循该协议。</p>
+<p>缺点：技术上不可行，无法得知哪些类实现了协议。</p>
+<p>想法4. 组件新增一个类，在<code>+ (void)load</code>中将类名注册进入管理类，AppDelegate执行的时候取出所有类名，进行实例化和事件分发。</p>
+<p>缺点：在<code>+ (void)load</code>中进行工作会增加App启动耗时</p>
+<p>想法5. 组件新增一个类，在主工程维护一个plist，将类名写进该plist，AppDelegate执行的时候取出所有类名，进行实例化和事件分发。</p>
+<p>缺点：plist在主工程，同样无法满足无缝对接的需求，A同事仍然需要对接维护。</p>
+<h2 id="解决方案"><a href="#解决方案" class="headerlink" title="解决方案"></a>解决方案</h2><p>目前能得出的最优解决方案：</p>
+<p>将类名注入mach-o文件中，在编译期写入，在AppDelegate事件分发的时候取出并实例化，不占用App启动耗时，也不用维护多一个plist文件。</p>
+<h2 id="试验"><a href="#试验" class="headerlink" title="试验"></a>试验</h2><ol>
+<li><p>新建 MacOS - Command Line Tool 项目，命名为<code>TestC</code></p>
+</li>
+<li><p>加入我们想注入字符串<code>ModuleAModule</code>,将其存储在名为<code>TestModes</code>的section内，那么在main.m中写如下代码：</p>
+ <figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">char * kModuleAModule_mod __attribute((used, section(&quot;__DATA, &quot;&quot;TestModes&quot;&quot; &quot;))) &#x3D; &quot;&quot;&quot;ModuleAModule&quot;&quot;&quot;;</span><br><span class="line"></span><br><span class="line">int main(int argc, const char * argv[]) &#123;</span><br><span class="line">	&#x2F;&#x2F; insert code here...</span><br><span class="line">	printf(&quot;Hello, World!\n&quot;);</span><br><span class="line">	return 0;</span><br><span class="line">&#125;</span><br><span class="line"></span><br></pre></td></tr></table></figure></li>
+<li><p>输出这个mach-o文件的所有segment和section<code>otool -l TestC</code></p>
+<p> 部分结果：</p>
+ <figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">Section</span><br><span class="line">  sectname TestModes</span><br><span class="line">   segname __DATA</span><br><span class="line">	  addr 0x0000000100002008</span><br><span class="line">	  size 0x0000000000000008</span><br><span class="line">	offset 8200</span><br><span class="line">	 align 2^3 (8)</span><br><span class="line">	reloff 0</span><br><span class="line">	nreloc 0</span><br><span class="line">	 flags 0x00000000</span><br><span class="line"> reserved1 0</span><br><span class="line"> reserved2 0</span><br></pre></td></tr></table></figure>
+<p> 看到了<code>Test Modes</code>了，继续看一下section的内容<code>otool -s __DATA TestModes TestC</code></p>
+<p> 结果</p>
+ <figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">	TestC:</span><br><span class="line">Contents of (__DATA,TestModes) section</span><br><span class="line">0000000100002008	92 0f 00 00 01 00 00 00 </span><br></pre></td></tr></table></figure>
+<p> 发现<code>0000000100002008</code>这个地址可能是我们要的东西，再看看这个地址里有啥<br> <code>otool -V -s __TEXT __cstring TestC </code>打印所有字符串数据内容<br> 看到了</p>
+ <figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">Contents of (__TEXT,__cstring) section</span><br><span class="line">	0000000100000f92  ModuleAModule</span><br><span class="line">	0000000100000fa0  Hello, World!\n</span><br></pre></td></tr></table></figure>
+<p> 找到了我们想注入的类名<code>ModuleAModule</code><br> 这样，类名就被存储在mach-o文件的section中了。</p>
+</li>
+<li><p>取出类名， 代码如下</p>
+ <figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">NSArray&lt;NSString *&gt;* readConfiguration(char *sectionName,const struct mach_header *mhp)</span><br><span class="line">&#123;</span><br><span class="line">	NSMutableArray *configs &#x3D; [NSMutableArray array];</span><br><span class="line">	unsigned long size &#x3D; 0;</span><br><span class="line">#ifndef __LP64__</span><br><span class="line">	uintptr_t *memory &#x3D; (uintptr_t*)getsectiondata(mhp, SEG_DATA, sectionName, &amp;size);</span><br><span class="line">#else</span><br><span class="line">	const struct mach_header_64 *mhp64 &#x3D; (const struct mach_header_64 *)mhp;</span><br><span class="line">	uintptr_t *memory &#x3D; (uintptr_t*)getsectiondata(mhp64, SEG_DATA, sectionName, &amp;size);</span><br><span class="line">#endif</span><br><span class="line"></span><br><span class="line">	unsigned long counter &#x3D; size&#x2F;sizeof(void*);</span><br><span class="line">	for(int idx &#x3D; 0; idx &lt; counter; ++idx)&#123;</span><br><span class="line">		char *string &#x3D; (char*)memory[idx];</span><br><span class="line">		NSString *str &#x3D; [NSString stringWithUTF8String:string];</span><br><span class="line">		if(!str)continue;</span><br><span class="line">		if(str) [configs addObject:str];</span><br><span class="line">	&#125;</span><br><span class="line"></span><br><span class="line">	return configs;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line">static void dyld_callback(const struct mach_header *mhp, intptr_t vmaddr_slide)</span><br><span class="line">&#123;</span><br><span class="line">	NSArray *mods &#x3D; readConfiguration(&quot;TestModes&quot;, mhp);</span><br><span class="line">	for (NSString *modName in mods) &#123;</span><br><span class="line">		if (modName) &#123;</span><br><span class="line">			NSLog(@&quot;取得：%@&quot;,modName);</span><br><span class="line">		&#125;</span><br><span class="line">	&#125;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line">__attribute__((constructor))</span><br><span class="line">void initProphet() &#123;</span><br><span class="line">	_dyld_register_func_for_add_image(dyld_callback);</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p> 当一个函数被<code>__attribute__((constructor))</code>修饰时，表示这个函数是这个镜像的初始化函数，在镜像被加载时，首先会调用这个函数。（镜像指的是mach-o和动态共享库，在工程运行时，可以使用lldb命令<code>image list</code>查看这个工程中加载的所有镜像。）<br>上述代码表示<code>initProphet</code>函数被指定为mach-o的初始化函数，当dyld（动态链接器）加载mach-o时，执行<code>initProphet</code>函数，其执行时机在main函数和类的load方法之前。</p>
+<p> 当<code>_dyld_register_func_for_add_image(dyld_callback);</code>被执行时，如果已经加载了镜像，则每存在一个已经加载的镜像就执行一次<code>dyld_callback</code>函数，在此之后，每当有一个新的镜像被加载时，也会执行一次<code>dyld_callback</code>函数。<br>（<code>dyld_callback</code>函数在镜像的初始化函数之前被调用，mach-o是第一个被加载的镜像，调用顺序是：<code>load mach-o -&gt; initProphet -&gt; dyld_callback -&gt; load other_image -&gt; dyld_callback -&gt; other_image_initializers -&gt; ......</code>）</p>
+<p> 所以，当程序启动时，会多次调用dyld_callback函数。<br> 在dyld_callback函数中，使用下列函数来获取[步骤2]中存储的类名</p>
+ <figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">extern uint8_t *getsectiondata(</span><br><span class="line">   const struct mach_header_64 *mhp,</span><br><span class="line">   const char *segname,</span><br><span class="line">   const char *sectname,</span><br><span class="line">   unsigned long *size);</span><br></pre></td></tr></table></figure>
+<p> segname的值为<code>__DATA</code>，sectname的值为<code>TestMods</code></p>
+</li>
+</ol>
+<h2 id="封装组件"><a href="#封装组件" class="headerlink" title="封装组件"></a>封装组件</h2><p>有了上面的指导思想，那么我们就可以封装组件了，具体内容见<a href="https://git.linghit.io/ios_cocoapods/LMComponentManager">LMComponentManager</a></p>
+<h3 id="使用方法"><a href="#使用方法" class="headerlink" title="使用方法"></a>使用方法</h3><ol>
+<li><p> 在AppDelegate做分发埋点，</p>
+<p> 如<code>- (BOOL)application:(UIApplication *)application didFinishLaunchingWithOptions:(NSDictionary *)launchOptions</code></p>
+<p> 埋点如下</p>
+ <figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">- (BOOL)application:(UIApplication *)application didFinishLaunchingWithOptions:(NSDictionary *)launchOptions</span><br><span class="line">&#123;</span><br><span class="line">	[[LMComponentManager sharedManager] triggerEvent:LMSetupEvent];</span><br><span class="line">	[[LMComponentManager sharedManager] triggerEvent:LMInitEvent];</span><br><span class="line"></span><br><span class="line">	dispatch_async(dispatch_get_main_queue(), ^&#123;</span><br><span class="line">		[[LMComponentManager sharedManager] triggerEvent:LMSplashEvent];</span><br><span class="line">	&#125;);</span><br><span class="line">#if __IPHONE_OS_VERSION_MAX_ALLOWED &gt;&#x3D; 100000</span><br><span class="line">	if ([UIDevice currentDevice].systemVersion.floatValue &gt;&#x3D; 10.0f) &#123;</span><br><span class="line">		[UNUserNotificationCenter currentNotificationCenter].delegate &#x3D; self;</span><br><span class="line">	&#125;</span><br><span class="line">#endif</span><br><span class="line">	return YES;</span><br><span class="line">&#125;</span><br><span class="line"></span><br></pre></td></tr></table></figure>
+<p> 其他埋点见组件Demo</p>
+</li>
+<li><p>给每个组件创建一个类并写上注解，如<code>LMComponentA.m</code></p>
+ <figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">@LMMod(LMComponentA);</span><br><span class="line">@interface LMComponentA()&lt;LMComponentProtocol&gt;</span><br><span class="line"></span><br><span class="line">@end</span><br><span class="line"></span><br><span class="line">@implementation LMComponentA</span><br><span class="line"></span><br><span class="line">@end</span><br></pre></td></tr></table></figure>
+</li>
+<li><p>实现协议<code>LMComponentProtocol</code>和需要的协议方法。<br> 这个协议里面蕴含了基本所有的<code>AppDelegate</code>方法，当然要触发这些方法都是要预先在AppDelegate写上埋点。</p>
+ <figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">@implementation LMComponentA</span><br><span class="line"></span><br><span class="line">+ (void)load</span><br><span class="line">&#123;</span><br><span class="line">	NSLog(@&quot;Component A Load&quot;);    </span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line">- (instancetype)init</span><br><span class="line">&#123;</span><br><span class="line">	if (self &#x3D; [super init]) &#123;</span><br><span class="line">		NSLog(@&quot;ComponentA Init&quot;);</span><br><span class="line">	&#125;</span><br><span class="line">	return self;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line">- (void)modSetUp:(LMContext *)context</span><br><span class="line">&#123;</span><br><span class="line">	NSLog(@&quot;ComponentA setup&quot;);</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line">@end</span><br></pre></td></tr></table></figure>
+</li>
+<li><p>接下来你就可以尝试使用了。</p>
+</li>
+</ol>
+<h2 id="疑问"><a href="#疑问" class="headerlink" title="疑问"></a>疑问</h2><p>要是组件间的初始化互相依赖怎么办？</p>
+<p>还能怎么办，已经违背了组件隔离的原则，就只能按原来的方法处理了。</p>
+<h2 id="结束"><a href="#结束" class="headerlink" title="结束"></a>结束</h2><p>参考思想：<a href="https://github.com/alibaba/BeeHive">BeeHive</a></p>
+]]></content>
+      <categories>
+        <category>iOS</category>
+      </categories>
+      <tags>
+        <tag>iOS</tag>
+        <tag>架构</tag>
+      </tags>
+  </entry>
 </search>
