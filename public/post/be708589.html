@@ -1,0 +1,564 @@
+<!DOCTYPE html>
+<html lang="zh-Hans">
+<head>
+  <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=2">
+<meta name="theme-color" content="#222">
+<meta name="generator" content="Hexo 5.4.0">
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png">
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32-next.png">
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next.png">
+  <link rel="mask-icon" href="/images/logo.svg" color="#222">
+
+<link rel="stylesheet" href="/css/main.css">
+
+
+<link rel="stylesheet" href="/lib/font-awesome/css/all.min.css">
+
+<script id="hexo-configurations">
+    var NexT = window.NexT || {};
+    var CONFIG = {"hostname":"www.arclin.cn","root":"/","scheme":"Muse","version":"7.8.0","exturl":false,"sidebar":{"position":"left","display":"post","padding":18,"offset":12,"onmobile":false},"copycode":{"enable":false,"show_result":false,"style":null},"back2top":{"enable":true,"sidebar":false,"scrollpercent":false},"bookmark":{"enable":false,"color":"#222","save":"auto"},"fancybox":false,"mediumzoom":false,"lazyload":false,"pangu":false,"comments":{"style":"tabs","active":null,"storage":true,"lazyload":false,"nav":null},"algolia":{"appID":"VOFC7668C9","apiKey":"24c644edc8e7353bf2e8d8e31f03a940","indexName":"hexo","hits":{"per_page":10},"labels":{"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}},"localsearch":{"enable":true,"trigger":"auto","top_n_per_article":1,"unescape":false,"preload":false},"motion":{"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},"path":"search.xml"};
+  </script>
+
+  <meta name="description" content="本文简述组件化方案之强业务组件的设计">
+<meta property="og:type" content="article">
+<meta property="og:title" content="组件化方案之强业务组件的设计">
+<meta property="og:url" content="https://www.arclin.cn/post/be708589.html">
+<meta property="og:site_name" content="Arclin">
+<meta property="og:description" content="本文简述组件化方案之强业务组件的设计">
+<meta property="og:locale">
+<meta property="article:published_time" content="2020-02-04T02:48:31.000Z">
+<meta property="article:modified_time" content="2021-04-19T02:53:24.230Z">
+<meta property="article:author" content="Arclin">
+<meta property="article:tag" content="iOS">
+<meta property="article:tag" content="架构">
+<meta name="twitter:card" content="summary">
+
+<link rel="canonical" href="https://www.arclin.cn/post/be708589.html">
+
+
+<script id="page-configurations">
+  // https://hexo.io/docs/variables.html
+  CONFIG.page = {
+    sidebar: "",
+    isHome : false,
+    isPost : true,
+    lang   : 'zh-Hans'
+  };
+</script>
+
+  <title>组件化方案之强业务组件的设计 | Arclin</title>
+  
+
+
+
+
+
+
+  <noscript>
+  <style>
+  .use-motion .brand,
+  .use-motion .menu-item,
+  .sidebar-inner,
+  .use-motion .post-block,
+  .use-motion .pagination,
+  .use-motion .comments,
+  .use-motion .post-header,
+  .use-motion .post-body,
+  .use-motion .collection-header { opacity: initial; }
+
+  .use-motion .site-title,
+  .use-motion .site-subtitle {
+    opacity: initial;
+    top: initial;
+  }
+
+  .use-motion .logo-line-before i { left: initial; }
+  .use-motion .logo-line-after i { right: initial; }
+  </style>
+</noscript>
+
+<link rel="alternate" href="/atom.xml" title="Arclin" type="application/atom+xml">
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage">
+  <div class="container use-motion">
+    <div class="headband"></div>
+
+    <header class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-container">
+  <div class="site-nav-toggle">
+    <div class="toggle" aria-label="Toggle navigation bar">
+      <span class="toggle-line toggle-line-first"></span>
+      <span class="toggle-line toggle-line-middle"></span>
+      <span class="toggle-line toggle-line-last"></span>
+    </div>
+  </div>
+
+  <div class="site-meta">
+
+    <a href="/" class="brand" rel="start">
+      <span class="logo-line-before"><i></i></span>
+      <h1 class="site-title">Arclin</h1>
+      <span class="logo-line-after"><i></i></span>
+    </a>
+      <p class="site-subtitle" itemprop="description">Advocate Technology. Enjoy Technology.</p>
+  </div>
+
+  <div class="site-nav-right">
+    <div class="toggle popup-trigger">
+        <i class="fa fa-search fa-fw fa-lg"></i>
+    </div>
+  </div>
+</div>
+
+
+
+
+<nav class="site-nav">
+  <ul id="menu" class="main-menu menu">
+        <li class="menu-item menu-item-home">
+
+    <a href="/" rel="section"><i class="fa fa-home fa-fw"></i>Home</a>
+
+  </li>
+        <li class="menu-item menu-item-tags">
+
+    <a href="/tags/" rel="section"><i class="fa fa-tags fa-fw"></i>Tags</a>
+
+  </li>
+        <li class="menu-item menu-item-categories">
+
+    <a href="/categories/" rel="section"><i class="fa fa-th fa-fw"></i>Categories</a>
+
+  </li>
+        <li class="menu-item menu-item-archives">
+
+    <a href="/archives/" rel="section"><i class="fa fa-archive fa-fw"></i>Archives</a>
+
+  </li>
+        <li class="menu-item menu-item-about">
+
+    <a href="/about/" rel="section"><i class="fa fa-user fa-fw"></i>About</a>
+
+  </li>
+      <li class="menu-item menu-item-search">
+        <a role="button" class="popup-trigger"><i class="fa fa-search fa-fw"></i>Search
+        </a>
+      </li>
+  </ul>
+</nav>
+
+
+
+  <div class="search-pop-overlay">
+    <div class="popup search-popup">
+        <div class="search-header">
+  <span class="search-icon">
+    <i class="fa fa-search"></i>
+  </span>
+  <div class="search-input-container">
+    <input autocomplete="off" autocapitalize="off"
+           placeholder="Searching..." spellcheck="false"
+           type="search" class="search-input">
+  </div>
+  <span class="popup-btn-close">
+    <i class="fa fa-times-circle"></i>
+  </span>
+</div>
+<div id="search-result">
+  <div id="no-result">
+    <i class="fa fa-spinner fa-pulse fa-5x fa-fw"></i>
+  </div>
+</div>
+
+    </div>
+  </div>
+
+</div>
+    </header>
+
+    
+  <div class="back-to-top">
+    <i class="fa fa-arrow-up"></i>
+    <span>0%</span>
+  </div>
+
+
+    <main class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          
+
+          <div class="content post posts-expand">
+            
+
+    
+  
+  
+  <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="zh-Hans">
+    <link itemprop="mainEntityOfPage" href="https://www.arclin.cn/post/be708589.html">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="https://avatars.githubusercontent.com/u/12107804?v=4">
+      <meta itemprop="name" content="Arclin">
+      <meta itemprop="description" content="Stay hungry,stay foolish">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="Arclin">
+    </span>
+      <header class="post-header">
+        <h1 class="post-title" itemprop="name headline">
+          组件化方案之强业务组件的设计
+        </h1>
+
+        <div class="post-meta">
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-calendar"></i>
+              </span>
+              <span class="post-meta-item-text">Posted on</span>
+
+              <time title="Created: 2020-02-04 10:48:31" itemprop="dateCreated datePublished" datetime="2020-02-04T10:48:31+08:00">2020-02-04</time>
+            </span>
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-folder"></i>
+              </span>
+              <span class="post-meta-item-text">In</span>
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/iOS/" itemprop="url" rel="index"><span itemprop="name">iOS</span></a>
+                </span>
+            </span>
+
+          
+            <span class="post-meta-item" title="Views" id="busuanzi_container_page_pv" style="display: none;">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-eye"></i>
+              </span>
+              <span class="post-meta-item-text">Views: </span>
+              <span id="busuanzi_value_page_pv"></span>
+            </span>
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+        <p>本文简述组件化方案之强业务组件的设计</p>
+<span id="more"></span>
+
+<h3 id="如何定义强业务组件"><a href="#如何定义强业务组件" class="headerlink" title="如何定义强业务组件"></a>如何定义强业务组件</h3><p>涉及到具体业务需求，能单独完成App某个功能点（主要feature）的组件</p>
+<h3 id="需要符合什么要求"><a href="#需要符合什么要求" class="headerlink" title="需要符合什么要求"></a>需要符合什么要求</h3><p>UI层和逻辑层的绝对独立</p>
+<p>需求内容完整</p>
+<p>可拓展，可维护</p>
+<p>可独立配置UI（UI只可重写、不可修改）</p>
+<p>逻辑层不可配置</p>
+<p>代码内容清晰明确</p>
+<h3 id="接下来开始讲故事"><a href="#接下来开始讲故事" class="headerlink" title="接下来开始讲故事"></a>接下来开始讲故事</h3><h4 id="背景"><a href="#背景" class="headerlink" title="背景"></a>背景</h4><p>随着业务发展，灵机大师说的咨询室模块需要抽离到各个App当中使用，但是由于不同App的网关配置和UI配置都不一样，造成了代码不可以完全进行复用，所以需要对原有代码重新设计。</p>
+<h4 id="基本思想"><a href="#基本思想" class="headerlink" title="基本思想"></a>基本思想</h4><p>如何设计组件是个比较复杂的问题</p>
+<p>首先参考其他第三方IM提供商的Demo，基本上要用他们的UI的话就只能全套用，提供的配置项比较有限，自己改里面的东西成本很大，也不方便。</p>
+<p>然后考虑自己如何修改原有代码</p>
+<p>参考原有MVVM架构的话，在View和ViewModel之间是一个强耦合的状态，View会直接依赖ViewModel，如果使用方需要定制UI则会十分懵逼，不明确自己的View需要做什么才能配合ViewModel的使用。但这并不意味着MVVM就不能用，在组件初期，为了快速成型，必须沿用之前的设计模式。</p>
+<p>接下来思考第二种方案，一种能够高度分离职责的架构，那便是VIPER。确实，在VIPER的设计思想中，单一职责原则体现得很好：Presenter寻找实现了InputProtocol的ViewController并给予数据，ViewController内的操作事件则通过实现了OutputProtocol的Presenter去执行，Presenter内部又通过Interactor和wireframe去实现数据获取和路由的交互，这种面相协议的开发也十分契合我们的需求，协议的方式能够很明确的让使用者知道他要做什么和他需要给予什么。但是VIPER的结构比较复杂比较适合后期在发展，目前还是以MVVM为主比较好。</p>
+<p>那么如何改进我们现有的MVVM模式？这里我们就要将VIPER的精髓，面向协议和依赖注入抽离出来。</p>
+<h4 id="依赖注入"><a href="#依赖注入" class="headerlink" title="依赖注入"></a>依赖注入</h4><p>首先先说明什么叫做依赖注入</p>
+<p>比如AController跳转到BController,那么这时候BController就需要在AController内部进行实例化，如下</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br></pre></td><td class="code"><pre><span class="line">@implementation AController : UIViewController</span><br><span class="line"></span><br><span class="line">...</span><br><span class="line"></span><br><span class="line">- (void)jump </span><br><span class="line">&#123;</span><br><span class="line">	BController *bController &#x3D; [[BController alloc] init];</span><br><span class="line">    [self.navigationController pushViewController:bController animated:YES];</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line">@end</span><br><span class="line"></span><br></pre></td></tr></table></figure>
+
+<p>这么做的话，当AController被封装成组件之后，BController的配置将会被限制，外部无法改变BController任何细节，所以我们 ** 稍 加 改 进 **</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br></pre></td><td class="code"><pre><span class="line">@implementation AController : UIViewController</span><br><span class="line"></span><br><span class="line">...</span><br><span class="line"></span><br><span class="line">- (instancetype)initWithCreateBlock:(UIViewController *(^)(void))createBViewControllerBlock &#123;</span><br><span class="line">	....</span><br><span class="line">	self.createBViewControllerBlock &#x3D; createBViewControllerBlock;</span><br><span class="line">	...</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line">- (void)jump </span><br><span class="line">&#123;</span><br><span class="line">	UIViewController *bController &#x3D; self.createBViewControllerBlock();</span><br><span class="line">    [self.navigationController pushViewController:bController animated:YES];</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line">@end</span><br><span class="line"></span><br></pre></td></tr></table></figure>
+
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">[[AController alloc] initWithCreateBlock:UIViewController* ^&#123;</span><br><span class="line">	BController *bController &#x3D; [[BController alloc] initWithTitle:@&quot;xxx&quot;];</span><br><span class="line">	return bController;</span><br><span class="line">&#125;];</span><br></pre></td></tr></table></figure>
+
+<p>将BController的创建通过Block暴露出来，AController内部不关心BController是如何被创建的，那么AController对BController的依赖将通过外部的Block进行注入。</p>
+<p>这，就是依赖注入。</p>
+<p>当然这是最简单的依赖注入，无法满足我们复杂的需求，所以有时候我们需要使用第三方框架，如<code>Objection</code>和<code>Typhoon</code></p>
+<h4 id="依赖倒置"><a href="#依赖倒置" class="headerlink" title="依赖倒置"></a>依赖倒置</h4><p>依赖倒置是是六个设计原则之一。依赖倒置意味着实现依赖于抽象，抽象不依赖实现。</p>
+<p>举个例子</p>
+<p>当你需要买一杯饮料，你不需要到具体哪家店买，反正任意一个便利店都有饮料卖，所以你需要的并不是获得美宜佳的地址或者711的地址，你需要的只是一个“卖饮料的店”，这是一个抽象的概念，这样子就是依赖被倒置了，本来是你去寻找美宜佳，现在变成拥有“卖饮料”功能的店去满足你。</p>
+<p>在iOS中，抽象是通过代理体现的</p>
+<p>同样的，我们再来看看刚刚的代码</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><span class="line">@implementation AController : UIViewController</span><br><span class="line"></span><br><span class="line">...</span><br><span class="line"></span><br><span class="line">- (void)jump </span><br><span class="line">&#123;</span><br><span class="line">	BController *bController &#x3D; [[BController alloc] init];</span><br><span class="line">    [self.navigationController pushViewController:bController animated:YES];</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line">@end</span><br></pre></td></tr></table></figure>
+
+<p>根据依赖倒置原则进行改造</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br></pre></td><td class="code"><pre><span class="line"></span><br><span class="line">@interface AController()</span><br><span class="line"></span><br><span class="line">@property(weak) id&lt;BControllerProtocol&gt; bViewController;</span><br><span class="line"></span><br><span class="line">@end</span><br><span class="line"></span><br><span class="line">@implementation AController : UIViewController</span><br><span class="line"></span><br><span class="line">...</span><br><span class="line"></span><br><span class="line">- (void)jump </span><br><span class="line">&#123;</span><br><span class="line">    [self.navigationController pushViewController:self.bViewController animated:YES];</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line">@end</span><br></pre></td></tr></table></figure>
+
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">AViewController *aViewController &#x3D; [[AViewController alloc] init];</span><br><span class="line">id&lt;BControllerProtocol&gt; bViewController &#x3D; [[BViewController alloc] init];</span><br><span class="line">aViewController.bViewController &#x3D; bViewController;</span><br></pre></td></tr></table></figure>
+
+
+<h4 id="依赖注入-依赖倒置"><a href="#依赖注入-依赖倒置" class="headerlink" title="依赖注入+依赖倒置"></a>依赖注入+依赖倒置</h4><p>将协议和注入的模式进行结合，仿照上面的代码，估计就是这样子</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">[[AController alloc] initWithCreateBlock:UIViewController&lt;BControllerProtocol&gt;* ^&#123;</span><br><span class="line">	id&lt;BControllerProtocol&gt; bController &#x3D; [[BController alloc] initWithTitle:@&quot;xxx&quot;];</span><br><span class="line">	return bController;</span><br><span class="line">&#125;];</span><br></pre></td></tr></table></figure>
+
+<p>当然 这种模式只是个例子，给大家一种具体的观感</p>
+<p>实际上在编码的时候，一个控制器往往有很多依赖，这里分为<code>可注入依赖</code>和<code>不可注入依赖</code></p>
+<p>可注入的依赖往往是一些可以配置的依赖，使用者通过将自己自定义的配置注入，覆盖原有的默认依赖，达到配置内部样式的效果</p>
+<p>反之，不可注入的依赖就会是代码中固定的耦合项目，合理的耦合以不至于组件产生过多未知问题。</p>
+<p>刚刚说到一些依赖注入的第三方框架<code>Objection</code>和<code>Typhoon</code>，这个之后再详细介绍，这里简单说明一下，当使用方需要使用自定义类注入组件的时候，都是需要依赖这两种框架，不能只由组件内部依赖，所以为了避免不必要的学习成本，暂时先不使用，后面如果拓展开了使用方法，可能会修改使用，我们这里先用一些理解起来比较简单但是操作起来可能比较麻烦的注入方式。</p>
+<p>首先我们这里我们新增一个单例用于注入，通过反射机制实例化自定义的对象，然后进行注入。</p>
+<p>当然这个对象是需要遵循我们对应的协议的。</p>
+<p>协议我们按照VIPIER的规范，分为两种<code>InputProtocol</code>和<code>OutputProtocol</code></p>
+<p><code>InputProtocol</code>包括控制器需要的外部参数<br><code>OutputProtocol</code>包括控制器的回调参数</p>
+<p>按照目前咨询室的设计模式看来，是由三个控制器（一个父控制器和两个子控制器）构成，他们分别会有自己的<code>InputProtocol</code>和<code>OutputProtocol</code>，如果业务端需要自己实现UI则自己实现协议然后进行注入即可。</p>
+<p>待续</p>
+<p>有空继续写</p>
+
+    </div>
+
+    
+    
+    
+
+      <footer class="post-footer">
+          <div class="post-tags">
+              <a href="/tags/iOS/" rel="tag"># iOS</a>
+              <a href="/tags/%E6%9E%B6%E6%9E%84/" rel="tag"># 架构</a>
+          </div>
+
+        
+
+
+        
+    <div class="post-nav">
+      <div class="post-nav-item">
+    <a href="/post/f6762f39.html" rel="prev" title="SwiftUI指南">
+      <i class="fa fa-chevron-left"></i> SwiftUI指南
+    </a></div>
+      <div class="post-nav-item">
+    <a href="/post/826fbbdd.html" rel="next" title="pod install速度慢的终极解决方案">
+      pod install速度慢的终极解决方案 <i class="fa fa-chevron-right"></i>
+    </a></div>
+    </div>
+      </footer>
+    
+  </article>
+  
+  
+  
+
+
+
+          </div>
+          
+    <div class="comments" id="gitalk-container"></div>
+
+<script>
+  window.addEventListener('tabs:register', () => {
+    let { activeClass } = CONFIG.comments;
+    if (CONFIG.comments.storage) {
+      activeClass = localStorage.getItem('comments_active') || activeClass;
+    }
+    if (activeClass) {
+      let activeTab = document.querySelector(`a[href="#comment-${activeClass}"]`);
+      if (activeTab) {
+        activeTab.click();
+      }
+    }
+  });
+  if (CONFIG.comments.storage) {
+    window.addEventListener('tabs:click', event => {
+      if (!event.target.matches('.tabs-comment .tab-content .tab-pane')) return;
+      let commentClass = event.target.classList[1];
+      localStorage.setItem('comments_active', commentClass);
+    });
+  }
+</script>
+
+        </div>
+          
+  
+  <div class="toggle sidebar-toggle">
+    <span class="toggle-line toggle-line-first"></span>
+    <span class="toggle-line toggle-line-middle"></span>
+    <span class="toggle-line toggle-line-last"></span>
+  </div>
+
+  <aside class="sidebar">
+    <div class="sidebar-inner">
+
+      <ul class="sidebar-nav motion-element">
+        <li class="sidebar-nav-toc">
+          Table of Contents
+        </li>
+        <li class="sidebar-nav-overview">
+          Overview
+        </li>
+      </ul>
+
+      <!--noindex-->
+      <div class="post-toc-wrap sidebar-panel">
+          <div class="post-toc motion-element"><ol class="nav"><li class="nav-item nav-level-3"><a class="nav-link" href="#%E5%A6%82%E4%BD%95%E5%AE%9A%E4%B9%89%E5%BC%BA%E4%B8%9A%E5%8A%A1%E7%BB%84%E4%BB%B6"><span class="nav-number">1.</span> <span class="nav-text">如何定义强业务组件</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E9%9C%80%E8%A6%81%E7%AC%A6%E5%90%88%E4%BB%80%E4%B9%88%E8%A6%81%E6%B1%82"><span class="nav-number">2.</span> <span class="nav-text">需要符合什么要求</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E6%8E%A5%E4%B8%8B%E6%9D%A5%E5%BC%80%E5%A7%8B%E8%AE%B2%E6%95%85%E4%BA%8B"><span class="nav-number">3.</span> <span class="nav-text">接下来开始讲故事</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#%E8%83%8C%E6%99%AF"><span class="nav-number">3.1.</span> <span class="nav-text">背景</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#%E5%9F%BA%E6%9C%AC%E6%80%9D%E6%83%B3"><span class="nav-number">3.2.</span> <span class="nav-text">基本思想</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#%E4%BE%9D%E8%B5%96%E6%B3%A8%E5%85%A5"><span class="nav-number">3.3.</span> <span class="nav-text">依赖注入</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#%E4%BE%9D%E8%B5%96%E5%80%92%E7%BD%AE"><span class="nav-number">3.4.</span> <span class="nav-text">依赖倒置</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#%E4%BE%9D%E8%B5%96%E6%B3%A8%E5%85%A5-%E4%BE%9D%E8%B5%96%E5%80%92%E7%BD%AE"><span class="nav-number">3.5.</span> <span class="nav-text">依赖注入+依赖倒置</span></a></li></ol></li></ol></div>
+      </div>
+      <!--/noindex-->
+
+      <div class="site-overview-wrap sidebar-panel">
+        <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+    <img class="site-author-image" itemprop="image" alt="Arclin"
+      src="https://avatars.githubusercontent.com/u/12107804?v=4">
+  <p class="site-author-name" itemprop="name">Arclin</p>
+  <div class="site-description" itemprop="description">Stay hungry,stay foolish</div>
+</div>
+<div class="site-state-wrap motion-element">
+  <nav class="site-state">
+      <div class="site-state-item site-state-posts">
+          <a href="/archives/">
+        
+          <span class="site-state-item-count">78</span>
+          <span class="site-state-item-name">posts</span>
+        </a>
+      </div>
+      <div class="site-state-item site-state-categories">
+            <a href="/categories/">
+          
+        <span class="site-state-item-count">12</span>
+        <span class="site-state-item-name">categories</span></a>
+      </div>
+      <div class="site-state-item site-state-tags">
+            <a href="/tags/">
+          
+        <span class="site-state-item-count">37</span>
+        <span class="site-state-item-name">tags</span></a>
+      </div>
+  </nav>
+</div>
+  <div class="links-of-author motion-element">
+      <span class="links-of-author-item">
+        <a href="https://github.com/Arc-lin" title="GitHub → https://github.com/Arc-lin" rel="noopener" target="_blank"><i class="fab fa-github fa-fw"></i>GitHub</a>
+      </span>
+      <span class="links-of-author-item">
+        <a href="mailto:arclin325@gmail.com" title="E-Mail → mailto:arclin325@gmail.com" rel="noopener" target="_blank"><i class="fa fa-envelope fa-fw"></i>E-Mail</a>
+      </span>
+  </div>
+
+
+
+      </div>
+
+    </div>
+  </aside>
+  <div id="sidebar-dimmer"></div>
+
+
+      </div>
+    </main>
+
+    <footer class="footer">
+      <div class="footer-inner">
+        
+
+        
+
+<div class="copyright">
+  
+  &copy; 
+  <span itemprop="copyrightYear">2021</span>
+  <span class="with-love">
+    <i class="fa fa-heart"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">Arclin</span>
+</div>
+  <div class="powered-by">Powered by <a href="https://hexo.io" class="theme-link" rel="noopener" target="_blank">Hexo</a> & <a href="https://muse.theme-next.org" class="theme-link" rel="noopener" target="_blank">NexT.Muse</a>
+  </div>
+
+        
+<div class="busuanzi-count">
+  <script async src="https://busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js"></script>
+    <span class="post-meta-item" id="busuanzi_container_site_uv" style="display: none;">
+      <span class="post-meta-item-icon">
+        <i class="fa fa-user"></i>
+      </span>
+      <span class="site-uv" title="Total Visitors">
+        <span id="busuanzi_value_site_uv"></span>
+      </span>
+    </span>
+    <span class="post-meta-divider">|</span>
+    <span class="post-meta-item" id="busuanzi_container_site_pv" style="display: none;">
+      <span class="post-meta-item-icon">
+        <i class="fa fa-eye"></i>
+      </span>
+      <span class="site-pv" title="Total Views">
+        <span id="busuanzi_value_site_pv"></span>
+      </span>
+    </span>
+</div>
+
+
+
+
+
+
+
+
+      </div>
+    </footer>
+  </div>
+
+  
+  <script src="/lib/anime.min.js"></script>
+  <script src="/lib/velocity/velocity.min.js"></script>
+  <script src="/lib/velocity/velocity.ui.min.js"></script>
+
+<script src="/js/utils.js"></script>
+
+<script src="/js/motion.js"></script>
+
+
+<script src="/js/schemes/muse.js"></script>
+
+
+<script src="/js/next-boot.js"></script>
+
+
+
+
+  
+
+
+
+
+  
+<script src="/js/local-search.js"></script>
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+  
+
+<link rel="stylesheet" href="//cdn.jsdelivr.net/npm/gitalk@1/dist/gitalk.min.css">
+
+<script>
+NexT.utils.loadComments(document.querySelector('#gitalk-container'), () => {
+  NexT.utils.getScript('//cdn.jsdelivr.net/npm/gitalk@1/dist/gitalk.min.js', () => {
+    var gitalk = new Gitalk({
+      clientID    : 'df6d1f33bb4a66f5fa60',
+      clientSecret: '5fcc9fb756ac9d4b16381288da7b29f691b45e0a',
+      repo        : 'arc-lin.github.io',
+      owner       : 'Arc-lin',
+      admin       : ['Arc-lin'],
+      id          : '7c8bca8ee234b59e352631d605af2089',
+        language: 'zh-CN',
+      distractionFreeMode: false
+    });
+    gitalk.render('gitalk-container');
+  }, window.Gitalk);
+});
+</script>
+
+</body>
+</html>

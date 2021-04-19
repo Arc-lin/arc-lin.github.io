@@ -1430,35 +1430,6 @@
       </tags>
   </entry>
   <entry>
-    <title>XCode 添加Target</title>
-    <url>/post/8cafabb2.html</url>
-    <content><![CDATA[<p>在区分开发环境和测试环境或生产环境的时候经常需要在XCode 添加Target, 所以在此记录一下</p>
-<span id="more"></span>
-
-<ol>
-<li>Duplicate target</li>
-<li>Change DisplayName &amp; Bundle Identifier</li>
-<li>A copy-info.plist，默认生成在程序环境根目录，也就是<code>A.xcodeproj</code>的同级目录中，如果想放到里层（比如与<code>A-info.plist</code>放在同级目录），可以先在Xcode删除<code>A copy-info.plist</code>索引，然后拷贝文件到制定目录中，然后更名为<code>B-info.plist</code>，在add到project中。在<code>Project</code>的<code>Build Settings</code>中，修改<code>Info.plist</code> File选项为<code>B-info.plist</code>的目录（相对路径）,这样就可以看到Info页了（就是B-info.plist），接着修改<code>ProductName</code>和<code>Bundle identifier</code>，使之成为另一个app。<code>Prefix Header的路径</code>，视具体需求而定是否要修改，如果两个target可以公用同一个<code>Prefix Header</code>，那么就不需要修改这里的路径</li>
-<li>修改scheme，在调试的Stop按钮边上，我们可以选择本工程中所有的target来做编译，如果不修改，在这里选择出来的名字就是A copy，为了与新建的target统一起来，同样也要修改这里的名字。点击scheme选择区，然后选Manager Scheme，找到A copy，然后改成你需要的名字，比如B</li>
-<li>生成一个新的target，一定会与原target有区别，这里可以定义预编译宏，来区分两个版本的不同代码，预编译宏可以在Build Settings中Preprocessor Macros定义，比如在我们新建的target B中定义预编译宏MACRO，然后在代码中通过<figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">#if defined (MACRO)</span><br><span class="line">&#x2F;&#x2F;target  B需要执行的代码</span><br><span class="line">#else</span><br><span class="line">&#x2F;&#x2F;target A需要执行的代码</span><br><span class="line">#endif</span><br></pre></td></tr></table></figure>
-来区分</li>
-<li>其他：Build Phases（各target编译所包含的内容，需要注意的是，如果创建了target B后，再往A里面添加资源或文件，target B中不会自动增加这些资源，需要手动添加）<ul>
-<li>Compile Sources<br>需要编译的代码文件</li>
-<li>Link Binary With Libraries<br>编译所依赖的库</li>
-<li>Copy Bundle Resources<br>编译需要的资源<br>每个target可以根据具体需要增减里面的内容</li>
-</ul>
-</li>
-</ol>
-]]></content>
-      <categories>
-        <category>iOS</category>
-      </categories>
-      <tags>
-        <tag>iOS</tag>
-        <tag>XCode</tag>
-      </tags>
-  </entry>
-  <entry>
     <title>iOS-定位总结</title>
     <url>/post/2684222a.html</url>
     <content><![CDATA[<p>iOS-定位总结</p>
@@ -1485,7 +1456,7 @@
       </tags>
   </entry>
   <entry>
-    <title>iOS13新API</title>
+    <title>iOS 13新API</title>
     <url>/post/f356f3c1.html</url>
     <content><![CDATA[<p>可能会用到的iOS13新Api</p>
 <span id="more"></span>
@@ -3780,11 +3751,9 @@
       </tags>
   </entry>
   <entry>
-    <title>iOS14 App Clips</title>
+    <title>iOS 14 App Clips</title>
     <url>/post/a44df9c3.html</url>
-    <content><![CDATA[<blockquote>
-<p>本文将主要探讨App Clips开发流程 和 组件化、非组件化两种开发方式下如何复用代码的问题。</p>
-</blockquote>
+    <content><![CDATA[<p>本文将主要探讨App Clips开发流程 和 组件化、非组件化两种开发方式下如何复用代码的问题。</p>
 <span id="more"></span>
 
 <p>App Clips是iOS14系统的新特性之一，类似于小程序，用户可以在不下载App的情况下体验到App的部分功能，如网易严选的商品详情功能（<a href="https://m.you.163.com/item/detail?id=1615007#/?_k=yz97vw">https://m.you.163.com/item/detail?id=1615007#/?_k=yz97vw</a>），该功能适合做一些推广和引流的运营工作，另外苹果也提供的原生的浮窗样式，可以引导用户下载完整版App。</p>
@@ -3944,7 +3913,7 @@
       </tags>
   </entry>
   <entry>
-    <title>iOS14新API</title>
+    <title>iOS 14新API</title>
     <url>/post/36f1cd4f.html</url>
     <content><![CDATA[<p>iOS 14 新API</p>
 <span id="more"></span>
@@ -4143,6 +4112,234 @@
         <tag>iOS</tag>
         <tag>技巧</tag>
         <tag>Cocoapods</tag>
+      </tags>
+  </entry>
+  <entry>
+    <title>XCode 添加Target</title>
+    <url>/post/8cafabb2.html</url>
+    <content><![CDATA[<p>在区分开发环境和测试环境或生产环境的时候经常需要在XCode 添加Target, 所以在此记录一下</p>
+<span id="more"></span>
+
+<ol>
+<li>Duplicate target</li>
+<li>Change DisplayName &amp; Bundle Identifier</li>
+<li>A copy-info.plist，默认生成在程序环境根目录，也就是<code>A.xcodeproj</code>的同级目录中，如果想放到里层（比如与<code>A-info.plist</code>放在同级目录），可以先在Xcode删除<code>A copy-info.plist</code>索引，然后拷贝文件到制定目录中，然后更名为<code>B-info.plist</code>，在add到project中。在<code>Project</code>的<code>Build Settings</code>中，修改<code>Info.plist</code> File选项为<code>B-info.plist</code>的目录（相对路径）,这样就可以看到Info页了（就是B-info.plist），接着修改<code>ProductName</code>和<code>Bundle identifier</code>，使之成为另一个app。<code>Prefix Header的路径</code>，视具体需求而定是否要修改，如果两个target可以公用同一个<code>Prefix Header</code>，那么就不需要修改这里的路径</li>
+<li>修改scheme，在调试的Stop按钮边上，我们可以选择本工程中所有的target来做编译，如果不修改，在这里选择出来的名字就是A copy，为了与新建的target统一起来，同样也要修改这里的名字。点击scheme选择区，然后选Manager Scheme，找到A copy，然后改成你需要的名字，比如B</li>
+<li>生成一个新的target，一定会与原target有区别，这里可以定义预编译宏，来区分两个版本的不同代码，预编译宏可以在Build Settings中Preprocessor Macros定义，比如在我们新建的target B中定义预编译宏MACRO，然后在代码中通过<figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">#if defined (MACRO)</span><br><span class="line">&#x2F;&#x2F;target  B需要执行的代码</span><br><span class="line">#else</span><br><span class="line">&#x2F;&#x2F;target A需要执行的代码</span><br><span class="line">#endif</span><br></pre></td></tr></table></figure>
+来区分</li>
+<li>其他：Build Phases（各target编译所包含的内容，需要注意的是，如果创建了target B后，再往A里面添加资源或文件，target B中不会自动增加这些资源，需要手动添加）<ul>
+<li>Compile Sources<br>需要编译的代码文件</li>
+<li>Link Binary With Libraries<br>编译所依赖的库</li>
+<li>Copy Bundle Resources<br>编译需要的资源<br>每个target可以根据具体需要增减里面的内容</li>
+</ul>
+</li>
+</ol>
+]]></content>
+      <categories>
+        <category>iOS</category>
+      </categories>
+      <tags>
+        <tag>iOS</tag>
+        <tag>Xcode</tag>
+      </tags>
+  </entry>
+  <entry>
+    <title>依赖注入与Objection</title>
+    <url>/post/6ae5f77f.html</url>
+    <content><![CDATA[<p>本文会说明iOS内依赖注入的概念和依赖注入框架Objection的一般使用</p>
+<span id="more"></span>
+
+<h4 id="依赖注入"><a href="#依赖注入" class="headerlink" title="依赖注入"></a>依赖注入</h4><p>首先先说明什么叫做依赖注入</p>
+<p>比如AController跳转到BController,那么这时候BController就需要在AController内部进行实例化，如下</p>
+<figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">@implementation AController : UIViewController</span><br><span class="line"></span><br><span class="line">...</span><br><span class="line"></span><br><span class="line">- (void)jump </span><br><span class="line">&#123;</span><br><span class="line">	BController *bController &#x3D; [[BController alloc] init];</span><br><span class="line">    [self.navigationController pushViewController:bController animated:YES];</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line">@end</span><br><span class="line"></span><br></pre></td></tr></table></figure>
+
+<p>这么做的话，当AController被封装成组件之后，BController的配置将会被限制，外部无法改变BController任何细节，所以我们 ** 稍 加 改 进 **</p>
+<figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">@implementation AController : UIViewController</span><br><span class="line"></span><br><span class="line">...</span><br><span class="line"></span><br><span class="line">- (instancetype)initWithCreateBlock:(UIViewController *(^)(void))createBViewControllerBlock &#123;</span><br><span class="line">	....</span><br><span class="line">	self.createBViewControllerBlock &#x3D; createBViewControllerBlock;</span><br><span class="line">	...</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line">- (void)jump </span><br><span class="line">&#123;</span><br><span class="line">	UIViewController *bController &#x3D; self.createBViewControllerBlock();</span><br><span class="line">    [self.navigationController pushViewController:bController animated:YES];</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line">@end</span><br><span class="line"></span><br></pre></td></tr></table></figure>
+
+<figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">[[AController alloc] initWithCreateBlock:UIViewController* ^&#123;</span><br><span class="line">	BController *bController &#x3D; [[BController alloc] initWithTitle:@&quot;xxx&quot;];</span><br><span class="line">	return bController;</span><br><span class="line">&#125;];</span><br></pre></td></tr></table></figure>
+
+<p>将BController的创建通过Block暴露出来，AController内部不关心BController是如何被创建的，那么AController对BController的依赖将通过外部的Block进行注入。</p>
+<p>这，就是依赖注入。</p>
+<p>当然这是最简单的依赖注入，无法满足我们复杂的需求，所以有时候我们需要使用第三方框架，如<code>Objection</code>和<code>Typhoon</code></p>
+<h4 id="Objection"><a href="#Objection" class="headerlink" title="Objection"></a>Objection</h4><p>接下来说明一下Objection的使用</p>
+<p>Objection 是一个依赖注入框架，能够在你获取一个类的实例的时候，这个类内部的属性也同时会被实例化。举个例子：</p>
+<figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">&#x2F;&#x2F;Car.h</span><br><span class="line"></span><br><span class="line">@class Engine,Break;</span><br><span class="line"></span><br><span class="line">@interface Car : NSObject</span><br><span class="line"></span><br><span class="line">@property (nonatomic, strong) Engine *engine;</span><br><span class="line"></span><br><span class="line">@property (nonatomic, strong) Break *breaks;</span><br><span class="line"></span><br><span class="line">@end</span><br><span class="line"></span><br></pre></td></tr></table></figure>
+
+<figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">&#x2F;&#x2F;Car.m</span><br><span class="line"></span><br><span class="line">#import &lt;Objection&#x2F;Objection.h&gt;</span><br><span class="line"></span><br><span class="line">@implementation Car</span><br><span class="line">objection_requires(@&quot;engine&quot;, @&quot;breaks&quot;)</span><br><span class="line"></span><br><span class="line">@end</span><br><span class="line"></span><br></pre></td></tr></table></figure>
+
+<p>创建一个默认注射器</p>
+<figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">JSObjectionInjector *injector &#x3D; [JSObjection createInjector];</span><br><span class="line">[JSObjection setDefaultInjector:injector];</span><br></pre></td></tr></table></figure>
+
+<p>实例化Car对象</p>
+<figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">Car *car &#x3D; [[JSObjection defaultInjector] getObject:[Car class]];</span><br></pre></td></tr></table></figure>
+
+<p>这时候所依赖的<code>engine</code>对象和<code>breaks</code>对象都会通过<code>init</code>方法实例化</p>
+<p>最后打印属性</p>
+<figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">car &lt;Car: 0x6000006d8480&gt; engine &lt;Engine: 0x6000004841b0&gt; breaks &lt;Break: 0x6000004841e0&gt;</span><br></pre></td></tr></table></figure>
+
+<p>假如说Car对象不能通过<code>init</code>或者<code>initWithXXX</code>等自定义构造方法去实例化，那么我们需要指定方法，让注射器在指定的方法构建依赖</p>
+<figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">@implementation Car</span><br><span class="line">objection_requires(@&quot;engine&quot;, @&quot;breaks&quot;)</span><br><span class="line">- (void)awakeFromNib &#123;</span><br><span class="line">  [[JSObjection defaultInjector] injectDependencies:self];</span><br><span class="line">&#125;</span><br><span class="line">@end</span><br></pre></td></tr></table></figure>
+
+<p>当Car被注射器初始化完成之后，会调用<code>- awakeFromObjection</code>方法，这里可以额外赋一些值</p>
+<figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">- (void)awakeFromObjection </span><br><span class="line">&#123;</span><br><span class="line">	self.test &#x3D; @&quot;111&quot;;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>上面的说的都是直接init出来的对象，但是更多情况下我们需要指定构造方法</p>
+<figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">@implementation Car</span><br><span class="line">objection_initializer_sel(@selector(initWithObject:)) &#x2F;&#x2F; 该宏只需且只能出现一次</span><br><span class="line"></span><br><span class="line">- (instancetype)initWithObject:(id)object</span><br><span class="line">&#123;</span><br><span class="line">    if (self &#x3D; [super init]) &#123;</span><br><span class="line">        self.test &#x3D; object;</span><br><span class="line">    &#125;</span><br><span class="line">    return self;</span><br><span class="line">&#125;</span><br><span class="line">@end</span><br></pre></td></tr></table></figure>
+
+<p>取出的时候加上<code>argumentList:</code>参数即可</p>
+<figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">Car *car &#x3D; [[JSObjection defaultInjector] getObject:[Car class] argumentList:@[@&quot;aaaa&quot;]];</span><br></pre></td></tr></table></figure>
+
+<p>或者不想写<code>objection_initializer_sel()</code>宏的话<br>可以直接在取的方法那里改动一下变成</p>
+<figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">Car *car &#x3D; [[JSObjection defaultInjector] getObject:[Car class] initializer:@selector(initWithObject:) argumentList:@[@&quot;aaaa&quot;]];</span><br></pre></td></tr></table></figure>
+
+<p>效果也是一样的</p>
+<h5 id="对象工厂"><a href="#对象工厂" class="headerlink" title="对象工厂"></a>对象工厂</h5><p>在Car中添加一个对象工厂属性</p>
+<figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">@property(nonatomic, strong) JSObjectFactory *objectFactory;</span><br></pre></td></tr></table></figure>
+
+<p>然后标记注入里面加多一个<code>objectFactory</code></p>
+<figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">objection_requires(@&quot;engine&quot;, @&quot;breaks&quot;,@&quot;objectFactory&quot;)</span><br></pre></td></tr></table></figure>
+
+<p>然后你就可以通过</p>
+<figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">id obj &#x3D; [self.objectFactory getObject:[Engine class]];</span><br></pre></td></tr></table></figure>
+
+<p>获取到对应的对象</p>
+<h5 id="模块"><a href="#模块" class="headerlink" title="模块"></a>模块</h5><p>你可以创建一个继承自<code>JSObjectionModule</code>的模块，在里面绑定相对应的<code>事物</code>，便可直接取到对应的值</p>
+<p>例如  一个协议和一个模块类，对象绑定了类名和这个类所遵循的协议</p>
+<figure class="highlight plain"><table><tr><td class="code"><pre><span class="line"></span><br><span class="line">@protocol APIService &lt;NSObject&gt;</span><br><span class="line"></span><br><span class="line">- (void)api:(NSString *)params;</span><br><span class="line"></span><br><span class="line">@end</span><br><span class="line"></span><br><span class="line"></span><br><span class="line">@interface ModuleA : JSObjectionModule</span><br><span class="line"></span><br><span class="line">@end</span><br><span class="line"></span><br><span class="line">@implementation ModuleA</span><br><span class="line"></span><br><span class="line">- (void)configure</span><br><span class="line">&#123;</span><br><span class="line">    [self bindClass:[MyAPIService class] toProtocol:@protocol(APIService)];</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line">@end</span><br><span class="line"></span><br></pre></td></tr></table></figure>
+
+<p>这时候注射器初始化方式改为</p>
+<figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">JSObjectionInjector *injectorA &#x3D; [JSObjection createInjector:ModuleA.new]; [JSObjection setDefaultInjector:injectorA];</span><br></pre></td></tr></table></figure>
+
+<p>你就可以直接拿到对应遵循了这个协议的对象而不用通过ModuleA的实例对象</p>
+<figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">MyAPIService *delegate &#x3D; [injectorA getObject:@protocol(APIService)];</span><br></pre></td></tr></table></figure>
+
+<p><strong>注意由于绑定的时候是用了bindClass:方法，所以每次取出都是不同的对象</strong></p>
+<p>除了绑定对象类名和协议外，还可以绑定一个对象和绑定一个类名</p>
+<figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">@implementation ModuleA</span><br><span class="line"></span><br><span class="line">- (void)configure</span><br><span class="line">&#123;</span><br><span class="line">    [self bind:对象实例 toClass:[UIApplication class]];</span><br><span class="line">    [self bind:对象实例 toProtocol:@protocol(UIApplicationDelegate)];</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line">@end</span><br><span class="line"></span><br></pre></td></tr></table></figure>
+
+<p>**注意由于绑定的时候是用了bind:方法，所以每次取出都是相同的对象 **</p>
+<p>当对象被创建的时候，可以通过bindBlock:方法进行干涉</p>
+<figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">@implementation ModuleA</span><br><span class="line"></span><br><span class="line">- (void)configure</span><br><span class="line">&#123;</span><br><span class="line">    [self bindClass:[MyAPIService class] toProtocol:@protocol(APIService)];</span><br><span class="line">    [self bindBlock:^id(JSObjectionInjector *context) &#123;</span><br><span class="line">        MyAPIService *service &#x3D; [[MyAPIService alloc] init];</span><br><span class="line">        service.buildByMySelf &#x3D; YES;</span><br><span class="line">        return service;</span><br><span class="line">    &#125; toClass:[MyAPIService class]];</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line">@end</span><br></pre></td></tr></table></figure>
+
+<p>上面这个例子表示MyAPIService被实例化后都会带上<code>buildByMySelf = YES</code></p>
+<p>但是用这种方法的话，假如用注射器取出对象的时候带上了参数，那我们就没办法拿到参数了，所以我们需要用到<code>ObjectionProvider</code>协议</p>
+<figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">@interface ProviderA : JSObjectionModule&lt;JSObjectionProvider&gt;</span><br><span class="line"></span><br><span class="line">@end</span><br><span class="line"></span><br><span class="line">@implementation ProviderA</span><br><span class="line">- (id)provide:(JSObjectionInjector *)context arguments:(NSArray *)arguments</span><br><span class="line">&#123;</span><br><span class="line">    MyAPIService *service &#x3D; [[MyAPIService alloc] init];</span><br><span class="line">    service.buildByProvider &#x3D; YES;</span><br><span class="line">    service.arguments &#x3D; arguments;</span><br><span class="line">    return service;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line">- (void)configure</span><br><span class="line">&#123;</span><br><span class="line">	[self bindProvider:[ModuleA new] toClass:MyAPIService.class];</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line">@end</span><br></pre></td></tr></table></figure>
+
+<p>这样子就能手动构建对象并且得到参数了</p>
+<h5 id="作用域"><a href="#作用域" class="headerlink" title="作用域"></a>作用域</h5><p>上面提及的<code>bindClass:</code>、<code>bindBlock:</code>、<code>bindProvider:</code>这些方法，都有一个拓展参数<code>inScope:(JSObjectionScope)scope;</code></p>
+<p>比如：</p>
+<figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">[self bindClass:[MyAPIService class] toProtocol:@protocol(APIService) inScope:JSObjectionScopeSingleton named:@&quot;&quot;];</span><br><span class="line"></span><br><span class="line">[self bindBlock:^id(JSObjectionInjector *context) &#123;</span><br><span class="line">	MyAPIService *service &#x3D; [[MyAPIService alloc] init];</span><br><span class="line">	service.buildByMySelf &#x3D; YES;</span><br><span class="line">	return service;</span><br><span class="line">&#125; toClass:[MyAPIService class] inScope:JSObjectionScopeSingleton named:@&quot;&quot;];</span><br><span class="line"></span><br><span class="line">[self bindProvider:[ModuleA new] toClass:MyAPIService.class inScope:JSObjectionScopeSingleton];</span><br></pre></td></tr></table></figure>
+
+<p><code>JSObjectionScopeSingleton</code>意味着注射器取出来的都是同个对象，<br><code>JSObjectionScopeNormal</code>意味着注射器取出来的是不同对象。</p>
+<h5 id="总结"><a href="#总结" class="headerlink" title="总结"></a>总结</h5><p>Objection 帮助你实现** 依赖注入 **，你只需要完成两件事情，配置依赖关系和获取依赖对象。配置依赖关系时，你可以使用几个常用的宏来快速的完成依赖关系的配置，另外你还可以使用模块的概念来完成更多的绑定操作，它允许你将某些类或某些协议接口绑定到某个或某一类的对象上，在配置完成后，你就可以使用关键的 injector 注入器获取到你所需要的对象。</p>
+<p>Objection 像是一种字典容器，通过多种形式将 value 和 key 关联起来，在完成配置之后，你只需要关注你通过何种 key 获取到需要的 value 即可。Objection 最主要的功能之一就是面向接口编程的实现，在上面的示例中也进行了演示，面向接口编程是一种非常重要的编程思想。</p>
+]]></content>
+      <categories>
+        <category>iOS</category>
+      </categories>
+      <tags>
+        <tag>iOS</tag>
+        <tag>架构</tag>
+      </tags>
+  </entry>
+  <entry>
+    <title>组件化方案之强业务组件的设计</title>
+    <url>/post/be708589.html</url>
+    <content><![CDATA[<p>本文简述组件化方案之强业务组件的设计</p>
+<span id="more"></span>
+
+<h3 id="如何定义强业务组件"><a href="#如何定义强业务组件" class="headerlink" title="如何定义强业务组件"></a>如何定义强业务组件</h3><p>涉及到具体业务需求，能单独完成App某个功能点（主要feature）的组件</p>
+<h3 id="需要符合什么要求"><a href="#需要符合什么要求" class="headerlink" title="需要符合什么要求"></a>需要符合什么要求</h3><p>UI层和逻辑层的绝对独立</p>
+<p>需求内容完整</p>
+<p>可拓展，可维护</p>
+<p>可独立配置UI（UI只可重写、不可修改）</p>
+<p>逻辑层不可配置</p>
+<p>代码内容清晰明确</p>
+<h3 id="接下来开始讲故事"><a href="#接下来开始讲故事" class="headerlink" title="接下来开始讲故事"></a>接下来开始讲故事</h3><h4 id="背景"><a href="#背景" class="headerlink" title="背景"></a>背景</h4><p>随着业务发展，灵机大师说的咨询室模块需要抽离到各个App当中使用，但是由于不同App的网关配置和UI配置都不一样，造成了代码不可以完全进行复用，所以需要对原有代码重新设计。</p>
+<h4 id="基本思想"><a href="#基本思想" class="headerlink" title="基本思想"></a>基本思想</h4><p>如何设计组件是个比较复杂的问题</p>
+<p>首先参考其他第三方IM提供商的Demo，基本上要用他们的UI的话就只能全套用，提供的配置项比较有限，自己改里面的东西成本很大，也不方便。</p>
+<p>然后考虑自己如何修改原有代码</p>
+<p>参考原有MVVM架构的话，在View和ViewModel之间是一个强耦合的状态，View会直接依赖ViewModel，如果使用方需要定制UI则会十分懵逼，不明确自己的View需要做什么才能配合ViewModel的使用。但这并不意味着MVVM就不能用，在组件初期，为了快速成型，必须沿用之前的设计模式。</p>
+<p>接下来思考第二种方案，一种能够高度分离职责的架构，那便是VIPER。确实，在VIPER的设计思想中，单一职责原则体现得很好：Presenter寻找实现了InputProtocol的ViewController并给予数据，ViewController内的操作事件则通过实现了OutputProtocol的Presenter去执行，Presenter内部又通过Interactor和wireframe去实现数据获取和路由的交互，这种面相协议的开发也十分契合我们的需求，协议的方式能够很明确的让使用者知道他要做什么和他需要给予什么。但是VIPER的结构比较复杂比较适合后期在发展，目前还是以MVVM为主比较好。</p>
+<p>那么如何改进我们现有的MVVM模式？这里我们就要将VIPER的精髓，面向协议和依赖注入抽离出来。</p>
+<h4 id="依赖注入"><a href="#依赖注入" class="headerlink" title="依赖注入"></a>依赖注入</h4><p>首先先说明什么叫做依赖注入</p>
+<p>比如AController跳转到BController,那么这时候BController就需要在AController内部进行实例化，如下</p>
+<figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">@implementation AController : UIViewController</span><br><span class="line"></span><br><span class="line">...</span><br><span class="line"></span><br><span class="line">- (void)jump </span><br><span class="line">&#123;</span><br><span class="line">	BController *bController &#x3D; [[BController alloc] init];</span><br><span class="line">    [self.navigationController pushViewController:bController animated:YES];</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line">@end</span><br><span class="line"></span><br></pre></td></tr></table></figure>
+
+<p>这么做的话，当AController被封装成组件之后，BController的配置将会被限制，外部无法改变BController任何细节，所以我们 ** 稍 加 改 进 **</p>
+<figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">@implementation AController : UIViewController</span><br><span class="line"></span><br><span class="line">...</span><br><span class="line"></span><br><span class="line">- (instancetype)initWithCreateBlock:(UIViewController *(^)(void))createBViewControllerBlock &#123;</span><br><span class="line">	....</span><br><span class="line">	self.createBViewControllerBlock &#x3D; createBViewControllerBlock;</span><br><span class="line">	...</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line">- (void)jump </span><br><span class="line">&#123;</span><br><span class="line">	UIViewController *bController &#x3D; self.createBViewControllerBlock();</span><br><span class="line">    [self.navigationController pushViewController:bController animated:YES];</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line">@end</span><br><span class="line"></span><br></pre></td></tr></table></figure>
+
+<figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">[[AController alloc] initWithCreateBlock:UIViewController* ^&#123;</span><br><span class="line">	BController *bController &#x3D; [[BController alloc] initWithTitle:@&quot;xxx&quot;];</span><br><span class="line">	return bController;</span><br><span class="line">&#125;];</span><br></pre></td></tr></table></figure>
+
+<p>将BController的创建通过Block暴露出来，AController内部不关心BController是如何被创建的，那么AController对BController的依赖将通过外部的Block进行注入。</p>
+<p>这，就是依赖注入。</p>
+<p>当然这是最简单的依赖注入，无法满足我们复杂的需求，所以有时候我们需要使用第三方框架，如<code>Objection</code>和<code>Typhoon</code></p>
+<h4 id="依赖倒置"><a href="#依赖倒置" class="headerlink" title="依赖倒置"></a>依赖倒置</h4><p>依赖倒置是是六个设计原则之一。依赖倒置意味着实现依赖于抽象，抽象不依赖实现。</p>
+<p>举个例子</p>
+<p>当你需要买一杯饮料，你不需要到具体哪家店买，反正任意一个便利店都有饮料卖，所以你需要的并不是获得美宜佳的地址或者711的地址，你需要的只是一个“卖饮料的店”，这是一个抽象的概念，这样子就是依赖被倒置了，本来是你去寻找美宜佳，现在变成拥有“卖饮料”功能的店去满足你。</p>
+<p>在iOS中，抽象是通过代理体现的</p>
+<p>同样的，我们再来看看刚刚的代码</p>
+<figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">@implementation AController : UIViewController</span><br><span class="line"></span><br><span class="line">...</span><br><span class="line"></span><br><span class="line">- (void)jump </span><br><span class="line">&#123;</span><br><span class="line">	BController *bController &#x3D; [[BController alloc] init];</span><br><span class="line">    [self.navigationController pushViewController:bController animated:YES];</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line">@end</span><br></pre></td></tr></table></figure>
+
+<p>根据依赖倒置原则进行改造</p>
+<figure class="highlight plain"><table><tr><td class="code"><pre><span class="line"></span><br><span class="line">@interface AController()</span><br><span class="line"></span><br><span class="line">@property(weak) id&lt;BControllerProtocol&gt; bViewController;</span><br><span class="line"></span><br><span class="line">@end</span><br><span class="line"></span><br><span class="line">@implementation AController : UIViewController</span><br><span class="line"></span><br><span class="line">...</span><br><span class="line"></span><br><span class="line">- (void)jump </span><br><span class="line">&#123;</span><br><span class="line">    [self.navigationController pushViewController:self.bViewController animated:YES];</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line">@end</span><br></pre></td></tr></table></figure>
+
+<figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">AViewController *aViewController &#x3D; [[AViewController alloc] init];</span><br><span class="line">id&lt;BControllerProtocol&gt; bViewController &#x3D; [[BViewController alloc] init];</span><br><span class="line">aViewController.bViewController &#x3D; bViewController;</span><br></pre></td></tr></table></figure>
+
+
+<h4 id="依赖注入-依赖倒置"><a href="#依赖注入-依赖倒置" class="headerlink" title="依赖注入+依赖倒置"></a>依赖注入+依赖倒置</h4><p>将协议和注入的模式进行结合，仿照上面的代码，估计就是这样子</p>
+<figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">[[AController alloc] initWithCreateBlock:UIViewController&lt;BControllerProtocol&gt;* ^&#123;</span><br><span class="line">	id&lt;BControllerProtocol&gt; bController &#x3D; [[BController alloc] initWithTitle:@&quot;xxx&quot;];</span><br><span class="line">	return bController;</span><br><span class="line">&#125;];</span><br></pre></td></tr></table></figure>
+
+<p>当然 这种模式只是个例子，给大家一种具体的观感</p>
+<p>实际上在编码的时候，一个控制器往往有很多依赖，这里分为<code>可注入依赖</code>和<code>不可注入依赖</code></p>
+<p>可注入的依赖往往是一些可以配置的依赖，使用者通过将自己自定义的配置注入，覆盖原有的默认依赖，达到配置内部样式的效果</p>
+<p>反之，不可注入的依赖就会是代码中固定的耦合项目，合理的耦合以不至于组件产生过多未知问题。</p>
+<p>刚刚说到一些依赖注入的第三方框架<code>Objection</code>和<code>Typhoon</code>，这个之后再详细介绍，这里简单说明一下，当使用方需要使用自定义类注入组件的时候，都是需要依赖这两种框架，不能只由组件内部依赖，所以为了避免不必要的学习成本，暂时先不使用，后面如果拓展开了使用方法，可能会修改使用，我们这里先用一些理解起来比较简单但是操作起来可能比较麻烦的注入方式。</p>
+<p>首先我们这里我们新增一个单例用于注入，通过反射机制实例化自定义的对象，然后进行注入。</p>
+<p>当然这个对象是需要遵循我们对应的协议的。</p>
+<p>协议我们按照VIPIER的规范，分为两种<code>InputProtocol</code>和<code>OutputProtocol</code></p>
+<p><code>InputProtocol</code>包括控制器需要的外部参数<br><code>OutputProtocol</code>包括控制器的回调参数</p>
+<p>按照目前咨询室的设计模式看来，是由三个控制器（一个父控制器和两个子控制器）构成，他们分别会有自己的<code>InputProtocol</code>和<code>OutputProtocol</code>，如果业务端需要自己实现UI则自己实现协议然后进行注入即可。</p>
+<p>待续</p>
+<p>有空继续写</p>
+]]></content>
+      <categories>
+        <category>iOS</category>
+      </categories>
+      <tags>
+        <tag>iOS</tag>
+        <tag>架构</tag>
+      </tags>
+  </entry>
+  <entry>
+    <title>iOS动态加载字体</title>
+    <url>/post/f82939c6.html</url>
+    <content><![CDATA[<p>当你某个在开发某个SDK时需要使用到特殊字体，因为无法修改应用的info.plist，所以这时候我们需要采用动态注册字体的方式加载字体，方法如下</p>
+<span id="more"></span>
+
+<ul>
+<li><p>OC</p>
+<p>  方法调用</p>
+  <figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">[UIFont fontWithName:&lt;#(nonnull NSString *)#&gt; size:&lt;#(CGFloat)#&gt;]</span><br></pre></td></tr></table></figure>
+
+<p>  如果上述方法返回nil,则你需要注册你的字体</p>
+  <figure class="highlight plain"><table><tr><td class="code"><pre><span class="line"> NSBundle *bundle &#x3D; [NSBundle bundleForClass:[self class]];</span><br><span class="line">NSURL *fontURL &#x3D; [bundle URLForResource:&lt;#fontName#&gt; withExtension:@&quot;otf&quot;&#x2F;*or TTF*&#x2F;];</span><br><span class="line">NSData *inData &#x3D; [NSData dataWithContentsOfURL:fontURL];</span><br><span class="line">CFErrorRef error;</span><br><span class="line">CGDataProviderRef provider &#x3D; CGDataProviderCreateWithCFData((CFDataRef)inData);</span><br><span class="line">CGFontRef font &#x3D; CGFontCreateWithDataProvider(provider);</span><br><span class="line">if (!CTFontManagerRegisterGraphicsFont(font, &amp;error)) &#123;</span><br><span class="line">	CFStringRef errorDescription &#x3D; CFErrorCopyDescription(error);</span><br><span class="line">	NSLog(@&quot;Failed to load font: %@&quot;, errorDescription);</span><br><span class="line">	CFRelease(errorDescription);</span><br><span class="line">&#125;</span><br><span class="line">CFSafeRelease(font);</span><br><span class="line">CFSafeRelease(provider);</span><br></pre></td></tr></table></figure>
+
+  <figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">void CFSafeRelease(CFTypeRef cf) &#123;</span><br><span class="line">	if (cf !&#x3D; NULL) &#123;</span><br><span class="line">		CFRelease(cf);</span><br><span class="line">	&#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+</li>
+<li><p>Swift</p>
+<p>  方法调用</p>
+  <figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">UIFont.customFont(name:&quot;xxx&quot; size: 12)</span><br></pre></td></tr></table></figure>
+
+  <figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">extension UIFont &#123;</span><br><span class="line">	    static func customFont(fontName:String, size: CGFloat) -&gt; UIFont &#123;</span><br><span class="line">        if let font &#x3D; UIFont(name: fontName, size: size) &#123;</span><br><span class="line">            return font</span><br><span class="line">        &#125; else &#123;</span><br><span class="line">            _ &#x3D; self.registerFont(bundle: Bundle.init(for: XXXX.self), fontName: fontName, fontExtension: &quot;otf&quot;) &#x2F;&#x2F; 也可以写ttf,看具体格式</span><br><span class="line">            if let newFont &#x3D; UIFont(name: fontName, size: size) &#123;</span><br><span class="line">                return newFont</span><br><span class="line">            &#125;</span><br><span class="line">            return UIFont.customFont(ofSize: size)</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line">    </span><br><span class="line">    static func registerFont(bundle: Bundle, fontName: String, fontExtension: String) -&gt; Bool &#123;</span><br><span class="line">        guard let fontURL &#x3D; bundle.url(forResource: fontName, withExtension: fontExtension) else &#123;</span><br><span class="line">            fatalError(&quot;Couldn&#39;t find font \(fontName)&quot;)</span><br><span class="line">        &#125;</span><br><span class="line">        </span><br><span class="line">        guard let fontDataProvider &#x3D; CGDataProvider(url: fontURL as CFURL) else &#123;</span><br><span class="line">            fatalError(&quot;Couldn&#39;t load data from the font \(fontName)&quot;)</span><br><span class="line">        &#125;</span><br><span class="line">        </span><br><span class="line">        guard let font &#x3D; CGFont(fontDataProvider) else &#123;</span><br><span class="line">            fatalError(&quot;Couldn&#39;t create font from data&quot;)</span><br><span class="line">        &#125;</span><br><span class="line">        </span><br><span class="line">        var error: Unmanaged&lt;CFError&gt;?</span><br><span class="line">        let success &#x3D; CTFontManagerRegisterGraphicsFont(font, &amp;error)</span><br><span class="line">        guard success else &#123;</span><br><span class="line">            print(&quot;Error registering font: maybe it was already registered.&quot;)</span><br><span class="line">            return false</span><br><span class="line">        &#125;</span><br><span class="line">        </span><br><span class="line">        return true</span><br><span class="line">    &#125;</span><br><span class="line"></span><br></pre></td></tr></table></figure></li>
+</ul>
+<p>参考资料：<br>    <a href="https://stackoverflow.com/questions/12919513/how-do-i-add-a-custom-font-to-a-cocoapod">https://stackoverflow.com/questions/12919513/how-do-i-add-a-custom-font-to-a-cocoapod</a></p>
+]]></content>
+      <categories>
+        <category>iOS</category>
+      </categories>
+      <tags>
+        <tag>iOS</tag>
       </tags>
   </entry>
 </search>

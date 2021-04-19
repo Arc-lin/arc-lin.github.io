@@ -1,0 +1,675 @@
+<!DOCTYPE html>
+<html lang="zh-Hans">
+<head>
+  <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=2">
+<meta name="theme-color" content="#222">
+<meta name="generator" content="Hexo 5.4.0">
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png">
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32-next.png">
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next.png">
+  <link rel="mask-icon" href="/images/logo.svg" color="#222">
+
+<link rel="stylesheet" href="/css/main.css">
+
+
+<link rel="stylesheet" href="/lib/font-awesome/css/all.min.css">
+
+<script id="hexo-configurations">
+    var NexT = window.NexT || {};
+    var CONFIG = {"hostname":"www.arclin.cn","root":"/","scheme":"Muse","version":"7.8.0","exturl":false,"sidebar":{"position":"left","display":"post","padding":18,"offset":12,"onmobile":false},"copycode":{"enable":false,"show_result":false,"style":null},"back2top":{"enable":true,"sidebar":false,"scrollpercent":false},"bookmark":{"enable":false,"color":"#222","save":"auto"},"fancybox":false,"mediumzoom":false,"lazyload":false,"pangu":false,"comments":{"style":"tabs","active":null,"storage":true,"lazyload":false,"nav":null},"algolia":{"appID":"VOFC7668C9","apiKey":"24c644edc8e7353bf2e8d8e31f03a940","indexName":"hexo","hits":{"per_page":10},"labels":{"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}},"localsearch":{"enable":true,"trigger":"auto","top_n_per_article":1,"unescape":false,"preload":false},"motion":{"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},"path":"search.xml"};
+  </script>
+
+  <meta name="description" content="本文将主要探讨App Clips开发流程 和 组件化、非组件化两种开发方式下如何复用代码的问题。">
+<meta property="og:type" content="article">
+<meta property="og:title" content="iOS 14 App Clips">
+<meta property="og:url" content="https://www.arclin.cn/post/a44df9c3.html">
+<meta property="og:site_name" content="Arclin">
+<meta property="og:description" content="本文将主要探讨App Clips开发流程 和 组件化、非组件化两种开发方式下如何复用代码的问题。">
+<meta property="og:locale">
+<meta property="og:image" content="https://p3-juejin.byteimg.com/tos-cn-i-k3u1fbpfcp/a13d29c7a17d471dbc551c416ce2ed57~tplv-k3u1fbpfcp-watermark.image">
+<meta property="og:image" content="https://p3-juejin.byteimg.com/tos-cn-i-k3u1fbpfcp/d62145df226549428f600ace6f1b44cb~tplv-k3u1fbpfcp-zoom-1.image">
+<meta property="og:image" content="https://p3-juejin.byteimg.com/tos-cn-i-k3u1fbpfcp/f93a07c34f7249b982f0cbca84bfcafe~tplv-k3u1fbpfcp-zoom-1.image">
+<meta property="og:image" content="https://p3-juejin.byteimg.com/tos-cn-i-k3u1fbpfcp/1da0c96044db46bb897aab6f71543c8d~tplv-k3u1fbpfcp-zoom-1.image">
+<meta property="og:image" content="https://p3-juejin.byteimg.com/tos-cn-i-k3u1fbpfcp/a2ae0fb422f149d98589f36c80123315~tplv-k3u1fbpfcp-zoom-1.image">
+<meta property="og:image" content="https://p3-juejin.byteimg.com/tos-cn-i-k3u1fbpfcp/33e78440190242efaa8dac9b47004393~tplv-k3u1fbpfcp-zoom-1.image">
+<meta property="og:image" content="https://p3-juejin.byteimg.com/tos-cn-i-k3u1fbpfcp/68bfe6ee218047b7a3232058dcc2e006~tplv-k3u1fbpfcp-zoom-1.image">
+<meta property="og:image" content="https://p3-juejin.byteimg.com/tos-cn-i-k3u1fbpfcp/4b3e18f56f6d49219fc46f77dab1cef2~tplv-k3u1fbpfcp-zoom-1.image">
+<meta property="og:image" content="https://p3-juejin.byteimg.com/tos-cn-i-k3u1fbpfcp/0c14c35967084886bc3f4fce6e985fcb~tplv-k3u1fbpfcp-zoom-1.image">
+<meta property="og:image" content="https://p3-juejin.byteimg.com/tos-cn-i-k3u1fbpfcp/05ddb4d106a349d28c1504762697a9eb~tplv-k3u1fbpfcp-zoom-1.image">
+<meta property="og:image" content="https://p3-juejin.byteimg.com/tos-cn-i-k3u1fbpfcp/9edc6108c0b64885b708ef5c9de8e1d0~tplv-k3u1fbpfcp-zoom-1.image">
+<meta property="og:image" content="https://p3-juejin.byteimg.com/tos-cn-i-k3u1fbpfcp/fa5c9c1032174d77a4db0518029b78dd~tplv-k3u1fbpfcp-zoom-1.image">
+<meta property="og:image" content="https://p3-juejin.byteimg.com/tos-cn-i-k3u1fbpfcp/5fbccb4eee1445ca9b680200358535e0~tplv-k3u1fbpfcp-zoom-1.image">
+<meta property="og:image" content="https://p3-juejin.byteimg.com/tos-cn-i-k3u1fbpfcp/a5125ca96f15433b8205294e48906e13~tplv-k3u1fbpfcp-zoom-1.image">
+<meta property="og:image" content="https://p3-juejin.byteimg.com/tos-cn-i-k3u1fbpfcp/0c2847eb910740229f410d0aa29f7bb5~tplv-k3u1fbpfcp-zoom-1.image">
+<meta property="og:image" content="https://p3-juejin.byteimg.com/tos-cn-i-k3u1fbpfcp/3fec69fde9e64618819b1b526034d23b~tplv-k3u1fbpfcp-zoom-1.image">
+<meta property="og:image" content="https://p3-juejin.byteimg.com/tos-cn-i-k3u1fbpfcp/7708c16f9c4247a9ab9ec393d01420b1~tplv-k3u1fbpfcp-zoom-1.image">
+<meta property="article:published_time" content="2020-11-25T02:08:18.000Z">
+<meta property="article:modified_time" content="2021-04-19T02:38:42.935Z">
+<meta property="article:author" content="Arclin">
+<meta property="article:tag" content="iOS">
+<meta property="article:tag" content="feature">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="https://p3-juejin.byteimg.com/tos-cn-i-k3u1fbpfcp/a13d29c7a17d471dbc551c416ce2ed57~tplv-k3u1fbpfcp-watermark.image">
+
+<link rel="canonical" href="https://www.arclin.cn/post/a44df9c3.html">
+
+
+<script id="page-configurations">
+  // https://hexo.io/docs/variables.html
+  CONFIG.page = {
+    sidebar: "",
+    isHome : false,
+    isPost : true,
+    lang   : 'zh-Hans'
+  };
+</script>
+
+  <title>iOS 14 App Clips | Arclin</title>
+  
+
+
+
+
+
+
+  <noscript>
+  <style>
+  .use-motion .brand,
+  .use-motion .menu-item,
+  .sidebar-inner,
+  .use-motion .post-block,
+  .use-motion .pagination,
+  .use-motion .comments,
+  .use-motion .post-header,
+  .use-motion .post-body,
+  .use-motion .collection-header { opacity: initial; }
+
+  .use-motion .site-title,
+  .use-motion .site-subtitle {
+    opacity: initial;
+    top: initial;
+  }
+
+  .use-motion .logo-line-before i { left: initial; }
+  .use-motion .logo-line-after i { right: initial; }
+  </style>
+</noscript>
+
+<link rel="alternate" href="/atom.xml" title="Arclin" type="application/atom+xml">
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage">
+  <div class="container use-motion">
+    <div class="headband"></div>
+
+    <header class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-container">
+  <div class="site-nav-toggle">
+    <div class="toggle" aria-label="Toggle navigation bar">
+      <span class="toggle-line toggle-line-first"></span>
+      <span class="toggle-line toggle-line-middle"></span>
+      <span class="toggle-line toggle-line-last"></span>
+    </div>
+  </div>
+
+  <div class="site-meta">
+
+    <a href="/" class="brand" rel="start">
+      <span class="logo-line-before"><i></i></span>
+      <h1 class="site-title">Arclin</h1>
+      <span class="logo-line-after"><i></i></span>
+    </a>
+      <p class="site-subtitle" itemprop="description">Advocate Technology. Enjoy Technology.</p>
+  </div>
+
+  <div class="site-nav-right">
+    <div class="toggle popup-trigger">
+        <i class="fa fa-search fa-fw fa-lg"></i>
+    </div>
+  </div>
+</div>
+
+
+
+
+<nav class="site-nav">
+  <ul id="menu" class="main-menu menu">
+        <li class="menu-item menu-item-home">
+
+    <a href="/" rel="section"><i class="fa fa-home fa-fw"></i>Home</a>
+
+  </li>
+        <li class="menu-item menu-item-tags">
+
+    <a href="/tags/" rel="section"><i class="fa fa-tags fa-fw"></i>Tags</a>
+
+  </li>
+        <li class="menu-item menu-item-categories">
+
+    <a href="/categories/" rel="section"><i class="fa fa-th fa-fw"></i>Categories</a>
+
+  </li>
+        <li class="menu-item menu-item-archives">
+
+    <a href="/archives/" rel="section"><i class="fa fa-archive fa-fw"></i>Archives</a>
+
+  </li>
+        <li class="menu-item menu-item-about">
+
+    <a href="/about/" rel="section"><i class="fa fa-user fa-fw"></i>About</a>
+
+  </li>
+      <li class="menu-item menu-item-search">
+        <a role="button" class="popup-trigger"><i class="fa fa-search fa-fw"></i>Search
+        </a>
+      </li>
+  </ul>
+</nav>
+
+
+
+  <div class="search-pop-overlay">
+    <div class="popup search-popup">
+        <div class="search-header">
+  <span class="search-icon">
+    <i class="fa fa-search"></i>
+  </span>
+  <div class="search-input-container">
+    <input autocomplete="off" autocapitalize="off"
+           placeholder="Searching..." spellcheck="false"
+           type="search" class="search-input">
+  </div>
+  <span class="popup-btn-close">
+    <i class="fa fa-times-circle"></i>
+  </span>
+</div>
+<div id="search-result">
+  <div id="no-result">
+    <i class="fa fa-spinner fa-pulse fa-5x fa-fw"></i>
+  </div>
+</div>
+
+    </div>
+  </div>
+
+</div>
+    </header>
+
+    
+  <div class="back-to-top">
+    <i class="fa fa-arrow-up"></i>
+    <span>0%</span>
+  </div>
+
+
+    <main class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          
+
+          <div class="content post posts-expand">
+            
+
+    
+  
+  
+  <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="zh-Hans">
+    <link itemprop="mainEntityOfPage" href="https://www.arclin.cn/post/a44df9c3.html">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="https://avatars.githubusercontent.com/u/12107804?v=4">
+      <meta itemprop="name" content="Arclin">
+      <meta itemprop="description" content="Stay hungry,stay foolish">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="Arclin">
+    </span>
+      <header class="post-header">
+        <h1 class="post-title" itemprop="name headline">
+          iOS 14 App Clips
+        </h1>
+
+        <div class="post-meta">
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-calendar"></i>
+              </span>
+              <span class="post-meta-item-text">Posted on</span>
+
+              <time title="Created: 2020-11-25 10:08:18" itemprop="dateCreated datePublished" datetime="2020-11-25T10:08:18+08:00">2020-11-25</time>
+            </span>
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-folder"></i>
+              </span>
+              <span class="post-meta-item-text">In</span>
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/iOS/" itemprop="url" rel="index"><span itemprop="name">iOS</span></a>
+                </span>
+            </span>
+
+          
+            <span class="post-meta-item" title="Views" id="busuanzi_container_page_pv" style="display: none;">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-eye"></i>
+              </span>
+              <span class="post-meta-item-text">Views: </span>
+              <span id="busuanzi_value_page_pv"></span>
+            </span>
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+        <p>本文将主要探讨App Clips开发流程 和 组件化、非组件化两种开发方式下如何复用代码的问题。</p>
+<span id="more"></span>
+
+<p>App Clips是iOS14系统的新特性之一，类似于小程序，用户可以在不下载App的情况下体验到App的部分功能，如网易严选的商品详情功能（<a target="_blank" rel="noopener" href="https://m.you.163.com/item/detail?id=1615007#/?_k=yz97vw">https://m.you.163.com/item/detail?id=1615007#/?_k=yz97vw</a>），该功能适合做一些推广和引流的运营工作，另外苹果也提供的原生的浮窗样式，可以引导用户下载完整版App。</p>
+<p>苹果官方文档：<a target="_blank" rel="noopener" href="https://developer.apple.com/app-clips/">https://developer.apple.com/app-clips/</a></p>
+<h3 id="目前已知的触发方式"><a href="#目前已知的触发方式" class="headerlink" title="目前已知的触发方式"></a>目前已知的触发方式</h3><ul>
+<li><p>二维码</p>
+<p>  必须使用iOS 14系统相机或者使用控制中心的读取二维码组件来扫码才能触发App Clips。</p>
+</li>
+<li><p>NFC Tags</p>
+<p>  NFC标签感应，比如星巴克桌面内嵌的NFC Tags。</p>
+</li>
+<li><p>Safari App Banner</p>
+<p>  当用户用iOS的Safari浏览器浏览相应的网址后，页面顶部会出现一个横幅，提示用户有App Clips可以用。</p>
+</li>
+<li><p>信息</p>
+<p>  iOS系统自带的iMessage，当你在iMessage发送一个App Clips链接时，系统会自动把信息显示成一个App Clips的卡片。</p>
+</li>
+</ul>
+<p><img src="https://p3-juejin.byteimg.com/tos-cn-i-k3u1fbpfcp/a13d29c7a17d471dbc551c416ce2ed57~tplv-k3u1fbpfcp-watermark.image"></p>
+<h3 id="开发前置工作"><a href="#开发前置工作" class="headerlink" title="开发前置工作"></a>开发前置工作</h3><h4 id="申请证书"><a href="#申请证书" class="headerlink" title="申请证书"></a>申请证书</h4><h5 id="创建App-Clips-ID"><a href="#创建App-Clips-ID" class="headerlink" title="创建App Clips ID"></a>创建App Clips ID</h5><ol>
+<li>点击新增APP ID</li>
+</ol>
+<img src="https://p3-juejin.byteimg.com/tos-cn-i-k3u1fbpfcp/d62145df226549428f600ace6f1b44cb~tplv-k3u1fbpfcp-zoom-1.image" >
+
+<ol start="2">
+<li>选择App Clip <img src="https://p3-juejin.byteimg.com/tos-cn-i-k3u1fbpfcp/f93a07c34f7249b982f0cbca84bfcafe~tplv-k3u1fbpfcp-zoom-1.image" >
+<img src="https://p3-juejin.byteimg.com/tos-cn-i-k3u1fbpfcp/1da0c96044db46bb897aab6f71543c8d~tplv-k3u1fbpfcp-zoom-1.image" ></li>
+</ol>
+<ol start="3">
+<li>输入一串英文名，用于拼接在主工程的bundle id的后面，生成该clip的bundle id <img src="https://p3-juejin.byteimg.com/tos-cn-i-k3u1fbpfcp/a2ae0fb422f149d98589f36c80123315~tplv-k3u1fbpfcp-zoom-1.image" >
+ </li>
+<li>在Description内输入描述（不能使用特殊符号），并且在下方勾选App Clip能力，比如Apple Pay，Sign in with Apple，Push等等，<strong>Associated Domains必须勾选</strong><img src="https://p3-juejin.byteimg.com/tos-cn-i-k3u1fbpfcp/33e78440190242efaa8dac9b47004393~tplv-k3u1fbpfcp-zoom-1.image" >
+ </li>
+<li>最后确认并点击右上方Register即可</li>
+</ol>
+<h5 id="创建Profiles"><a href="#创建Profiles" class="headerlink" title="创建Profiles"></a>创建Profiles</h5><p>流程跟创建App的Profiles一样，就是选择bundle id的时候改成Clip的bundle id 即可，同样有Development、AdHoc、Distribution三种类型</p>
+<img src="https://p3-juejin.byteimg.com/tos-cn-i-k3u1fbpfcp/68bfe6ee218047b7a3232058dcc2e006~tplv-k3u1fbpfcp-zoom-1.image" >
+
+<h5 id="其他配置"><a href="#其他配置" class="headerlink" title="其他配置"></a>其他配置</h5><p>如果需要其他NFC、地点等等的一些方式触发App Clip配置的话，参考这个苹果的文档<a target="_blank" rel="noopener" href="https://help.apple.com/app-store-connect/#/dev5b665db74">https://help.apple.com/app-store-connect/#/dev5b665db74</a></p>
+<h4 id="Apple-Store-Connect-配置图片和标题，描述"><a href="#Apple-Store-Connect-配置图片和标题，描述" class="headerlink" title="Apple Store Connect 配置图片和标题，描述"></a>Apple Store Connect 配置图片和标题，描述</h4><ol>
+<li>需要一张1800 * 1200 的图片，用于显示在Clip的卡片上</li>
+<li>副标题用于显示在卡片标题下的小字，如图所示<img src="https://p3-juejin.byteimg.com/tos-cn-i-k3u1fbpfcp/4b3e18f56f6d49219fc46f77dab1cef2~tplv-k3u1fbpfcp-zoom-1.image" width=30%></li>
+<li>操作包括“打开”“查看”“开始游戏”，体现在卡片右边的蓝色按钮内的文案，根据你的产品类型进行选择就好</li>
+</ol>
+<img src="https://p3-juejin.byteimg.com/tos-cn-i-k3u1fbpfcp/0c14c35967084886bc3f4fce6e985fcb~tplv-k3u1fbpfcp-zoom-1.image" >
+
+
+<h4 id="配置apple-app-site-association-json"><a href="#配置apple-app-site-association-json" class="headerlink" title="配置apple-app-site-association.json"></a>配置apple-app-site-association.json</h4><p>假设你的开发者账号的Team Id是<code>A123</code>，Clips的bundle id是<code>com.abc.def.clips</code>，主工程的bundle id 是<code>com.abc.def</code>，则配置如下</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br></pre></td><td class="code"><pre><span class="line">&#123;</span><br><span class="line">    &quot;appclips&quot;:&#123;</span><br><span class="line">        &quot;apps&quot;:[&quot;A123.com.abc.def.clips&quot;]</span><br><span class="line">    &#125;,</span><br><span class="line">    &quot;applinks&quot;:&#123;</span><br><span class="line">        &quot;apps&quot;:[</span><br><span class="line">        ],</span><br><span class="line">        &quot;details&quot;:&#123;</span><br><span class="line">            &quot;A123.com.abc.def&quot;:&#123;</span><br><span class="line">                &quot;paths&quot;:[</span><br><span class="line">                    &quot;*&quot; &#x2F;&#x2F; 这里的Path根据实际情况配置即可</span><br><span class="line">                ]</span><br><span class="line">            &#125;</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;,</span><br><span class="line">    &quot;webcredentials&quot;:&#123;</span><br><span class="line">        &quot;apps&quot;:[</span><br><span class="line">            &quot;A123.com.abc.def&quot;,</span><br><span class="line">        ]</span><br><span class="line">    &#125;,</span><br><span class="line">    &quot;activitycontinuation&quot;:&#123;</span><br><span class="line">        &quot;apps&quot;:[</span><br><span class="line">            &quot;A123.com.abc.def&quot;,</span><br><span class="line">        ]</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>配置完成后部署到你自己域名的根目录下，配置方法网上很多教程，这里贴上<a target="_blank" rel="noopener" href="https://developer.apple.com/documentation/safariservices/supporting_associated_domains?language=objc">苹果官方文档</a></p>
+<p>如果配置错了，那么上传包到苹果后台之后，就会显示无效域名<br><img src="https://p3-juejin.byteimg.com/tos-cn-i-k3u1fbpfcp/05ddb4d106a349d28c1504762697a9eb~tplv-k3u1fbpfcp-zoom-1.image"></p>
+<p>如果是json配置错误，那么配置正确后不用重新传包，等待苹果那边刷新缓存就好。</p>
+<p>App Clip支持最多在三个域名的网页显示入口，到后面的工程配置那里会说明。</p>
+<h4 id="前端页面添加meta标签"><a href="#前端页面添加meta标签" class="headerlink" title="前端页面添加meta标签"></a>前端页面添加meta标签</h4><p>如果要在H5页面显示Clips入口，加上一段meta标签即可</p>
+<p>如果你的应用市场App id是 <code>123456</code>, Clips的bundle id 是 <code>com.abc.clips</code> 则应该配置</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">&lt;meta name&#x3D;&quot;apple-itunes-app&quot; content&#x3D;&quot;app-id&#x3D;123456,app-clip-bundle-id&#x3D;com.abc.clips&quot;&gt;</span><br></pre></td></tr></table></figure>
+
+<h3 id="开发工作"><a href="#开发工作" class="headerlink" title="开发工作"></a>开发工作</h3><h4 id="新建App-Clip-Target"><a href="#新建App-Clip-Target" class="headerlink" title="新建App Clip Target"></a>新建App Clip Target</h4><p>这里以OC工程为例</p>
+<img src="https://p3-juejin.byteimg.com/tos-cn-i-k3u1fbpfcp/9edc6108c0b64885b708ef5c9de8e1d0~tplv-k3u1fbpfcp-zoom-1.image" >
+<img src="https://p3-juejin.byteimg.com/tos-cn-i-k3u1fbpfcp/fa5c9c1032174d77a4db0518029b78dd~tplv-k3u1fbpfcp-zoom-1.image" >
+
+<h4 id="配置证书和Associated-Domains"><a href="#配置证书和Associated-Domains" class="headerlink" title="配置证书和Associated Domains"></a>配置证书和Associated Domains</h4><p>用刚才生成的证书去配置一下即可</p>
+<img src="https://p3-juejin.byteimg.com/tos-cn-i-k3u1fbpfcp/5fbccb4eee1445ca9b680200358535e0~tplv-k3u1fbpfcp-zoom-1.image" >
+
+<p>添加Associated Domains，目的是打开对应域名网页后，页面上方能够出现Clip的入口。</p>
+<p><strong>这里可以添加多个域名，注意每个域名都需要配置apple-app-site-association！！！</strong></p>
+<p><strong>主工程的Target和Clip的Target都需要配置！！！</strong></p>
+<img src="https://p3-juejin.byteimg.com/tos-cn-i-k3u1fbpfcp/a5125ca96f15433b8205294e48906e13~tplv-k3u1fbpfcp-zoom-1.image" >
+
+<h4 id="编写代码"><a href="#编写代码" class="headerlink" title="编写代码"></a>编写代码</h4><p>创建完之后就会生成一个文件夹，里面就是我们熟悉的AppDelegate、SecneDelegate、Main.storyboard、Info.plist等文件，如果你不使用Storyboard进行界面搭建，那么也是跟之前的开发模式一样，删除info.plist内Application Scene Manifest，修改General-Deployment info - Main interface 为空，修改AppDelegate.m，在里面创建根控制器。</p>
+<p>之后的操作就跟普通开发一样了，调试的话可以直接在Xcode上左上角选择Clip的target，然后就可以跑起来了。</p>
+<p>另外，AppIcon是需要独立配置的，同样也是在Clip项目工程文件夹内Assets.xcassets。</p>
+<h5 id="非组件化开发模式"><a href="#非组件化开发模式" class="headerlink" title="非组件化开发模式"></a>非组件化开发模式</h5><p>一般情况下我们是需要复用代码的，将代码内某些模块功能进行复用，然后直接用在Clip，这时候我们只需要在右侧Target Membership勾选新建的Clip Target即可。</p>
+<img src="https://p3-juejin.byteimg.com/tos-cn-i-k3u1fbpfcp/0c2847eb910740229f410d0aa29f7bb5~tplv-k3u1fbpfcp-zoom-1.image" width=30%>
+
+<p>同样的 相关的依赖到的文件也需要勾选Clip Target</p>
+<h5 id="组件化开发模式-和-Podfile的配置"><a href="#组件化开发模式-和-Podfile的配置" class="headerlink" title="组件化开发模式 和 Podfile的配置"></a>组件化开发模式 和 Podfile的配置</h5><p>如果是在组件化开发模式下，那么就需要配置Podfile</p>
+<p>在Podfile 底部新增代码</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br></pre></td><td class="code"><pre><span class="line">source &#39;https:&#x2F;&#x2F;github.com&#x2F;CocoaPods&#x2F;Specs.git&#39;</span><br><span class="line"># 你的私有pod仓库</span><br><span class="line">source &#39;https:&#x2F;&#x2F;git.xxx.com&#x2F;yourprivatepodspec&#x2F;Podspec.git&#39;</span><br><span class="line"></span><br><span class="line">target &#39;YourApp’ do</span><br><span class="line">    platform :ios, &#39;10.3&#39;</span><br><span class="line">    pod &quot;AFNetworking&quot;</span><br><span class="line">    pod &quot;SDWebImage&quot;</span><br><span class="line">    # 等等</span><br><span class="line">end</span><br><span class="line"></span><br><span class="line">target &#39;YourApp_Clips&#39; do</span><br><span class="line">    platform :ios, &#39;10.3&#39;</span><br><span class="line">    pod &#39;ComponentA&#39;,           :path&#x3D;&gt; &#39;..&#x2F;ComponentA&#39;</span><br><span class="line">    pod &quot;ComponentB&quot;,           :path&#x3D;&gt;&quot;..&#x2F;ComponentB&quot;</span><br><span class="line">    pod &quot;AFNetworking&quot;</span><br><span class="line">    pod &quot;SDWebImage&quot;</span><br><span class="line">    # 等等</span><br><span class="line">end</span><br><span class="line"></span><br></pre></td></tr></table></figure>
+
+<p>但是这样子相同的第三方pod会写两遍，所以我们可以优化成</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br></pre></td><td class="code"><pre><span class="line">source &#39;https:&#x2F;&#x2F;github.com&#x2F;CocoaPods&#x2F;Specs.git&#39;</span><br><span class="line"># 你的私有pod仓库</span><br><span class="line">source &#39;https:&#x2F;&#x2F;git.xxx.com&#x2F;yourprivatepodspec&#x2F;Podspec.git&#39;</span><br><span class="line"></span><br><span class="line">def common_pods</span><br><span class="line">    pod &quot;AFNetworking&quot;</span><br><span class="line">    pod &quot;SDWebImage&quot;</span><br><span class="line">end</span><br><span class="line"></span><br><span class="line">target &#39;YourApp’ do</span><br><span class="line">    platform :ios, &#39;10.3&#39;</span><br><span class="line">    common_pods</span><br><span class="line">end</span><br><span class="line"></span><br><span class="line">target &#39;YourApp_Clips&#39; do</span><br><span class="line">    platform :ios, &#39;14.0&#39;</span><br><span class="line">    pod &#39;ComponentA&#39;,           :path&#x3D;&gt; &#39;..&#x2F;ComponentA&#39;</span><br><span class="line">    pod &quot;ComponentB&quot;,           :path&#x3D;&gt;&quot;..&#x2F;ComponentB&quot;</span><br><span class="line">    common_pods</span><br><span class="line">end</span><br><span class="line"></span><br></pre></td></tr></table></figure>
+
+<h5 id="抽离模块时不同环境的代码复用问题"><a href="#抽离模块时不同环境的代码复用问题" class="headerlink" title="抽离模块时不同环境的代码复用问题"></a>抽离模块时不同环境的代码复用问题</h5><p>假如说A功能需要抽离出来放到Clip，但是A模块里面有需求是会跳转到B模块的，但是我并不希望Clip引入B模块，希望他能在这个地方提示用户下载完整App，那应该怎么做呢？</p>
+<p>首先第一个事情，苹果提供了一个Api可以引导弹窗引导用户下载APP</p>
+<img src="https://p3-juejin.byteimg.com/tos-cn-i-k3u1fbpfcp/3fec69fde9e64618819b1b526034d23b~tplv-k3u1fbpfcp-zoom-1.image" width=40%>
+
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line">UIWindowScene *scene &#x3D; (UIWindowScene *)[[UIApplication sharedApplication].connectedScenes.allObjects firstObject];</span><br><span class="line">SKOverlayAppConfiguration *config &#x3D; [[SKOverlayAppConfiguration alloc] initWithAppIdentifier:@&quot;你的AppID&quot; position:SKOverlayPositionBottomRaised];</span><br><span class="line">SKOverlay *overlay &#x3D; [[SKOverlay alloc] initWithConfiguration:config];</span><br><span class="line">overlay.delegate &#x3D; self; &#x2F;&#x2F; 添加代理后可以监听弹窗的弹出和消失，可以在代理内添加埋点。</span><br><span class="line">[overlay presentInScene:scene];</span><br><span class="line"></span><br><span class="line">&#x2F;&#x2F; 主动让弹窗消失</span><br><span class="line">&#x2F;&#x2F; [SKOverlay dismissOverlayInScene:scene];</span><br></pre></td></tr></table></figure>
+
+<p>第二. 如何在模块内划分环境，区分是主App还是Clip</p>
+<p>方法一：设计一个单例，添加一个枚举属性，分别在<code>主工程</code>的AppDelegate和<code>Clip</code>的AppDelegate内给单例的属性赋值，标记当前环境。然后在业务代码中获取单例的环境属性后进行判断。</p>
+<p>方法二：有时候我们在Clip复用的模块代码内不需要import某些头文件，因为我们不需要这个功能，这时候单例的方法就不管用了，我们需要通过宏去判断。</p>
+<p>如果代码不在pod组件内的话，只需要在Clip Target的<code>Build Settings</code> - <code>Preprocessor Macros</code>添加<code>APP_CLIPS</code>宏即可。</p>
+<img src="https://p3-juejin.byteimg.com/tos-cn-i-k3u1fbpfcp/7708c16f9c4247a9ab9ec393d01420b1~tplv-k3u1fbpfcp-zoom-1.image" >
+
+<p>如果是组件化的开发模式，代码在pod内部，那么就稍微有点麻烦，需要在对应podspec新增一个subspec，专门提供给clip使用，然后配置上宏定义</p>
+<p><code>ComponentA.podspec</code></p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line"></span><br><span class="line">s.subspec &quot;App&quot; do |ss|</span><br><span class="line">    ss.source_files &#x3D; &quot;xxxxxx&quot;</span><br><span class="line">end</span><br><span class="line"></span><br><span class="line">s.subspec &quot;AppClip&quot; do |ss|</span><br><span class="line">    ss.source_files &#x3D; &quot;xxxxxx&quot;</span><br><span class="line">    ss.pod_target_xcconfig &#x3D; &#123; &#39;GCC_PREPROCESSOR_DEFINITIONS&#39; &#x3D;&gt; &#39;APP_CLIPS&#x3D;1&#39;&#125;</span><br><span class="line">end</span><br></pre></td></tr></table></figure>
+
+<blockquote>
+<p>这里为什么要弄多一个App的subspec，因为如果主工程直接<code>pod ComponentA</code>的话，所有的subspec都会被引入，所以这里为了区分开，就加多了一个专门给主工程用的subspec</p>
+</blockquote>
+<p><code>Podfile</code></p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br></pre></td><td class="code"><pre><span class="line">def common_pods</span><br><span class="line">    pod &quot;AFNetworking&quot;</span><br><span class="line">    pod &quot;SDWebImage&quot;</span><br><span class="line">end</span><br><span class="line"></span><br><span class="line">target &#39;YourApp’ do</span><br><span class="line">    platform :ios, &#39;10.3&#39;</span><br><span class="line">    common_pods</span><br><span class="line">    pod &#39;ComponentA&#x2F;App&#39;,           :path&#x3D;&gt; &#39;..&#x2F;ComponentA&#39;</span><br><span class="line">end</span><br><span class="line"></span><br><span class="line">target &#39;YourApp_Clips&#39; do</span><br><span class="line">    platform :ios, &#39;14.0&#39;</span><br><span class="line">    pod &#39;ComponentA&#x2F;AppClip&#39;,   :path&#x3D;&gt; &#39;..&#x2F;ComponentA&#39;</span><br><span class="line">    pod &quot;ComponentB&quot;,           :path&#x3D;&gt;&quot;..&#x2F;ComponentB&quot;</span><br><span class="line">    common_pods</span><br><span class="line">end</span><br></pre></td></tr></table></figure>
+
+<p>通过以上方法，就可以用如下方式进行宏判断，区分当前环境</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">#ifdef APP_CLIPS</span><br><span class="line"></span><br><span class="line">#else</span><br><span class="line"></span><br><span class="line">#endif</span><br></pre></td></tr></table></figure>
+
+<h3 id="测试工作"><a href="#测试工作" class="headerlink" title="测试工作"></a>测试工作</h3><h4 id="开发调试"><a href="#开发调试" class="headerlink" title="开发调试"></a>开发调试</h4><ul>
+<li><p>可以选择Clip Target直接使用Xcode编译运行</p>
+</li>
+<li><p>可以使用真机扫描二维码，调起Clip卡片，但是前提是Clip要先在真机跑一遍。</p>
+<ol>
+<li>手机点击<code>设置-开发者-Local Experiences-Register Local Experience</code></li>
+<li>输入域名、Clip的bundle id、标题、子标题，选择按钮标题、选择Clip弹出的卡片上的图片，然后点击存储即可。</li>
+<li>将刚才输入的域名，去草料二维码等二维码生成网站生成一个二维码，然后手机相机扫描即可弹出卡片样式。</li>
+<li>具体内容可以参考<a target="_blank" rel="noopener" href="https://developer.apple.com/documentation/app_clips/testing_your_app_clip_s_launch_experience?language=objc">官方文档</a></li>
+</ol>
+</li>
+</ul>
+<h4 id="外部测试"><a href="#外部测试" class="headerlink" title="外部测试"></a>外部测试</h4><ol>
+<li>可以通过Archive打Release环境的包（Debug状态下没有选择导出Clip ipa的选项，不知道是哪里配置问题，如果有知道的小伙伴可以评论区分享一下），然后单独导出Clip的ipa，上传到蒲公英或者Fir等分发平台，测试同事就可以下载安装测试了。</li>
+<li>如果已经传到了TestFlight，那么也可以在TestFlight上直接点击打开小程序进行测试。</li>
+</ol>
+<h3 id="苹果官方提及的产品要求"><a href="#苹果官方提及的产品要求" class="headerlink" title="苹果官方提及的产品要求"></a>苹果官方提及的产品要求</h3><p>原文：<a target="_blank" rel="noopener" href="https://developer.apple.com/design/human-interface-guidelines/app-clips/overview/">https://developer.apple.com/design/human-interface-guidelines/app-clips/overview/</a></p>
+<p>划重点：</p>
+<ol>
+<li><p>请勿仅将App Clip用作营销用途，不能显示广告。</p>
+</li>
+<li><p>避免登录，避免不了的话尽可能使用Apple id登录</p>
+</li>
+<li><p>Clips启动后只有在8小时内才能接收推送</p>
+</li>
+</ol>
+<h3 id="Q-amp-A"><a href="#Q-amp-A" class="headerlink" title="Q&amp;A"></a>Q&amp;A</h3><ol>
+<li><p>苹果文档说的App Clips 10M限制指的是哪个文件的10M</p>
+<p> 经过测试后发现，应该是Release环境下Archive后，导出的Clips的ipa的大小，如果有误欢迎评论区指正。</p>
+</li>
+<li><p>Clips可以有登录功能吗？</p>
+<p> 可以，但是苹果希望用户能不登录就使用App，如果要登录也首选Sign in with Apple登录的方式(iOS13特性)，但是我们可以学网易严选那样子苹果ID登录之后再弹出手机验证码绑定功能。</p>
+</li>
+<li><p>可以有内购吗？</p>
+<p> 可以。</p>
+</li>
+<li><p>用户使用完Clips后，如果想再次进入，入口在哪儿？</p>
+<p> 假如是网页打开的Clips，那么离开网页后，在桌面的”资源库”里可以找到这个Clips并重新打开。如果找不到就搜索资源库，总能搜到的。</p>
+</li>
+</ol>
+
+    </div>
+
+    
+    
+    
+
+      <footer class="post-footer">
+          <div class="post-tags">
+              <a href="/tags/iOS/" rel="tag"># iOS</a>
+              <a href="/tags/feature/" rel="tag"># feature</a>
+          </div>
+
+        
+
+
+        
+    <div class="post-nav">
+      <div class="post-nav-item">
+    <a href="/post/36f1cd4f.html" rel="prev" title="iOS 14新API">
+      <i class="fa fa-chevron-left"></i> iOS 14新API
+    </a></div>
+      <div class="post-nav-item">
+    <a href="/post/f82939c6.html" rel="next" title="iOS动态加载字体">
+      iOS动态加载字体 <i class="fa fa-chevron-right"></i>
+    </a></div>
+    </div>
+      </footer>
+    
+  </article>
+  
+  
+  
+
+
+
+          </div>
+          
+    <div class="comments" id="gitalk-container"></div>
+
+<script>
+  window.addEventListener('tabs:register', () => {
+    let { activeClass } = CONFIG.comments;
+    if (CONFIG.comments.storage) {
+      activeClass = localStorage.getItem('comments_active') || activeClass;
+    }
+    if (activeClass) {
+      let activeTab = document.querySelector(`a[href="#comment-${activeClass}"]`);
+      if (activeTab) {
+        activeTab.click();
+      }
+    }
+  });
+  if (CONFIG.comments.storage) {
+    window.addEventListener('tabs:click', event => {
+      if (!event.target.matches('.tabs-comment .tab-content .tab-pane')) return;
+      let commentClass = event.target.classList[1];
+      localStorage.setItem('comments_active', commentClass);
+    });
+  }
+</script>
+
+        </div>
+          
+  
+  <div class="toggle sidebar-toggle">
+    <span class="toggle-line toggle-line-first"></span>
+    <span class="toggle-line toggle-line-middle"></span>
+    <span class="toggle-line toggle-line-last"></span>
+  </div>
+
+  <aside class="sidebar">
+    <div class="sidebar-inner">
+
+      <ul class="sidebar-nav motion-element">
+        <li class="sidebar-nav-toc">
+          Table of Contents
+        </li>
+        <li class="sidebar-nav-overview">
+          Overview
+        </li>
+      </ul>
+
+      <!--noindex-->
+      <div class="post-toc-wrap sidebar-panel">
+          <div class="post-toc motion-element"><ol class="nav"><li class="nav-item nav-level-3"><a class="nav-link" href="#%E7%9B%AE%E5%89%8D%E5%B7%B2%E7%9F%A5%E7%9A%84%E8%A7%A6%E5%8F%91%E6%96%B9%E5%BC%8F"><span class="nav-number">1.</span> <span class="nav-text">目前已知的触发方式</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E5%BC%80%E5%8F%91%E5%89%8D%E7%BD%AE%E5%B7%A5%E4%BD%9C"><span class="nav-number">2.</span> <span class="nav-text">开发前置工作</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#%E7%94%B3%E8%AF%B7%E8%AF%81%E4%B9%A6"><span class="nav-number">2.1.</span> <span class="nav-text">申请证书</span></a><ol class="nav-child"><li class="nav-item nav-level-5"><a class="nav-link" href="#%E5%88%9B%E5%BB%BAApp-Clips-ID"><span class="nav-number">2.1.1.</span> <span class="nav-text">创建App Clips ID</span></a></li><li class="nav-item nav-level-5"><a class="nav-link" href="#%E5%88%9B%E5%BB%BAProfiles"><span class="nav-number">2.1.2.</span> <span class="nav-text">创建Profiles</span></a></li><li class="nav-item nav-level-5"><a class="nav-link" href="#%E5%85%B6%E4%BB%96%E9%85%8D%E7%BD%AE"><span class="nav-number">2.1.3.</span> <span class="nav-text">其他配置</span></a></li></ol></li><li class="nav-item nav-level-4"><a class="nav-link" href="#Apple-Store-Connect-%E9%85%8D%E7%BD%AE%E5%9B%BE%E7%89%87%E5%92%8C%E6%A0%87%E9%A2%98%EF%BC%8C%E6%8F%8F%E8%BF%B0"><span class="nav-number">2.2.</span> <span class="nav-text">Apple Store Connect 配置图片和标题，描述</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#%E9%85%8D%E7%BD%AEapple-app-site-association-json"><span class="nav-number">2.3.</span> <span class="nav-text">配置apple-app-site-association.json</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#%E5%89%8D%E7%AB%AF%E9%A1%B5%E9%9D%A2%E6%B7%BB%E5%8A%A0meta%E6%A0%87%E7%AD%BE"><span class="nav-number">2.4.</span> <span class="nav-text">前端页面添加meta标签</span></a></li></ol></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E5%BC%80%E5%8F%91%E5%B7%A5%E4%BD%9C"><span class="nav-number">3.</span> <span class="nav-text">开发工作</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#%E6%96%B0%E5%BB%BAApp-Clip-Target"><span class="nav-number">3.1.</span> <span class="nav-text">新建App Clip Target</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#%E9%85%8D%E7%BD%AE%E8%AF%81%E4%B9%A6%E5%92%8CAssociated-Domains"><span class="nav-number">3.2.</span> <span class="nav-text">配置证书和Associated Domains</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#%E7%BC%96%E5%86%99%E4%BB%A3%E7%A0%81"><span class="nav-number">3.3.</span> <span class="nav-text">编写代码</span></a><ol class="nav-child"><li class="nav-item nav-level-5"><a class="nav-link" href="#%E9%9D%9E%E7%BB%84%E4%BB%B6%E5%8C%96%E5%BC%80%E5%8F%91%E6%A8%A1%E5%BC%8F"><span class="nav-number">3.3.1.</span> <span class="nav-text">非组件化开发模式</span></a></li><li class="nav-item nav-level-5"><a class="nav-link" href="#%E7%BB%84%E4%BB%B6%E5%8C%96%E5%BC%80%E5%8F%91%E6%A8%A1%E5%BC%8F-%E5%92%8C-Podfile%E7%9A%84%E9%85%8D%E7%BD%AE"><span class="nav-number">3.3.2.</span> <span class="nav-text">组件化开发模式 和 Podfile的配置</span></a></li><li class="nav-item nav-level-5"><a class="nav-link" href="#%E6%8A%BD%E7%A6%BB%E6%A8%A1%E5%9D%97%E6%97%B6%E4%B8%8D%E5%90%8C%E7%8E%AF%E5%A2%83%E7%9A%84%E4%BB%A3%E7%A0%81%E5%A4%8D%E7%94%A8%E9%97%AE%E9%A2%98"><span class="nav-number">3.3.3.</span> <span class="nav-text">抽离模块时不同环境的代码复用问题</span></a></li></ol></li></ol></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E6%B5%8B%E8%AF%95%E5%B7%A5%E4%BD%9C"><span class="nav-number">4.</span> <span class="nav-text">测试工作</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#%E5%BC%80%E5%8F%91%E8%B0%83%E8%AF%95"><span class="nav-number">4.1.</span> <span class="nav-text">开发调试</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#%E5%A4%96%E9%83%A8%E6%B5%8B%E8%AF%95"><span class="nav-number">4.2.</span> <span class="nav-text">外部测试</span></a></li></ol></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E8%8B%B9%E6%9E%9C%E5%AE%98%E6%96%B9%E6%8F%90%E5%8F%8A%E7%9A%84%E4%BA%A7%E5%93%81%E8%A6%81%E6%B1%82"><span class="nav-number">5.</span> <span class="nav-text">苹果官方提及的产品要求</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#Q-amp-A"><span class="nav-number">6.</span> <span class="nav-text">Q&amp;A</span></a></li></ol></div>
+      </div>
+      <!--/noindex-->
+
+      <div class="site-overview-wrap sidebar-panel">
+        <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+    <img class="site-author-image" itemprop="image" alt="Arclin"
+      src="https://avatars.githubusercontent.com/u/12107804?v=4">
+  <p class="site-author-name" itemprop="name">Arclin</p>
+  <div class="site-description" itemprop="description">Stay hungry,stay foolish</div>
+</div>
+<div class="site-state-wrap motion-element">
+  <nav class="site-state">
+      <div class="site-state-item site-state-posts">
+          <a href="/archives/">
+        
+          <span class="site-state-item-count">78</span>
+          <span class="site-state-item-name">posts</span>
+        </a>
+      </div>
+      <div class="site-state-item site-state-categories">
+            <a href="/categories/">
+          
+        <span class="site-state-item-count">12</span>
+        <span class="site-state-item-name">categories</span></a>
+      </div>
+      <div class="site-state-item site-state-tags">
+            <a href="/tags/">
+          
+        <span class="site-state-item-count">37</span>
+        <span class="site-state-item-name">tags</span></a>
+      </div>
+  </nav>
+</div>
+  <div class="links-of-author motion-element">
+      <span class="links-of-author-item">
+        <a href="https://github.com/Arc-lin" title="GitHub → https://github.com/Arc-lin" rel="noopener" target="_blank"><i class="fab fa-github fa-fw"></i>GitHub</a>
+      </span>
+      <span class="links-of-author-item">
+        <a href="mailto:arclin325@gmail.com" title="E-Mail → mailto:arclin325@gmail.com" rel="noopener" target="_blank"><i class="fa fa-envelope fa-fw"></i>E-Mail</a>
+      </span>
+  </div>
+
+
+
+      </div>
+
+    </div>
+  </aside>
+  <div id="sidebar-dimmer"></div>
+
+
+      </div>
+    </main>
+
+    <footer class="footer">
+      <div class="footer-inner">
+        
+
+        
+
+<div class="copyright">
+  
+  &copy; 
+  <span itemprop="copyrightYear">2021</span>
+  <span class="with-love">
+    <i class="fa fa-heart"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">Arclin</span>
+</div>
+  <div class="powered-by">Powered by <a href="https://hexo.io" class="theme-link" rel="noopener" target="_blank">Hexo</a> & <a href="https://muse.theme-next.org" class="theme-link" rel="noopener" target="_blank">NexT.Muse</a>
+  </div>
+
+        
+<div class="busuanzi-count">
+  <script async src="https://busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js"></script>
+    <span class="post-meta-item" id="busuanzi_container_site_uv" style="display: none;">
+      <span class="post-meta-item-icon">
+        <i class="fa fa-user"></i>
+      </span>
+      <span class="site-uv" title="Total Visitors">
+        <span id="busuanzi_value_site_uv"></span>
+      </span>
+    </span>
+    <span class="post-meta-divider">|</span>
+    <span class="post-meta-item" id="busuanzi_container_site_pv" style="display: none;">
+      <span class="post-meta-item-icon">
+        <i class="fa fa-eye"></i>
+      </span>
+      <span class="site-pv" title="Total Views">
+        <span id="busuanzi_value_site_pv"></span>
+      </span>
+    </span>
+</div>
+
+
+
+
+
+
+
+
+      </div>
+    </footer>
+  </div>
+
+  
+  <script src="/lib/anime.min.js"></script>
+  <script src="/lib/velocity/velocity.min.js"></script>
+  <script src="/lib/velocity/velocity.ui.min.js"></script>
+
+<script src="/js/utils.js"></script>
+
+<script src="/js/motion.js"></script>
+
+
+<script src="/js/schemes/muse.js"></script>
+
+
+<script src="/js/next-boot.js"></script>
+
+
+
+
+  
+
+
+
+
+  
+<script src="/js/local-search.js"></script>
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+  
+
+<link rel="stylesheet" href="//cdn.jsdelivr.net/npm/gitalk@1/dist/gitalk.min.css">
+
+<script>
+NexT.utils.loadComments(document.querySelector('#gitalk-container'), () => {
+  NexT.utils.getScript('//cdn.jsdelivr.net/npm/gitalk@1/dist/gitalk.min.js', () => {
+    var gitalk = new Gitalk({
+      clientID    : 'df6d1f33bb4a66f5fa60',
+      clientSecret: '5fcc9fb756ac9d4b16381288da7b29f691b45e0a',
+      repo        : 'arc-lin.github.io',
+      owner       : 'Arc-lin',
+      admin       : ['Arc-lin'],
+      id          : '24ef8e3f1317c3c035092045b2daa423',
+        language: 'zh-CN',
+      distractionFreeMode: false
+    });
+    gitalk.render('gitalk-container');
+  }, window.Gitalk);
+});
+</script>
+
+</body>
+</html>

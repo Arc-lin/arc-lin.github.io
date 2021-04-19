@@ -3,7 +3,7 @@ title: XCode 添加Target
 author: Arclin
 tags:
   - iOS
-  - XCode
+  - Xcode
 categories:
   - iOS
 abbrlink: 8cafabb2
