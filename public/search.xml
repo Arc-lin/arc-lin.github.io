@@ -1470,7 +1470,7 @@
       </tags>
   </entry>
   <entry>
-    <title>XCode 添加Target</title>
+    <title>Xcode 添加Target</title>
     <url>/post/8cafabb2.html</url>
     <content><![CDATA[<p>在区分开发环境和测试环境或生产环境的时候经常需要在XCode 添加Target, 所以在此记录一下</p>
 <span id="more"></span>

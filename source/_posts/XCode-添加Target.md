@@ -1,5 +1,5 @@
 ---
-title: XCode 添加Target
+title: Xcode 添加Target
 author: Arclin
 tags:
   - iOS
