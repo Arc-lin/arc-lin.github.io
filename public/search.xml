@@ -1470,35 +1470,6 @@
       </tags>
   </entry>
   <entry>
-    <title>Xcode 添加Target</title>
-    <url>/post/8cafabb2.html</url>
-    <content><![CDATA[<p>在区分开发环境和测试环境或生产环境的时候经常需要在XCode 添加Target, 所以在此记录一下</p>
-<span id="more"></span>
-
-<ol>
-<li>Duplicate target</li>
-<li>Change DisplayName &amp; Bundle Identifier</li>
-<li>A copy-info.plist，默认生成在程序环境根目录，也就是<code>A.xcodeproj</code>的同级目录中，如果想放到里层（比如与<code>A-info.plist</code>放在同级目录），可以先在Xcode删除<code>A copy-info.plist</code>索引，然后拷贝文件到制定目录中，然后更名为<code>B-info.plist</code>，在add到project中。在<code>Project</code>的<code>Build Settings</code>中，修改<code>Info.plist</code> File选项为<code>B-info.plist</code>的目录（相对路径）,这样就可以看到Info页了（就是B-info.plist），接着修改<code>ProductName</code>和<code>Bundle identifier</code>，使之成为另一个app。<code>Prefix Header的路径</code>，视具体需求而定是否要修改，如果两个target可以公用同一个<code>Prefix Header</code>，那么就不需要修改这里的路径</li>
-<li>修改scheme，在调试的Stop按钮边上，我们可以选择本工程中所有的target来做编译，如果不修改，在这里选择出来的名字就是A copy，为了与新建的target统一起来，同样也要修改这里的名字。点击scheme选择区，然后选Manager Scheme，找到A copy，然后改成你需要的名字，比如B</li>
-<li>生成一个新的target，一定会与原target有区别，这里可以定义预编译宏，来区分两个版本的不同代码，预编译宏可以在Build Settings中Preprocessor Macros定义，比如在我们新建的target B中定义预编译宏MACRO，然后在代码中通过<figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">#if defined (MACRO)</span><br><span class="line">&#x2F;&#x2F;target  B需要执行的代码</span><br><span class="line">#else</span><br><span class="line">&#x2F;&#x2F;target A需要执行的代码</span><br><span class="line">#endif</span><br></pre></td></tr></table></figure>
-来区分</li>
-<li>其他：Build Phases（各target编译所包含的内容，需要注意的是，如果创建了target B后，再往A里面添加资源或文件，target B中不会自动增加这些资源，需要手动添加）<ul>
-<li>Compile Sources<br>需要编译的代码文件</li>
-<li>Link Binary With Libraries<br>编译所依赖的库</li>
-<li>Copy Bundle Resources<br>编译需要的资源<br>每个target可以根据具体需要增减里面的内容</li>
-</ul>
-</li>
-</ol>
-]]></content>
-      <categories>
-        <category>iOS</category>
-      </categories>
-      <tags>
-        <tag>iOS</tag>
-        <tag>Xcode</tag>
-      </tags>
-  </entry>
-  <entry>
     <title>docker笔记</title>
     <url>/post/4417b09c.html</url>
     <content><![CDATA[<p>docker学习笔记</p>
@@ -4425,6 +4396,505 @@
       <tags>
         <tag>iOS</tag>
         <tag>架构</tag>
+      </tags>
+  </entry>
+  <entry>
+    <title>Xcode 添加Target</title>
+    <url>/post/8cafabb2.html</url>
+    <content><![CDATA[<p>在区分开发环境和测试环境或生产环境的时候经常需要在XCode 添加Target, 所以在此记录一下</p>
+<span id="more"></span>
+
+<ol>
+<li>Duplicate target</li>
+<li>Change DisplayName &amp; Bundle Identifier</li>
+<li>A copy-info.plist，默认生成在程序环境根目录，也就是<code>A.xcodeproj</code>的同级目录中，如果想放到里层（比如与<code>A-info.plist</code>放在同级目录），可以先在Xcode删除<code>A copy-info.plist</code>索引，然后拷贝文件到制定目录中，然后更名为<code>B-info.plist</code>，在add到project中。在<code>Project</code>的<code>Build Settings</code>中，修改<code>Info.plist</code> File选项为<code>B-info.plist</code>的目录（相对路径）,这样就可以看到Info页了（就是B-info.plist），接着修改<code>ProductName</code>和<code>Bundle identifier</code>，使之成为另一个app。<code>Prefix Header的路径</code>，视具体需求而定是否要修改，如果两个target可以公用同一个<code>Prefix Header</code>，那么就不需要修改这里的路径</li>
+<li>修改scheme，在调试的Stop按钮边上，我们可以选择本工程中所有的target来做编译，如果不修改，在这里选择出来的名字就是A copy，为了与新建的target统一起来，同样也要修改这里的名字。点击scheme选择区，然后选Manager Scheme，找到A copy，然后改成你需要的名字，比如B</li>
+<li>生成一个新的target，一定会与原target有区别，这里可以定义预编译宏，来区分两个版本的不同代码，预编译宏可以在Build Settings中Preprocessor Macros定义，比如在我们新建的target B中定义预编译宏MACRO，然后在代码中通过<figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">#if defined (MACRO)</span><br><span class="line">&#x2F;&#x2F;target  B需要执行的代码</span><br><span class="line">#else</span><br><span class="line">&#x2F;&#x2F;target A需要执行的代码</span><br><span class="line">#endif</span><br></pre></td></tr></table></figure>
+来区分</li>
+<li>其他：Build Phases（各target编译所包含的内容，需要注意的是，如果创建了target B后，再往A里面添加资源或文件，target B中不会自动增加这些资源，需要手动添加）<ul>
+<li>Compile Sources<br>需要编译的代码文件</li>
+<li>Link Binary With Libraries<br>编译所依赖的库</li>
+<li>Copy Bundle Resources<br>编译需要的资源<br>每个target可以根据具体需要增减里面的内容</li>
+</ul>
+</li>
+</ol>
+]]></content>
+      <categories>
+        <category>iOS</category>
+      </categories>
+      <tags>
+        <tag>iOS</tag>
+        <tag>Xcode</tag>
+      </tags>
+  </entry>
+  <entry>
+    <title>iOS 底层原理 --- NSObject</title>
+    <url>/post/70f61b87.html</url>
+    <content><![CDATA[<p>本文只是作为iOS底层原理课程的笔记用，所以均为结论性内容，如有疑问可在评论区进行探讨。</p>
+<span id="more"></span>
+
+<h2 id="NSObject的本质"><a href="#NSObject的本质" class="headerlink" title="NSObject的本质"></a>NSObject的本质</h2><h3 id="一个NSObject对象占用16个字节。"><a href="#一个NSObject对象占用16个字节。" class="headerlink" title="一个NSObject对象占用16个字节。"></a>一个NSObject对象占用16个字节。</h3><p>验证方法</p>
+<ol>
+<li><p>初始化一个<code>NSObject</code>对象<br> <code>NSObject *obj = [[NSObject alloc] init];</code></p>
+</li>
+<li><p>打印内存分配的量，得到16字节<br> <code>malloc_size((__bridge const void *)obj)</code> </p>
+</li>
+<li><p>但是实际上只使用了8个字节，因为使用<code>class_getInstanceSize([NSObject class])</code>得到8</p>
+</li>
+</ol>
+<p><code>class_getInstanceSize</code>计算出了NSObject对象内的成员变量（即isa）的占用内存大小</p>
+<h3 id="NSObject实质上是一个结构体对象"><a href="#NSObject实质上是一个结构体对象" class="headerlink" title="NSObject实质上是一个结构体对象"></a>NSObject实质上是一个结构体对象</h3><p>大概长这样</p>
+<figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">struct NSObject_IMPL &#123;</span><br><span class="line">	Class isa;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>因为成员变量isa永远是对象（NSObject的子类对象）的第一个成员变量，所以对象的地址就是成员变量isa的地址</p>
+<h3 id="NSObject的子类"><a href="#NSObject的子类" class="headerlink" title="NSObject的子类"></a>NSObject的子类</h3><p>比如有这么一个类</p>
+<figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">@interface Student : NSObject</span><br><span class="line">&#123;</span><br><span class="line">    @public</span><br><span class="line">    int _no;</span><br><span class="line">    int _age;</span><br><span class="line">    int _height;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>实例化一下</p>
+<figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">Student *stu &#x3D; [[Student alloc] init];</span><br></pre></td></tr></table></figure>
+
+<p><code>class_getInstanceSize([Student class])</code> 得到 24（意思为这个类至少需要的内存）<br><code>malloc_size((__bridge const void *)stu)</code> 得到32（意思为系统分配给这个类的内存）</p>
+<p>一般情况下我们更关心<code>malloc_size</code>得到的值</p>
+<p>因为继承自<code>NSObject</code>，所以<code>Student</code>有一个<code>Class isa</code>属性，占用8个字节，<code>_no</code>、<code>_age</code>、<code>_height</code> 各占用4个字节，一共占用20个字节，</p>
+<p>因为内存分配原则为<strong>最大成员所占内存</strong>（目前是isa 最大）的倍数，所以给够24个，这个叫做字节对齐</p>
+<p>因为 <code>isa</code>、<code>_no</code>、<code>_age</code> 刚好够 16个字节了，这时候突然又来多了个<code>_height</code>，这时候就需要20个字节了 , 那么为了适配各个厂商的内存读取规则，又给他分配了16个（凑16的倍数），这个叫做内存对齐，所以一共给类分配了 32个字节</p>
+<p>注：int 占用4个字节 double占用8个字节</p>
+<p>分配原则：如果内存一行(16个字节)放不下，那么就直接开新的一行<br>比如</p>
+<figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">_no : Int </span><br><span class="line">_age : Double</span><br><span class="line">_height : Int</span><br></pre></td></tr></table></figure>
+
+<p>第一行：<code>isa</code> :8个，<code>_no</code> 4个，第一行剩下4个字节的位置，不够放<code>_age</code>,但是够放<code>_height</code>，那就直接放<code>_height</code>，如果这时候<code>_height</code>是<code>Double</code>的话，没别的东西来占用这4个位置，那么就直接放弃，开辟下一行<br>第二行：前八个位置直接给<code>_age</code></p>
+<figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">0x108b0bb00: d1 81 00 00 01 80 1d 01  &lt;- isa   04 00 00 00 &lt;- age   00 00 00 00  &lt;- height ................</span><br><span class="line">0x108b0bb10: 00 00 00 00 00 00 00 00  &lt;- age 00 00 00 00 00 00 00 00  ................</span><br></pre></td></tr></table></figure>
+
+<h3 id="sizeof"><a href="#sizeof" class="headerlink" title="sizeof()"></a>sizeof()</h3><p>__sizeof()__方法是一个运算符，在编译期间就确定值，类似于宏替换，他的作用是计算传入的对象占用的内存的大小，如果传入的是类型（或者类名）的话，就计算类型占用的大小，比如传入一个对象的话，就是计算指向这个对象的指针的大小，指针占用的内存大小是8个字节，跟<code>class_getInstanceSize</code>的区别是<code>class_getInstanceSize</code>是计算类实例化后占用的大小。</p>
+]]></content>
+      <categories>
+        <category>iOS</category>
+      </categories>
+      <tags>
+        <tag>iOS</tag>
+        <tag>底层原理</tag>
+      </tags>
+  </entry>
+  <entry>
+    <title>iOS 底层原理 --- instance、class和meta-class</title>
+    <url>/post/fdd98f42.html</url>
+    <content><![CDATA[<p>本文讲的是实例对象(instance)，类对象(class)，元类对象（meta-class）的内容和他们之间的联系</p>
+<span id="more"></span>
+
+<h1 id="实例对象"><a href="#实例对象" class="headerlink" title="实例对象"></a>实例对象</h1><p>实例对象内存储着成员变量的值</p>
+<h1 id="class对象"><a href="#class对象" class="headerlink" title="class对象"></a>class对象</h1><h2 id="class对象的基本内容"><a href="#class对象的基本内容" class="headerlink" title="class对象的基本内容"></a>class对象的基本内容</h2><p>每个类在内存中有且只有一个class对象</p>
+<p>class对象在内存中，存储的信息主要包括</p>
+<ul>
+<li>isa指针</li>
+<li>superclass指针</li>
+<li>类的属性信息（@property）、 类的对象方法信息（instance method）</li>
+<li>类的协议信息（protocol）、类的成员变量信息（ivar）</li>
+</ul>
+<h2 id="class对象的结构"><a href="#class对象的结构" class="headerlink" title="class对象的结构"></a>class对象的结构</h2><figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">rw: readwrite</span><br><span class="line">ro: readonly</span><br><span class="line">t:   table</span><br></pre></td></tr></table></figure>
+
+<figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">struct objc_class &#123;</span><br><span class="line">	Class isa;</span><br><span class="line">	Class superclass;</span><br><span class="line">	cache_t cache; 	&#x2F;&#x2F; 方法缓存</span><br><span class="line">	cache_data_bits_t bits; &#x2F;&#x2F; 用于获取具体类信息</span><br><span class="line">	</span><br><span class="line">	class_rw_t *data() &#123;</span><br><span class="line">	   return bits.data();  &#x2F;&#x2F;  实际方法实现为 bits &amp; FAST_DATA_MASK  结果返回值为 class_rw_t类型的对象</span><br><span class="line">	&#125;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line">struct class_rw_t &#123;</span><br><span class="line">	unit32 flags;</span><br><span class="line">	unit32 version;</span><br><span class="line">	const class_ro_t *ro;			&#x2F;&#x2F; 方法列表</span><br><span class="line">	property_list_t *properties;		&#x2F;&#x2F; 属性列表</span><br><span class="line">	const protocol_list_t *protocols;	&#x2F;&#x2F; 协议列表</span><br><span class="line">	Class firstSubclass;</span><br><span class="line">	Class nextSiblingClass;</span><br><span class="line">	chat *demangledName;</span><br><span class="line">&#125;;</span><br><span class="line"></span><br><span class="line">struct class_ro_t &#123;</span><br><span class="line">	uint32_t flags;</span><br><span class="line">	unit32_t instanceStart;</span><br><span class="line">	unit32_t instanceSize; 			&#x2F;&#x2F; instance对象占用的内存空间</span><br><span class="line">	</span><br><span class="line">	const uint8_t * ivarLayout;</span><br><span class="line">	const chat * name; 			&#x2F;&#x2F; 类名</span><br><span class="line">	method_list_t  * baseMethodList;</span><br><span class="line">	protoocl_list_t * baseProtocols;</span><br><span class="line">	const ivar_list_t *ivars;		  &#x2F;&#x2F; 成员变量列表</span><br><span class="line">	const uint8_t *weakIverLayout;</span><br><span class="line">	property_list_t *baseProperties;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<h2 id="相关的几个函数"><a href="#相关的几个函数" class="headerlink" title="相关的几个函数"></a>相关的几个函数</h2><ol>
+<li><code>Class objc_getClass(const chat *aClassName)</code><ol>
+<li>传入字符串类名</li>
+<li>返回对应的类对象</li>
+</ol>
+</li>
+<li><code>Class object_getClass(id obj)</code>获取isa指向的对象<ol>
+<li>传入的obj可能是instance对象、class对象、meta-class对象</li>
+<li>返回值<ol>
+<li>如果是instance对象，返回class对象</li>
+<li>如果是class对象，返回meta-class对象</li>
+<li>如果是meta-class对象，返回NSObject（基类）的meta-class对象</li>
+</ol>
+</li>
+</ol>
+</li>
+<li> <code>- (Class)class</code>、<code>+ (Class)class</code> 返回的就是类对象</li>
+</ol>
+<h1 id="meta-class对象"><a href="#meta-class对象" class="headerlink" title="meta-class对象"></a>meta-class对象</h1><p>意思是用来描述类对象的对象，是一种特殊的类对象。</p>
+<p>每个类在内存中有且只有一个meta-class对象</p>
+<p>meta-class对象和class对象的内存接口是一样的，但是用途不一样，在内存中存储的信息主要包括</p>
+<ul>
+<li>isa指针</li>
+<li>superclass指针</li>
+<li>类的类方法信息</li>
+</ul>
+<h1 id="isa指针和spuerclass指针"><a href="#isa指针和spuerclass指针" class="headerlink" title="isa指针和spuerclass指针"></a>isa指针和spuerclass指针</h1><img src="https://i.loli.net/2021/05/26/pjxbn5vQ17hrmae.png" width="50%">
+
+
+<h2 id="isa指针"><a href="#isa指针" class="headerlink" title="isa指针"></a>isa指针</h2><p>instance的isa指向class</p>
+<blockquote>
+<p>当调用对象方法时，通过instance的isa找到class，最后找到对象方法的实现进行调用</p>
+</blockquote>
+<p>class的isa指向meta-class</p>
+<blockquote>
+<p>当调用类方法时，通过class的isa找到meta-class，最后找到类方法的实现进行调用 </p>
+</blockquote>
+<p>meta-class的isa指向基类（NSObject）的meta-class（NSObject的meta-class的isa指向自己的meta-class）</p>
+<h2 id="superclass指针"><a href="#superclass指针" class="headerlink" title="superclass指针"></a>superclass指针</h2><p>举个例子，比如Student类继承自Person类，Person类继承自NSObject类：</p>
+<p>Student的class的superclass指针指向父类的class对象，如果没有父类（NSObject），则superclass指针为空</p>
+<p>Student的meta-class对象的superclass指针指向Person的meta-class</p>
+<p>基类（NSObject）的meta-class的superclass指针指向class对象</p>
+<h3 id="调用成员方法"><a href="#调用成员方法" class="headerlink" title="调用成员方法"></a>调用成员方法</h3><p>因为Student要调用成员方法的时候，需要找到class对象，因为class对象才存放着成员方法，找不到的话就通过superclass指针找到父类class对象看看里面有没有想要的成员方法</p>
+<h3 id="调用类方法"><a href="#调用类方法" class="headerlink" title="调用类方法"></a>调用类方法</h3><p>当Student要调用Student的类方法的时候，就通过Student的class对象的isa找到Student的meta-class对象，然后找到类方法进行调用</p>
+<p>当Student要调用Person的类方法的时候，就得先通过Student的class对象的isa找到Student的meta-class对象，然后通过Student的mata-class对象里面的superclass指针找到Person的meta-class对象，然后在里面找到Person的类方法进行调用</p>
+<h3 id="调用init方法"><a href="#调用init方法" class="headerlink" title="调用init方法"></a>调用init方法</h3><p>比如现在Student对象要调用init方法，流程如下</p>
+<ol>
+<li>先通过对象自己的isa指针，找到Student的类对象</li>
+<li>Student的类对象里面有superclass指针，那么就通过superclass指针拿到了Person的类对象</li>
+<li>Person的类对象里面也有superclass指针，那么就通过superclass指针拿到NSObject的类对象</li>
+<li>NSObject的类对象里面找到了init方法的相关信息，那么就可以进行调用了</li>
+</ol>
+<h3 id="调用不存在的类方法"><a href="#调用不存在的类方法" class="headerlink" title="调用不存在的类方法"></a>调用不存在的类方法</h3><p>Student调用一个不存在的类方法流程</p>
+<ol>
+<li>通过isa指针找到类对象</li>
+<li>类对象的isa指针找到meta-class对象</li>
+<li>meta-class找不到该类方法，通过superclass指针找到父类的meta-class对象</li>
+<li>一直找，直到找到基类的meta-class对象，基类的meta-class的superclass指向基类的class对象</li>
+<li>基类的class对象里面有对象方法，如果对象方法刚好跟准备调用的类方法同名，那么则会调用该对象方法，如果找不到，则开始抛出异常</li>
+</ol>
+<h2 id="ISA-MASK"><a href="#ISA-MASK" class="headerlink" title="ISA_MASK"></a>ISA_MASK</h2><figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">#if __arm64___</span><br><span class="line">#define ISA_MASK 0x000000ffffffff8ULL</span><br><span class="line">#elif __x86_64__</span><br><span class="line">#define  ISA_MASK 0x00007ffffffffff8ULL</span><br><span class="line">#endif</span><br></pre></td></tr></table></figure>
+
+<p>实例对象从64位系统开始，isa不直接指向类对象的地址，isa需要进行一次位运算，才能计算出真实地址</p>
+<figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">instance的 isa &amp; ISA_MASK -&gt; class对象</span><br><span class="line">class的isa &amp; ISA_MASK -&gt; meta_class 对象</span><br></pre></td></tr></table></figure>
+
+
+
+]]></content>
+      <categories>
+        <category>iOS</category>
+      </categories>
+      <tags>
+        <tag>iOS</tag>
+        <tag>底层原理</tag>
+      </tags>
+  </entry>
+  <entry>
+    <title>iOS 底层原理 --- KVO</title>
+    <url>/post/81c45883.html</url>
+    <content><![CDATA[<p>本文简述KVO的底层实现是怎么一回事</p>
+<span id="more"></span>
+
+<h1 id="如何使用KVO"><a href="#如何使用KVO" class="headerlink" title="如何使用KVO"></a>如何使用KVO</h1><p>举例</p>
+<figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">self.person &#x3D; [[Person alloc] init];</span><br><span class="line">self.person.age &#x3D; 1;</span><br><span class="line"></span><br><span class="line">&#x2F;&#x2F;&#x2F; 这个配置的值会直接影响监听方法的change字典里面带些什么值给你</span><br><span class="line">NSKeyValueObservingOptions options &#x3D; NSKeyValueObservingOptionNew|NSKeyValueObservingOptionOld;</span><br><span class="line"></span><br><span class="line">[self.person addObserver:self keyPath:@&quot;age&quot; options:options context:@&quot;123&quot;];</span><br><span class="line"></span><br></pre></td></tr></table></figure>
+
+
+<figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">&#x2F;&#x2F;&#x2F; 当监听对象的属性值发生改变时，就会调用这个方法</span><br><span class="line">- (void)observeValueForKeyPath:(NSString *)keyPath ofObject:(id)object change:(NSDictionary&lt;NSKeyValueChangeKey,id&gt; *)change context:(void *)context &#123;</span><br><span class="line">	&#x2F;&#x2F;&#x2F; 这里的context就是注册监听的时候传入的@“123”</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<h1 id="内部发生了什么"><a href="#内部发生了什么" class="headerlink" title="内部发生了什么"></a>内部发生了什么</h1><p>系统通过运行时机制，给<code>person</code>对象添加了一个父类，名为<code>NSKVONotifying_Person</code>(其他被监听的对象所生成的类也会遵循这个命名规则)，本质上是将<code>person</code>对象的isa指针指向了这个动态新建的类对象。</p>
+<p>另外，这个新建的类对象是继承自<code>Person</code>的，也就是<code>NSKVONotifying_Person</code>的superclass指针指向了<code>Persond</code>的类对象。</p>
+<h1 id="NSKVONotifying-类内部结构"><a href="#NSKVONotifying-类内部结构" class="headerlink" title="NSKVONotifying_*类内部结构"></a>NSKVONotifying_*类内部结构</h1><ul>
+<li>isa指针</li>
+<li>superclass指针</li>
+<li>setAge:方法  因为监听的是age属性，所以重写了setAge方法，若监听的属性没有set方法，或者值改变的时候没有调用set方法，那么KVO无法生效</li>
+<li>class:方法，主要是为了防止对象调用class方法的时候得到了这个动态生成的类对象，所以重写class方法，返回真正<code>的Person</code>类对象</li>
+<li>_isKVOA方法，返回一个bool，用来判断这是不是一个KVO类</li>
+<li>dealloc 进行一些收尾工作</li>
+</ul>
+<h2 id="重写的set方法的实现"><a href="#重写的set方法的实现" class="headerlink" title="重写的set方法的实现"></a>重写的set方法的实现</h2><p>大概是这么实现的</p>
+<figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">- (void)setAge:(int)age &#123;</span><br><span class="line">   _NSSetIntValueAnyNotify();</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line">void _NSSetIntValueAnyNotify() </span><br><span class="line">&#123;</span><br><span class="line">   [self willChangeValueForKey:@&quot;age&quot;];</span><br><span class="line">   [super setAge:age];</span><br><span class="line">   [self didChangeValueForKey:@&quot;age&quot;];</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line">- (void)didChangeValueForKey:(NSString *)key &#123;</span><br><span class="line">   [observer observeValueForKeyPath:key ofObject:self change:nil context:nil];</span><br><span class="line">&#125;</span><br><span class="line"></span><br></pre></td></tr></table></figure>
+
+<p>这里的方法<code>_NSSetIntValueAnyNotify</code>，看具体监听的属性类型而定，如果监听的是<code>double</code>类型，那么方法就会变成<code>_NSSetDoubleValueAnyNotify</code>，所以系统内置了很多这种类似的方法，统称为<code>_NSSet*ValueAnyNotify</code></p>
+<ul>
+<li><p>调用流程</p>
+<ol>
+<li>willChangeValueForKey:</li>
+<li>setAge:</li>
+<li>observeValueForKeyPath:ofObject:change:context:</li>
+<li>didChangeValueForKey:</li>
+</ol>
+</li>
+</ul>
+<h2 id="总结"><a href="#总结" class="headerlink" title="总结"></a>总结</h2><ul>
+<li><p>利用Runtime API动态生成一个之类，并且让instance对象的isa指针指向这个全新的子类</p>
+</li>
+<li><p>当修改instance对象的属性时，会调用Foundation的_NSSetXXXValueAnyNotify函数</p>
+<ul>
+<li>willChangeValueForKey:</li>
+<li>父类原来的setter</li>
+<li>didChangeValueForKey:<ul>
+<li>内部会触发监听器（Observer）的监听方法（observeValueForKeyPath:ofObject:change:context:）</li>
+</ul>
+</li>
+</ul>
+</li>
+<li><p>如何手动触发KVO<br>  注册监听后，手动调用<code>willChangeValueForKey:</code>和<code>didChangeValueForKey:</code></p>
+</li>
+<li><p>直接修改成员属性的值不会触发KVO，必须在前后分别补上<code>willChangeValueForKey:</code>和<code>didChangeValueForKey:</code></p>
+</li>
+</ul>
+]]></content>
+      <categories>
+        <category>iOS</category>
+      </categories>
+      <tags>
+        <tag>iOS</tag>
+        <tag>底层原理</tag>
+      </tags>
+  </entry>
+  <entry>
+    <title>iOS 底层原理 --- KVC</title>
+    <url>/post/34b9a649.html</url>
+    <content><![CDATA[<p>本文讲述KVC的底层实现和KVC是否能触发KVO呢？</p>
+<span id="more"></span>
+
+<h2 id="KVC的使用"><a href="#KVC的使用" class="headerlink" title="KVC的使用"></a>KVC的使用</h2><figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">[self.person setValue:@10 forKey:@&quot;age&quot;]</span><br><span class="line"></span><br><span class="line">[self.person setValue:@10 forKeyPath:@&quot;age&quot;]</span><br></pre></td></tr></table></figure>
+
+<p>keyPath和key的区别是，keyPath可以使用路径的方式进行赋值，比如person对象内有cat模型属性，cat对象里面有age属性，那么就可以使用<code>[self.person setValue:@10 forKeyPath:@&quot;cat.age&quot;]</code>的方式使用KVC，而key方式只支持直接访问的方式赋值</p>
+<h2 id="赋值过程"><a href="#赋值过程" class="headerlink" title="赋值过程"></a>赋值过程</h2><p><code>setValue:forKey</code>首先会先寻找<code>setKey:</code>方法，如果找不到，那么就会寻找<code>_setKey:</code>方法，类似下面这样子</p>
+<figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">&#x2F;&#x2F;&#x2F; 优先找这个方法</span><br><span class="line">- （void）setAge:(int)age &#123;</span><br><span class="line">	_age &#x3D; age;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line">&#x2F;&#x2F;&#x2F; 找不到上面那个方法的话，就找下面这儿方法</span><br><span class="line">- （void）_setAge:(int)age &#123;</span><br><span class="line">	_age &#x3D; age;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>如果上述两个方法都找不到，那么就会去访问类方法<code>+ (BOOL)accessInstanceVariablesDirectly</code>，询问是否允许直接访问成员变量，默认返回YES</p>
+<ul>
+<li><p>如果返回NO的话，那么程序会直接抛出异常<code>exception NSUnknownKeyException, reason:[XXX setValue:forUndefinedKey:]: this class is not key value coding-compliant for the key age</code></p>
+</li>
+<li><p>如果返回YES，那么程序会去直接访问成员变量，查找的顺序是<code>_key、_isKey、key、isKey</code>，类似下面这样子</p>
+</li>
+</ul>
+<figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">&#123;</span><br><span class="line">    @public </span><br><span class="line">    int _age;</span><br><span class="line">    int _isAge;</span><br><span class="line">    int age;</span><br><span class="line">    int isAge;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<ol>
+<li>如果找到了成员变量，那么就直接赋值</li>
+<li>如果找不到成员变量，那么就抛出上述异常</li>
+</ol>
+<h2 id="KVC是否会触发KVO"><a href="#KVC是否会触发KVO" class="headerlink" title="KVC是否会触发KVO"></a>KVC是否会触发KVO</h2><p>由于KVO是通过重写set方法的方式实现的，所以如果KVC找到了属性值并且通过set方法赋值的话，那么就自然会触发KVO</p>
+<p>如果KVC找不到set方法，如果<code>+ (BOOL)accessInstanceVariablesDirectly</code>返回YES的话，那么他去访问成员方法的时候，即便这时候成员方法是没有实现set方法的，KVC依旧会去执行<code>willChangeValueForKey:</code>和<code>didChangeValueForKey:</code>方法，在执行<code>didChangeValueForKey:</code>的时候，自然KVO就被触发了</p>
+<h2 id="valueForKey-的底层原理"><a href="#valueForKey-的底层原理" class="headerlink" title="valueForKey:的底层原理"></a>valueForKey:的底层原理</h2><p><code>valueForKey:</code>首先会根据<code>getKey、key、isKey、_key</code>顺序查找方法，找到了的话就调用，拿到返回值。</p>
+<p>如果没有找到方法，那么就会去访问类方法<code>+ (BOOL)accessInstanceVariablesDirectly</code>，询问是否允许直接访问成员变量，默认返回YES</p>
+<p>如果允许，那么按照<code>_key、_isKey、key、isKey</code>顺序查找成员变量，找到了的话就直接取值，找不到就抛出异常<code>NSUnknownKeyException</code>。</p>
+<p>如果不允许，就抛出异常<code>NSUnknownKeyException</code></p>
+]]></content>
+      <categories>
+        <category>iOS</category>
+      </categories>
+      <tags>
+        <tag>iOS</tag>
+        <tag>底层原理</tag>
+      </tags>
+  </entry>
+  <entry>
+    <title>iOS 底层原理 --- Category、+load、+initialize和关联对象</title>
+    <url>/post/2397c268.html</url>
+    <content><![CDATA[<p>本文简述iOS中分类的底层实现和load方法、initialize方法在类和分类中的调用特性，还有如何通过关联对象的方式给分类添加属性，以及关联对象的底层实现原理</p>
+<span id="more"></span>
+
+
+<h2 id="分类（Category）"><a href="#分类（Category）" class="headerlink" title="分类（Category）"></a>分类（Category）</h2><h3 id="先写一个Demo"><a href="#先写一个Demo" class="headerlink" title="先写一个Demo"></a>先写一个Demo</h3><p>新建一个命令行工程，在main.m中写几个类</p>
+<p>父类：写一个run方法</p>
+<figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">@interface Person : NSObject</span><br><span class="line"></span><br><span class="line">- (void)run;</span><br><span class="line"></span><br><span class="line">@end</span><br></pre></td></tr></table></figure>
+
+<p>父类的分类：写一个eat方法</p>
+<figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">@interface Person(Test) </span><br><span class="line"></span><br><span class="line">- (void)eat;</span><br><span class="line"></span><br><span class="line">@end</span><br><span class="line"></span><br></pre></td></tr></table></figure>
+
+<p>根据经验可知道，现在Peron对象拥有了run方法和eat方法</p>
+<h3 id="分类的底层结构"><a href="#分类的底层结构" class="headerlink" title="分类的底层结构"></a>分类的底层结构</h3><p>输入命令行</p>
+<p><code>xcrun -sdk iphoneos clang -arch arm64 -rewrite-objc main.m</code></p>
+<p>接下来同级目录下就会多出一个编译后的文件<code>main.cpp</code>，查看后发现<code>Person(Test) </code>分类被编译成了如下变量</p>
+<figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">static struct _category_t _OBJC_$_CATEGORY_Person_$_Test __attribute__ ((used, section (&quot;__DATA,__objc_const&quot;))) &#x3D; </span><br><span class="line">&#123;</span><br><span class="line">	&quot;Person&quot;,</span><br><span class="line">	0, &#x2F;&#x2F; &amp;OBJC_CLASS_$_Person,</span><br><span class="line">	(const struct _method_list_t *)&amp;_OBJC_$_CATEGORY_INSTANCE_METHODS_Person_$_Test,</span><br><span class="line">	0,</span><br><span class="line">	0,</span><br><span class="line">	0,</span><br><span class="line">&#125;;</span><br></pre></td></tr></table></figure>
+
+<p>这个变量的类型是<code>static struct _category_t</code>，名字是<code>_OBJC_$_CATEGORY_Person_$_Test</code>，等于号后面是一个初始化结构体的过程，可以看到要实例化这个结构体需要6个参数，所以查看<code>_category_t</code>的结构如下</p>
+<figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">struct _category_t &#123;</span><br><span class="line">	const char *name; &#x2F;&#x2F;&#x2F; 原来的类的名字</span><br><span class="line">	struct _class_t *cls; &#x2F;&#x2F;&#x2F; 类对象</span><br><span class="line">	const struct _method_list_t *instance_methods; &#x2F;&#x2F;&#x2F; 实例方法数组</span><br><span class="line">	const struct _method_list_t *class_methods; &#x2F;&#x2F;&#x2F; 类方法数组</span><br><span class="line">	const struct _protocol_list_t *protocols; &#x2F;&#x2F;&#x2F; 遵循的协议数组</span><br><span class="line">	const struct _prop_list_t *properties; &#x2F;&#x2F;&#x2F; 属性数组</span><br><span class="line">&#125;;</span><br></pre></td></tr></table></figure>
+
+<p>由此可知，<strong>分类可以定义实例方法，可以定义类方法，可以遵循协议，可以添加属性，但是不能添加成员变量！因为分类的结构里面没有存储成员变量的地方.</strong></p>
+<h3 id="程序通过runtime动态将分类合并到类对象、元类对象中"><a href="#程序通过runtime动态将分类合并到类对象、元类对象中" class="headerlink" title="程序通过runtime动态将分类合并到类对象、元类对象中"></a>程序通过runtime动态将分类合并到类对象、元类对象中</h3><p>分类中的方法是在运行时才添加到类对象和元类对象中的，而不是编译的时候添加的，编译之后只是多了几个类型为<code>_category_t</code>的结构体变量。</p>
+<p>合并的过程可以在runtime源码（objc4-818.2）中<code>objc-runtime-new.mm</code>的<code>load_categories_nolock</code>函数中看到，这里不展开流程，直接说结论。</p>
+<p>合并过程是这样子的，首先我们知道原来的类（我们就叫他主类吧）对象是存放着成员方法的，主类的元类对象是放着类方法的，因为类对象和元类对象结构是一样的，所以我们就讨论成员方法就好了。</p>
+<p>其次呢，runtime先根据分类方法的数量在数组里面开辟空间，然后把分类方法塞到原来的成员方法数组的前端，这样子合并就完成了，其他类方法、协议、属性等数组，也是同样的过程。</p>
+<p>所以最后在<strong>类对象的方法列表数组里面，排在前面的是分类方法，后面才是主类的方法。如果有多个分类的话，那么后编译的分类的成员方法会插在数组的前面（因为插入数组的时候是倒序插入）</strong>。</p>
+<p>有了上述结论 我们就可以解释很多事情了。</p>
+<h4 id="如果分类实现了主类的方法会怎么样"><a href="#如果分类实现了主类的方法会怎么样" class="headerlink" title="如果分类实现了主类的方法会怎么样"></a>如果分类实现了主类的方法会怎么样</h4><p>根据上述结论，系统在找对应的调用方法的时候，会先找到分类的方法，所以主类的方法没有机会被调用到。</p>
+<h4 id="如果多个分类都实现了同个主类的方法"><a href="#如果多个分类都实现了同个主类的方法" class="headerlink" title="如果多个分类都实现了同个主类的方法"></a>如果多个分类都实现了同个主类的方法</h4><p>根据上述结论，后编译的分类的成员方法会插在方法列表的前面，所以谁后编译，就调用谁</p>
+<h4 id="如果子类或者子类的分类实现了父类的分类方法"><a href="#如果子类或者子类的分类实现了父类的分类方法" class="headerlink" title="如果子类或者子类的分类实现了父类的分类方法"></a>如果子类或者子类的分类实现了父类的分类方法</h4><p>根据上述结论和结合我们以前所学知识，最后子类实例对象会去子类的类对象里面寻找方法并调用，使用<code>super</code>关键字调用方法的话，则会去到父类的类对象内找方法。</p>
+<h3 id="Category跟Class-Extension的区别"><a href="#Category跟Class-Extension的区别" class="headerlink" title="Category跟Class Extension的区别"></a>Category跟Class Extension的区别</h3><ul>
+<li>Class Extension是编译的时候，它的数据就已经包含在类信息中</li>
+<li>Category 是在运行时才会讲数据合并到类信息中</li>
+</ul>
+<h2 id="load方法"><a href="#load方法" class="headerlink" title="load方法"></a>load方法</h2><h3 id="先写一个Demo-1"><a href="#先写一个Demo-1" class="headerlink" title="先写一个Demo"></a>先写一个Demo</h3><p>父类：实现load方法</p>
+<figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">@implementation Person</span><br><span class="line"></span><br><span class="line">+ (void)load &#123;</span><br><span class="line">    NSLog(@&quot;Person load&quot;);</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line">@end</span><br></pre></td></tr></table></figure>
+
+<p>父类的分类：实现load方法</p>
+<figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">@implementation Person(Test)</span><br><span class="line"></span><br><span class="line">+ (void)load &#123;</span><br><span class="line">    NSLog(@&quot;Person Text load&quot;);</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line">@end</span><br><span class="line"></span><br></pre></td></tr></table></figure>
+
+<p>子类：实现load方法</p>
+<figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">@implementation Student</span><br><span class="line"></span><br><span class="line">+ (void)load &#123;</span><br><span class="line">    NSLog(@&quot;Student load&quot;);</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line">@end</span><br><span class="line"></span><br></pre></td></tr></table></figure>
+
+<p>子类的分类：实现load方法</p>
+<figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">@implementation Student(Test)</span><br><span class="line"></span><br><span class="line">+ (void)load &#123;</span><br><span class="line">    NSLog(@&quot;Student Test load&quot;);</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line">@end</span><br></pre></td></tr></table></figure>
+
+<h3 id="load方法的调用时机"><a href="#load方法的调用时机" class="headerlink" title="load方法的调用时机"></a>load方法的调用时机</h3><p>通过runtime源码（objc4-818.2）<code>objc-runtime-new.mm</code>第3233行得知，load方法是在加载镜像(load_images)的时候调用的。</p>
+<blockquote>
+<p>补充小细节：从<code>load_images</code>函数可以看到，加载分类<code>loadAllCategories()</code>早于调用load方法<code>call_load_methods()</code>，也就是元类对象中的类方法列表内，分类的load方法会在主类的load方法之前</p>
+</blockquote>
+<p>在调用load方法之前，首先要通过<code>prepare_load_methods</code>函数整理出一个数组，这个数组会决定主类的load方法的调用顺序</p>
+<p>从<code>prepare_load_methods</code>函数中调用的<code>schedule_class_load</code>函数的内部实现我们可以知道，父类会先被加入到数组中，其次才是主类。</p>
+<p>然后我们回到最开始的地方（load_images），通过<code>objc-loadmethod.mm</code>第337行<code>call_load_methods</code>得知，先调用主类的load方法(call_class_loads())，再调用分类的load方法<code>call_category_loads();</code></p>
+<blockquote>
+<p>补充一个小细节：在整理数组的时候，这个数组里面存放的是一个个结构体，结构体长这样</p>
+</blockquote>
+  <figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">struct loadable_class &#123;</span><br><span class="line">    Class cls;  &#x2F;&#x2F; may be nil  这里放元类对象（load是类方法所以存在元类对象里面）</span><br><span class="line">    IMP method;  &#x2F;&#x2F;&#x2F; 这里放的是load方法的函数指针</span><br><span class="line">&#125;;</span><br><span class="line"></span><br><span class="line">struct loadable_category &#123;</span><br><span class="line">    Category cat;  &#x2F;&#x2F; may be nil 这个是上面讲到的category_t类型的对象</span><br><span class="line">    IMP method; &#x2F;&#x2F;&#x2F; 这里放的是load方法的函数指针</span><br><span class="line">&#125;;</span><br></pre></td></tr></table></figure>
+<p>注意：runtime代码内有记录类的load方法是否曾经被加入到load数组过（RW_LOADED），如果被调用过了，就会跳过，这就是load方法只会执行一次的原因（但是你要是非要手动调用load方法那还是会执行的）</p>
+<p><strong>重要：系统调用load方法不通过消息发送机制</strong>，可以查看<code>objc-loadmethod.mm</code>第204行如下</p>
+<figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">(*load_method)(cls, @selector(load));</span><br></pre></td></tr></table></figure>
+
+<p>意为直接通过函数指针调用函数</p>
+<h3 id="load方法的调用顺序"><a href="#load方法的调用顺序" class="headerlink" title="load方法的调用顺序"></a>load方法的调用顺序</h3><p>综上所述，分类也有load方法。调用顺序是：先调用父类load方法，再调用子类load方法，最后调用分类的load方法，如果有多个分类，那么先编译的，先调用。</p>
+<p>所以上述Demo代码执行后输出结果为</p>
+<figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">Person load</span><br><span class="line">Student load</span><br><span class="line">Person Test load</span><br><span class="line">Student Test load</span><br></pre></td></tr></table></figure>
+
+<p>这里Person比Student先调用是因为他是父类，Person(Test)比Student(Test)先调用是因为它先编译</p>
+<h3 id="综上所述"><a href="#综上所述" class="headerlink" title="综上所述"></a>综上所述</h3><p>于是我们可以解答下面的问题</p>
+<ol>
+<li>类和分类都有+load方法</li>
+<li>根据编译顺序，先调用父类+load，再调用子类+load，再调用分类+load(看编译顺序)</li>
+<li>因为系统调用load方法时不通过消息发送机制，所以不存在子类load方法覆盖父类load方法的情况，但是，如果手动调用load方法（即通过消息发送机制调用方法），那么这时候就有继承的现象发生了，也就是子类会覆盖父类方法的实现。</li>
+</ol>
+<p>搞点复杂的事情</p>
+<ol>
+<li>父类实现，父类分类实现，子类不实现，子类分类实现<br/><br> 顺序：父类load，子类分类load、父类分类load<br/><br> 原因：本来应该调用子类load的，无奈子类load没实现，但是找到了子类分类，那么就调用子类分类的load，最后在调用父类分类load(因为分类要最晚调用，由于刚才子类分类被调用过了，所以这里没它事了)<br/><br> <strong>所以：不一定主类的load方法总比分类的load方法早调用，存在特殊情况</strong><br/><br/></li>
+<li>父类不实现，父类分类实现，子类实现，子类分类实现<br/><br> 顺序：父类分类load，子类load，子类分类load<br/><br> 原因：跟上面的理由是一样的，父类没实现但是父类分类找到了那么就调用<br/><br> <strong>所以：父类的分类的load也可以比子类load方法早调用</strong></li>
+</ol>
+<h2 id="initialize方法"><a href="#initialize方法" class="headerlink" title="initialize方法"></a>initialize方法</h2><h3 id="先写个Demo"><a href="#先写个Demo" class="headerlink" title="先写个Demo"></a>先写个Demo</h3><p>父类：实现initialize方法</p>
+<figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">@implementation Person</span><br><span class="line"></span><br><span class="line">+ (void)initialize &#123;</span><br><span class="line">    NSLog(@&quot;Person initialize&quot;);</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line">@end</span><br></pre></td></tr></table></figure>
+
+<p>父类的分类：实现initialize方法</p>
+<figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">@implementation Person(Test)</span><br><span class="line"></span><br><span class="line">+ (void)initialize &#123;</span><br><span class="line">    NSLog(@&quot;Person Text initialize&quot;);</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line">@end</span><br><span class="line"></span><br></pre></td></tr></table></figure>
+
+<p>子类：实现initialize方法</p>
+<figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">@implementation Student</span><br><span class="line"></span><br><span class="line">+ (void)initialize &#123;</span><br><span class="line">    NSLog(@&quot;Student initialize&quot;);</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line">@end</span><br><span class="line"></span><br></pre></td></tr></table></figure>
+
+<p>子类的分类：实现initialize方法</p>
+<figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">@implementation Student(Test)</span><br><span class="line"></span><br><span class="line">+ (void)initialize &#123;</span><br><span class="line">    NSLog(@&quot;Student Test initialize&quot;);</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line">@end</span><br></pre></td></tr></table></figure>
+
+<h3 id="initialize方法的调用时机"><a href="#initialize方法的调用时机" class="headerlink" title="initialize方法的调用时机"></a>initialize方法的调用时机</h3><ul>
+<li><p><code>+initialize</code>会在类第一次接受到消息的时候调用，即<code>objc_msgSend()</code>被触发的时候调用，这部分是汇编实现</p>
+</li>
+<li><p>runtime源码里面有一个<code>class_getInstanceMethod()</code>函数，用于查找方法，当找到要调用的方法之后，就会调用<code>initialize</code>方法，<code>class_getInstanceMethod()</code>内的主要实现为<code>lookUpImpOrForward()</code>函数的调用</p>
+</li>
+<li><p><code>lookUpImpOrForward()</code>函数实现内，有一判断条件为<code>if(slowpath(!cls-&gt;isInitialized())) &#123; ... &#125;</code> ，若该类已经调用过<code>+initialize</code>，那么就不会再调用，这就是<code>+initialize</code>只被系统调用一次的原因</p>
+</li>
+<li><p>经过一层层点击方法实现（流程见补充），最终我们可以在<code>objc-initialize.mm</code>内发现函数<code>callInitialize(Class cls)</code>，内部实现是<code>objc_msgSend</code>，如下</p>
+</li>
+</ul>
+<figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">  void callInitialize(Class cls)</span><br><span class="line">&#123;</span><br><span class="line">    ((void(*)(Class, SEL))objc_msgSend)(cls, @selector(initialize));</span><br><span class="line">    asm(&quot;&quot;);</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<blockquote>
+<p>补充：函数调用路径为<code>lookUpImpOrForward</code>-&gt;<code>realizeAndInitializeIfNeeded_locked</code>-&gt;<code>initializeAndLeaveLocked</code>-&gt;<code>initializeAndMaybeRelock</code>-&gt;<code>initializeNonMetaClass</code>-&gt;<code>callInitialize</code><br/>其中：<code>initializeNonMetaClass</code>函数实现内有一个递归，不断地传入<code>superclass</code>指针，去调用父类的<code>initialize</code>方法，直到<code>superclass</code>指针为空（或已经调用过<code>initialize</code>）为止，这就是先调用父类的<code>initialize</code>方法的原因</p>
+</blockquote>
+<h3 id="initialize方法的调用顺序"><a href="#initialize方法的调用顺序" class="headerlink" title="initialize方法的调用顺序"></a>initialize方法的调用顺序</h3><ul>
+<li>先调用父类的<code>initialize</code>方法，再调用子类的<code>initialize</code></li>
+</ul>
+<h3 id="综上所述-1"><a href="#综上所述-1" class="headerlink" title="综上所述"></a>综上所述</h3><ol>
+<li><code>initialize</code>是通过<code>objc_msgSend</code>方式调用的，所以会受分类、继承等等因素影响调用</li>
+<li>如果子类没有实现<code>+initialize</code>，会调用父类的<code>+initiailize</code>（所以父类的<code>+initialize</code>可能会被调用多次）</li>
+<li>如果分类实现了<code>+initialize</code>，就会覆盖主类的<code>+initialize</code>调用</li>
+</ol>
+<h2 id="关联对象"><a href="#关联对象" class="headerlink" title="关联对象"></a>关联对象</h2><p>假如我们要给一个类添加一个属性如下：<br><br><code>@property (copy, nonatomic) NSString *test;</code></p>
+<h3 id="存值"><a href="#存值" class="headerlink" title="存值"></a>存值</h3><figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">OBJC_EXPORT void</span><br><span class="line">objc_setAssociatedObject(id _Nonnull object, const void * _Nonnull key,</span><br><span class="line">                         id _Nullable value, objc_AssociationPolicy policy)</span><br></pre></td></tr></table></figure>
+
+<table>
+<thead>
+<tr>
+<th>参数名</th>
+<th>解释</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>object</td>
+<td>要关联的对象，如果是在分类内给主类添加属性，那么这里就写<code>self</code></td>
+</tr>
+<tr>
+<td>key</td>
+<td>要用来标记这个属性的key，取值的时候也得靠这个key取</td>
+</tr>
+<tr>
+<td>value</td>
+<td>存储的内容</td>
+</tr>
+<tr>
+<td>policy</td>
+<td>存储策略（见下表）</td>
+</tr>
+</tbody></table>
+<h4 id="objc-AssociationPolicy-存储策略"><a href="#objc-AssociationPolicy-存储策略" class="headerlink" title="objc_AssociationPolicy 存储策略"></a>objc_AssociationPolicy 存储策略</h4><table>
+<thead>
+<tr>
+<th>策略枚举</th>
+<th>对应修饰符</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>OBJC_ASSOCIATION_ASSIGN</td>
+<td>assign</td>
+</tr>
+<tr>
+<td>OBJC_ASSOCIATION_RETAIN_NONATOMIC</td>
+<td>strong, nonatomic</td>
+</tr>
+<tr>
+<td>OBJC_ASSOCIATION_COPY_NONATOMIC</td>
+<td>copy,nonatomic</td>
+</tr>
+<tr>
+<td>OBJC_ASSOCIATION_RETAIN</td>
+<td>strong, atomic</td>
+</tr>
+<tr>
+<td>OBJC_ASSOCIATION_COPY</td>
+<td>copy,atomic</td>
+</tr>
+</tbody></table>
+<blockquote>
+<p>如果要存weak类型的对象怎么办？<br/>创建一个类，用<code>OBJC_ASSOCIATION_RETAIN_NONATOMIC</code>标记存在主类中，然后在这个新建的类里面再存放一个weak引用的属性</p>
+</blockquote>
+<h4 id="key有多少种填写形式"><a href="#key有多少种填写形式" class="headerlink" title="key有多少种填写形式"></a>key有多少种填写形式</h4><ol>
+<li>声明全局变量<code>static const void *TestKey = &amp;TestKey;</code>,将<code>TestKey</code>的地址作为key的内容，不能直接写<code>const void *TestKey</code>，因为这么写等共同于<code>const void *TestKey = NULL</code>，要是以后添加别的属性，就会冲突，使用例子：</li>
+</ol>
+  <figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">objc_setAssociatedObject(self,TestKey,test,OBJC_ASSOCIATION_COPY_NONATOMIC)</span><br></pre></td></tr></table></figure>
+<ol start="2">
+<li>声明全局变量<code>static const char TestKey</code>，同样将<code>TestKey</code>的地址作为key，好处是<code>char</code>只占用一个字节的内存大小，使用例子：</li>
+</ol>
+  <figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">objc_setAssociatedObject(self,&amp;TestKey,test,OBJC_ASSOCIATION_COPY_NONATOMIC)</span><br></pre></td></tr></table></figure>
+<ol start="3">
+<li>因为OC内的字符串都存在常量区，所以通过字面量创建的相同字符串都是同个地址，所以我们也可以随便定义一个字符串去做key，使用例子：</li>
+</ol>
+  <figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">objc_setAssociatedObject(self,@&quot;Test&quot;,test,OBJC_ASSOCIATION_COPY_NONATOMIC)</span><br></pre></td></tr></table></figure>
+<ol start="4">
+<li>我们也可以通过使用getter方法的方法编号去做key，使用例子：</li>
+</ol>
+  <figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">objc_setAssociatedObject(self,@selector(test),test,OBJC_ASSOCIATION_COPY_NONATOMIC)</span><br></pre></td></tr></table></figure>
+<h3 id="取值"><a href="#取值" class="headerlink" title="取值"></a>取值</h3><figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">OBJC_EXPORT id _Nullable</span><br><span class="line">objc_getAssociatedObject(id _Nonnull object, const void * _Nonnull key);</span><br></pre></td></tr></table></figure>
+
+
+<ul>
+<li>object同上，一般分类里面就填self</li>
+<li>key属性需要和上面设值的key属性一致</li>
+</ul>
+<ul>
+<li>如果使用getter方法的方法编号去做key，有两种写法<ol>
+<li><code>objc_getAssociatedObject(self, @selector(test))</code></li>
+<li><code>objc_getAssociatedObject(self, _cmd)</code>，<code>_cmd</code>表示当前方法的方法地址</li>
+</ol>
+</li>
+</ul>
+<h3 id="底层实现"><a href="#底层实现" class="headerlink" title="底层实现"></a>底层实现</h3><p><img src="https://www.hualigs.cn/image/60bd149eb55dc.jpg" alt="图片来源自小码哥教程"></p>
+<ul>
+<li>runtime维护着一个名为<code>AssociationsManager</code>的类</li>
+<li>类里面存放着一个字典，键是传入的对象（object参数），值是<code>ObjectAssociationMap</code>类的实例对象</li>
+<li><code>ObjectAssociationMap</code>是一个字典，键是传入的key参数，值是<code>ObjcAssociation</code>类的实例对象</li>
+<li><code>ObjcAssociation</code>有两个成员变量，<code>_policy</code>存放着传入的policy参数，<code>_value</code>存放着传入的value参数</li>
+</ul>
+<h3 id="综上所述-2"><a href="#综上所述-2" class="headerlink" title="综上所述"></a>综上所述</h3><ol>
+<li>关联对象并不是存储在被关联对象的内存中</li>
+<li>关联对象存储在全局统一的<code>AssociationsManager</code>中</li>
+<li>设置关联对象（object参数）为nil，就相当于是移除关联对象</li>
+</ol>
+]]></content>
+      <categories>
+        <category>iOS</category>
+      </categories>
+      <tags>
+        <tag>iOS</tag>
+        <tag>底层原理</tag>
       </tags>
   </entry>
 </search>
