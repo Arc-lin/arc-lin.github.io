@@ -113,7 +113,7 @@ backup:
   type: git
   theme: next
   repository:
-    github: https://github.com/Arc-lin/arc-lin.github.io.git,backup
+    github: https://github.com/Arc-lin/arclin.cn.backup.git,master
 
 sitemap:
   path: sitemap.xml
