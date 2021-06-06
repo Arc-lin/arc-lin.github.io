@@ -112,7 +112,7 @@ algolia:
 backup:
   type: git
   theme: next
-  repository: https://github.com/Arc-lin/arclin.cn.backup.git,master
+  repo: https://github.com/Arc-lin/arclin.cn.backup.git,master
 
 sitemap:
   path: sitemap.xml
