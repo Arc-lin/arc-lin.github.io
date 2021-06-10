@@ -1,4 +1,3 @@
----
 title: 安装shadowsocks服务端
 author: Arclin
 tags:

@@ -170,11 +170,59 @@ struct _category_t {
 
 通过runtime源码（objc4-818.2）`objc-runtime-new.mm`第3233行得知，load方法是在加载镜像(load_images)的时候调用的。
 
+```
+void load_images(const char *path __unused, const struct mach_header *mh)
+{
+    if (!didInitialAttachCategories && didCallDyldNotifyRegister) {
+        didInitialAttachCategories = true;
+        loadAllCategories();
+    }
+
+    // Return without taking locks if there are no +load methods here.
+    if (!hasLoadMethods((const headerType *)mh)) return;
+
+    recursive_mutex_locker_t lock(loadMethodLock);
+
+    // Discover load methods
+    {
+        mutex_locker_t lock2(runtimeLock);
+        prepare_load_methods((const headerType *)mh);
+    }
+
+    // Call +load methods (without runtimeLock - re-entrant)
+    call_load_methods();
+}
+
+```
+
 > 补充小细节：从`load_images`函数可以看到，加载分类`loadAllCategories()`早于调用load方法`call_load_methods()`，也就是元类对象中的类方法列表内，分类的load方法会在主类的load方法之前
 
 在调用load方法之前，首先要通过`prepare_load_methods`函数整理出一个数组，这个数组会决定主类的load方法的调用顺序
 
 从`prepare_load_methods`函数中调用的`schedule_class_load`函数的内部实现我们可以知道，父类会先被加入到数组中，其次才是主类。
+
+```
+/***********************************************************************
+* prepare_load_methods
+* Schedule +load for classes in this image, any un-+load-ed 
+* superclasses in other images, and any categories in this image.
+**********************************************************************/
+// Recursively schedule +load for cls and any un-+load-ed superclasses.
+// cls must already be connected.
+static void schedule_class_load(Class cls)
+{
+    if (!cls) return;
+    ASSERT(cls->isRealized());  // _read_images should realize
+
+    if (cls->data()->flags & RW_LOADED) return;
+
+    // Ensure superclass-first ordering
+    schedule_class_load(cls->getSuperclass());
+
+    add_class_to_loadable_list(cls);
+    cls->setInfo(RW_LOADED); 
+}
+```
 
 然后我们回到最开始的地方（load_images），通过`objc-loadmethod.mm`第337行`call_load_methods`得知，先调用主类的load方法(call_class_loads())，再调用分类的load方法`call_category_loads();`
 
@@ -195,13 +243,45 @@ struct _category_t {
   
 注意：runtime代码内有记录类的load方法是否曾经被加入到load数组过（RW_LOADED），如果被调用过了，就会跳过，这就是load方法只会执行一次的原因（但是你要是非要手动调用load方法那还是会执行的）
   
-**重要：系统调用load方法不通过消息发送机制**，可以查看`objc-loadmethod.mm`第204行如下
+**重要：系统调用load方法不通过消息发送机制**，可以查看`objc-loadmethod.mm`第177行如下
 
 ```
-(*load_method)(cls, @selector(load));
+/***********************************************************************
+* call_class_loads
+* Call all pending class +load methods.
+* If new classes become loadable, +load is NOT called for them.
+*
+* Called only by call_load_methods().
+**********************************************************************/
+static void call_class_loads(void)
+{
+    int i;
+    
+    // Detach current loadable list.
+    struct loadable_class *classes = loadable_classes;
+    int used = loadable_classes_used;
+    loadable_classes = nil;
+    loadable_classes_allocated = 0;
+    loadable_classes_used = 0;
+    
+    // Call all +loads for the detached list.
+    for (i = 0; i < used; i++) {
+        Class cls = classes[i].cls;
+        load_method_t load_method = (load_method_t)classes[i].method;
+        if (!cls) continue; 
+
+        if (PrintLoading) {
+            _objc_inform("LOAD: +[%s load]\n", cls->nameForLogging());
+        }
+        /// 意为直接通过函数指针调用函数
+        (*load_method)(cls, @selector(load));
+    }
+    
+    // Destroy the detached list.
+    if (classes) free(classes);
+}
 ```
 
-意为直接通过函数指针调用函数
 
 
 ### load方法的调用顺序
@@ -300,6 +380,44 @@ Student Test load
 - `+initialize`会在类第一次接受到消息的时候调用，即`objc_msgSend()`被触发的时候调用，这部分是汇编实现
 
 - runtime源码里面有一个`class_getInstanceMethod()`函数，用于查找方法，当找到要调用的方法之后，就会调用`initialize`方法，`class_getInstanceMethod()`内的主要实现为`lookUpImpOrForward()`函数的调用
+
+```
+/***********************************************************************
+* class_getInstanceMethod.  Return the instance method for the
+* specified class and selector.
+**********************************************************************/
+Method class_getInstanceMethod(Class cls, SEL sel)
+{
+    if (!cls  ||  !sel) return nil;
+
+    // This deliberately avoids +initialize because it historically did so.
+
+    // This implementation is a bit weird because it's the only place that 
+    // wants a Method instead of an IMP.
+
+    Method meth;
+    meth = _cache_getMethod(cls, sel, _objc_msgForward_impcache);
+    if (meth == (Method)1) {
+        // Cache contains forward:: . Stop searching.
+        return nil;
+    } else if (meth) {
+        return meth;
+    }
+        
+    // Search method lists, try method resolver, etc.
+    lookUpImpOrForward(nil, sel, cls, LOOKUP_INITIALIZE | LOOKUP_RESOLVER);
+
+    meth = _cache_getMethod(cls, sel, _objc_msgForward_impcache);
+    if (meth == (Method)1) {
+        // Cache contains forward:: . Stop searching.
+        return nil;
+    } else if (meth) {
+        return meth;
+    }
+
+    return _class_getMethod(cls, sel);
+}
+```
 
 - `lookUpImpOrForward()`函数实现内，有一判断条件为`if(slowpath(!cls->isInitialized())) { ... }` ，若该类已经调用过`+initialize`，那么就不会再调用，这就是`+initialize`只被系统调用一次的原因
 
