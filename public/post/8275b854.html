@@ -28,7 +28,7 @@
 <meta property="og:description" content="本文主要简述Block、__block的本质是什么东西，文章涉及循环引用等开发常见问题，需要重点关注。">
 <meta property="og:locale">
 <meta property="article:published_time" content="2021-06-07T15:50:00.000Z">
-<meta property="article:modified_time" content="2021-06-11T17:59:18.949Z">
+<meta property="article:modified_time" content="2021-06-12T19:29:37.683Z">
 <meta property="article:author" content="Arclin">
 <meta property="article:tag" content="iOS">
 <meta property="article:tag" content="底层原理">
@@ -256,7 +256,7 @@
 
 <h2 id="先写一个最简单的block"><a href="#先写一个最简单的block" class="headerlink" title="先写一个最简单的block"></a>先写一个最简单的block</h2><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">void(^block)(void) &#x3D; ^&#123;</span><br><span class="line">    NSLog(@&quot;Block&quot;);</span><br><span class="line">&#125;;</span><br><span class="line"></span><br><span class="line">block();</span><br></pre></td></tr></table></figure>
 
-<p>使用命令行将<code>main.m</code>文件编译成C++文件<br/><br><code>xcrun -sdk iphoneos clang -arch arm64 -rewrite-objc main.m</code></p>
+<p>使用命令行将<code>main.m</code>文件编译成C++文件<br/><br><code>xcrun -sdk iphoneos clang -arch arm64 -rewrite-objc -fobjc-arc -fobjc-runtime=ios-8.0.0 main.m </code></p>
 <p>编译完成后，上述代码会变成以下结构</p>
 <figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">void(*block)(void) &#x3D; &amp;__main_block_impl_0(__main_block_func_0, &amp;__main_block_desc_0_DATA));</span><br><span class="line"></span><br><span class="line">((void (*)(__block_impl *))((__block_impl *)block)-&gt;FuncPtr)((__block_impl *)block);</span><br></pre></td></tr></table></figure>
 
@@ -373,19 +373,46 @@
 </ul>
 </li>
 </ol>
-<h3 id="NSMallocBlock"><a href="#NSMallocBlock" class="headerlink" title="__NSMallocBlock__"></a><code>__NSMallocBlock__</code></h3><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">int age &#x3D; 20;</span><br><span class="line">void(^block)(void) &#x3D; [^&#123;</span><br><span class="line">   NSLog(@&quot;Block %d&quot;,age);</span><br><span class="line">&#125; copy];</span><br></pre></td></tr></table></figure>
+<h3 id="NSMallocBlock"><a href="#NSMallocBlock" class="headerlink" title="__NSMallocBlock__"></a><code>__NSMallocBlock__</code></h3><p>将<code>__NSStackBlock__</code>进行一次copy，即可得到<code>__NSMallocBlock__</code></p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">int age &#x3D; 20;</span><br><span class="line">void(^block)(void) &#x3D; [^&#123;</span><br><span class="line">   NSLog(@&quot;Block %d&quot;,age);</span><br><span class="line">&#125; copy];</span><br></pre></td></tr></table></figure>
 
 
-<h2 id="对象类型的auto变量"><a href="#对象类型的auto变量" class="headerlink" title="对象类型的auto变量"></a>对象类型的auto变量</h2><p>当block内部访问了对象类型的auto变量时</p>
+<h2 id="捕获对象类型的auto变量"><a href="#捕获对象类型的auto变量" class="headerlink" title="捕获对象类型的auto变量"></a>捕获对象类型的auto变量</h2><p>当block内部访问了对象类型的auto变量时，如下</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">Person *person &#x3D; [[Person alloc] init];</span><br><span class="line">void(^block)(void) &#x3D; ^&#123;</span><br><span class="line">    NSLog(@&quot;Person %@&quot;,person);</span><br><span class="line">&#125;;</span><br><span class="line">block();</span><br></pre></td></tr></table></figure>
+<p>我们在ARC环境下编译，这时候block会在堆上（因为被自动copy了），执行命令行<code>xcrun -sdk iphoneos clang -arch arm64 -rewrite-objc -fobjc-arc -fobjc-runtime=ios-8.0.0 main.m</code>，会发现block结构体的person属性多了一个<code>__strong</code>的修饰符，证明他被block强持有了。</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">struct __main_block_impl_0 &#123;</span><br><span class="line">  ...</span><br><span class="line">  Person *__strong person;</span><br><span class="line">  ...</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>但是我们如果编译的时候去掉<code>-fobjc-arc</code>，默认就是MRC环境了，这时候block会在栈上，查看编译后的c++文件发现不会有<code>__strong</code>修饰符，如果我们在block执行前加一行<code>[person release]</code>，那么这时候<code>person</code>就会直接释放，证明block没有持有<code>person变量</code></p>
 <ul>
-<li>如果block是在栈上，将不会对auto变量产生强引用</li>
-<li>如果block被拷贝到堆上<ul>
+<li>结论1：如果block是在栈上，将不会对auto变量产生强引用</li>
+</ul>
+<p>如果我们给person添加<code>__weak</code>修饰符</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">__weak Person *person &#x3D; [[Person alloc] init];</span><br><span class="line">void(^block)(void) &#x3D; ^&#123;</span><br><span class="line">    NSLog(@&quot;Person %@&quot;,person);</span><br><span class="line">&#125;;</span><br><span class="line">block();</span><br></pre></td></tr></table></figure>
+
+<p>则block将会对person对象进行弱引用，编译后如下：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">struct __main_block_impl_0 &#123;</span><br><span class="line">  ...</span><br><span class="line">  Person *__weak person;</span><br><span class="line">  ...</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>所以使用<code>__weak</code>修饰符可以避免block对外部变量的强引用操作</p>
+<p>我们来看看block的结构体内的<code>__main_block_desc_0</code>是个什么东西</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line">static struct __main_block_desc_0 &#123;</span><br><span class="line">  size_t reserved;</span><br><span class="line">  size_t Block_size;</span><br><span class="line">  void (*copy)(struct __main_block_impl_0*, struct __main_block_impl_0*);</span><br><span class="line">  void (*dispose)(struct __main_block_impl_0*);</span><br><span class="line">&#125; __main_block_desc_0_DATA &#x3D; &#123; 0, sizeof(struct __main_block_impl_0), __main_block_copy_0, __main_block_dispose_0&#125;;</span><br></pre></td></tr></table></figure>
+
+<p>可以发现，多了两个函数指针，<code>copy</code>和<code>dispose</code>，分别指向<code>__main_block_copy_0</code>和<code>__main_block_dispose_0</code></p>
+<p>这两个函数的实现如下</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line">static void __main_block_copy_0(struct __main_block_impl_0*dst, struct __main_block_impl_0*src) &#123;</span><br><span class="line">	_Block_object_assign((void*)&amp;dst-&gt;person, (void*)src-&gt;person, 3&#x2F;*BLOCK_FIELD_IS_OBJECT*&#x2F;);</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line">static void __main_block_dispose_0(struct __main_block_impl_0*src) &#123;</span><br><span class="line">	_Block_object_dispose((void*)src-&gt;person, 3&#x2F;*BLOCK_FIELD_IS_OBJECT*&#x2F;);</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p><code>_Block_object_assign</code>函数内部会对person进行引用计数器的操作，如果<code>__main_block_impl_0</code>结构体内person指针是<code>__strong</code>类型，则为强引用，引用计数+1，如果<code>__main_block_impl_0</code>结构体内person指针是<code>__weak</code>类型，则为弱引用，引用计数不变。</p>
+<p><code>_Block_object_dispose</code>会对person对象做释放操作，类似于release，也就是断开对person对象的引用，而person究竟是否被释放还是取决于person对象自己的引用计数</p>
+<ul>
+<li>结论2：如果block被拷贝到堆上<ul>
 <li>会调用block内部的copy函数</li>
 <li>copy函数内部会调用_Block_object_assign函数</li>
-<li>_Block_object_assign函数会根据auto变量的修饰符（<code>__strong</code>，<code>__weak</code>，<code>__unsafe_unretained</code>）做出响应的操作，类似于retain(形成强引用、弱引用)</li>
+<li>_Block_object_assign函数会根据auto变量的修饰符（<code>__strong</code>，<code>__weak</code>，<code>__unsafe_unretained</code>）做出相应的操作，类似于retain(形成强引用、弱引用)</li>
 </ul>
+<blockquote>
+<p>__unsafe_unretained修饰的变量不会增加引用计数，当销毁时，该指针不会置空，会造成不安全的情况。</p>
+</blockquote>
 </li>
-<li>如果block从堆上移除<ul>
+<li>结论3：如果block从堆上移除<ul>
 <li>会调用block内部的dispose函数</li>
 <li>dispose函数内部会调用_Block_object_assign函数</li>
 <li>_Block_object_dispose函数会自动释放引用的auto变量，类似于release</li>
@@ -408,11 +435,42 @@
 <td>堆上的Block被废弃时</td>
 </tr>
 </tbody></table>
-<h2 id="block"><a href="#block" class="headerlink" title="__block"></a>__block</h2><ul>
+<h2 id="block"><a href="#block" class="headerlink" title="__block"></a>__block</h2><p>一般情况下我们是无法改变block捕获的外部的值的</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">Person *person &#x3D; [[Person alloc] init];</span><br><span class="line">void(^block)(void) &#x3D; ^&#123;</span><br><span class="line">	person &#x3D; nil;  &#x2F;&#x2F;&#x2F; 这种情况是会编译失败的</span><br><span class="line">&#125;;</span><br><span class="line">block();</span><br></pre></td></tr></table></figure>
+
+<p>从上面的内容我们也可以知道原因。就是因为外部的person所在的内存空间和block内（单独开辟了一个函数）的内存空间不在同一个位置，所以block内是访问不到的外部的person的。</p>
+<p>但是我们如果添加了<code>__block</code>关键字的话，就可以访问了，所以我们编译一下看看添加<code>__block</code>之后的情况</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">__block Person *person &#x3D; [[Person alloc] init];</span><br><span class="line">void(^block)(void) &#x3D; ^&#123;</span><br><span class="line">	person &#x3D; nil;  &#x2F;&#x2F; 编译成功</span><br><span class="line">&#125;;</span><br><span class="line">block();</span><br></pre></td></tr></table></figure>
+
+<p>编译后长这样</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><span class="line">struct __main_block_impl_0 &#123;</span><br><span class="line">  struct __block_impl impl;</span><br><span class="line">  struct __main_block_desc_0* Desc;</span><br><span class="line">  __Block_byref_person_0 *person; &#x2F;&#x2F; by ref</span><br><span class="line">  __main_block_impl_0(void *fp, struct __main_block_desc_0 *desc, __Block_byref_person_0 *_person, int flags&#x3D;0) : person(_person-&gt;__forwarding) &#123;</span><br><span class="line">    impl.isa &#x3D; &amp;_NSConcreteStackBlock;</span><br><span class="line">    impl.Flags &#x3D; flags;</span><br><span class="line">    impl.FuncPtr &#x3D; fp;</span><br><span class="line">    Desc &#x3D; desc;</span><br><span class="line">  &#125;</span><br><span class="line">&#125;;</span><br></pre></td></tr></table></figure>
+
+<p>可以看到person对象被封装成了一个<code>__Block_byref_person_0 *</code>类型的属性</p>
+<p>继续看看<code>__Block_byref_person_0</code>是什么</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line">struct __Block_byref_person_0 &#123;</span><br><span class="line">  void *__isa;</span><br><span class="line">__Block_byref_person_0 *__forwarding;</span><br><span class="line"> int __flags;</span><br><span class="line"> int __size;</span><br><span class="line"> void (*__Block_byref_id_object_copy)(void*, void*);</span><br><span class="line"> void (*__Block_byref_id_object_dispose)(void*);</span><br><span class="line"> Person *__strong person;</span><br><span class="line">&#125;;</span><br></pre></td></tr></table></figure>
+
+<p><code>__Block_byref_person_0</code>有isa指针，是一个OC对象，里面有一个强引用的person对象（指向的内容等同于外面的person指针指向的内容），和我们熟悉的<code>__Block_byref_id_object_copy</code>和<code>__Block_byref_id_object_dispose</code>方法用于处理内存管理问题，还有指向自身的<code>forwarding</code>指针（这个指针指向对象自身），<code>flag</code>和<code>size</code>，分别表示标记位和这个结构体的占用内存空间大小。</p>
+<p>person被封装成了结构体对象之后，原先的block函数就变成了</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">static void __main_block_func_0(struct __main_block_impl_0 *__cself) &#123;</span><br><span class="line">	__Block_byref_person_0 *person &#x3D; __cself-&gt;person; &#x2F;&#x2F; bound by ref</span><br><span class="line">	(person-&gt;__forwarding-&gt;person) &#x3D; __null;</span><br><span class="line">    NSLog((NSString *)&amp;__NSConstantStringImpl__var_folders_jj_276qbs652l5ckj94jfcx28jh0000gn_T_main_250618_mi_0,(person-&gt;__forwarding-&gt;person));</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>可以看出，但我们要改变person指针的值的时候，首先是取出person对象，即<code>__Block_byref_person_0 *person</code>，然后再通过<code>forwarding</code>指针拿到自己，再拿到最里面的person，最后就可以修改了。</p>
+<ol>
+<li><p>通过内存打印，我们可以得知<code>__Block_byref_person_0</code>内的person对象和外部的person对象的地址是一致的，所以我们在block内修改外部的person就是相当于修改<code>__Block_byref_person_0</code>内的person对象</p>
+</li>
+<li><p>为什么要绕一个圈，不直接<code>person-&gt;person</code>而是要<code>person-&gt;__forwarding-&gt;person</code>？原因是防止block从栈复制到堆之后，栈上面的block访问person访问到的是栈上的person而不是堆上的person，所以栈上的forwarding指针要指向堆的block，这样子就能一直访问到堆上的person了</p>
+</li>
+<li><p>封装的<code>__Block_byref_person_0</code>结构体内的<code>__Block_byref_id_object_copy</code>函数会管理他自己的person对象的内存，实现代码如下:<br> <code>_Block_object_assign((char*)dst + 40, *(void * *) ((char*)src + 40), 131);</code>，这里的40是person对象的偏移值，可以看到结构体内person前面的4个指针加2个整型刚好40个字节。</p>
+</li>
+<li><p><code>__Block_byref_person_0</code>在<code>__main_block_impl_0</code>内必定是强引用，跟我们上面所说的不一样，就算在<code>__block</code>之前再添加<code>__weak</code>修饰，<code>__Block_byref_person_0</code>在<code>__main_block_impl_0</code>内依旧是强引用</p>
+</li>
+</ol>
+<ul>
 <li><p>注意 MRC环境下，__block 不会对变量造成强引用，即以下情况person会提前释放</p>
   <figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">__block Person *person &#x3D; [Person new];</span><br><span class="line">void(^block)(void) &#x3D; ^&#123;</span><br><span class="line">	NSLog(@&quot;%@&quot;,person);</span><br><span class="line">&#125;;</span><br><span class="line">block(); &#x2F;&#x2F;&#x2F; 这时候person已经释放了</span><br></pre></td></tr></table></figure></li>
 </ul>
-<p>待续</p>
+<blockquote>
+<p>注意：__block只能用于修饰auto变量，不能修饰全局变量和静态（static）变量</p>
+</blockquote>
 <h2 id="循环引用"><a href="#循环引用" class="headerlink" title="循环引用"></a>循环引用</h2><ul>
 <li><p>以下代码会产生循环引用</p>
   <figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">Person *person &#x3D; [Person alloc] init];</span><br><span class="line">person.age &#x3D; 10;</span><br><span class="line">person.block &#x3D; ^&#123;</span><br><span class="line">	NSLog(@&quot;age is %d&quot;,person.age);</span><br><span class="line">&#125;;</span><br></pre></td></tr></table></figure></li>
@@ -503,7 +561,7 @@
 
       <!--noindex-->
       <div class="post-toc-wrap sidebar-panel">
-          <div class="post-toc motion-element"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#%E5%85%88%E5%86%99%E4%B8%80%E4%B8%AA%E6%9C%80%E7%AE%80%E5%8D%95%E7%9A%84block"><span class="nav-number">1.</span> <span class="nav-text">先写一个最简单的block</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#block%E7%9A%84%E5%BA%95%E5%B1%82%E7%BB%93%E6%9E%84"><span class="nav-number">2.</span> <span class="nav-text">block的底层结构</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#block%E6%8D%95%E8%8E%B7%E5%A4%96%E9%83%A8%E5%8F%98%E9%87%8F"><span class="nav-number">3.</span> <span class="nav-text">block捕获外部变量</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#%E5%B1%80%E9%83%A8auto%E7%B1%BB%E5%9E%8B%E7%9A%84%E5%8F%98%E9%87%8F%E6%8D%95%E8%8E%B7"><span class="nav-number">3.1.</span> <span class="nav-text">局部auto类型的变量捕获</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E5%B1%80%E9%83%A8static%E7%B1%BB%E5%9E%8B%E7%9A%84%E5%8F%98%E9%87%8F%E6%8D%95%E8%8E%B7"><span class="nav-number">3.2.</span> <span class="nav-text">局部static类型的变量捕获</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E5%85%A8%E5%B1%80%E5%8F%98%E9%87%8F%E4%B8%8D%E6%8D%95%E8%8E%B7"><span class="nav-number">3.3.</span> <span class="nav-text">全局变量不捕获</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#block%E5%86%85%E7%9A%84self%E4%BC%9A%E8%A2%AB%E6%8D%95%E8%8E%B7%E5%90%97"><span class="nav-number">3.4.</span> <span class="nav-text">block内的self会被捕获吗</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#Block%E7%9A%84%E7%B1%BB%E5%9E%8B"><span class="nav-number">4.</span> <span class="nav-text">Block的类型</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#NSGlobalBlock"><span class="nav-number">4.1.</span> <span class="nav-text">__NSGlobalBlock__</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#NSStackBlock"><span class="nav-number">4.2.</span> <span class="nav-text">__NSStackBlock__</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#NSMallocBlock"><span class="nav-number">4.3.</span> <span class="nav-text">__NSMallocBlock__</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E5%AF%B9%E8%B1%A1%E7%B1%BB%E5%9E%8B%E7%9A%84auto%E5%8F%98%E9%87%8F"><span class="nav-number">5.</span> <span class="nav-text">对象类型的auto变量</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#block"><span class="nav-number">6.</span> <span class="nav-text">__block</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E5%BE%AA%E7%8E%AF%E5%BC%95%E7%94%A8"><span class="nav-number">7.</span> <span class="nav-text">循环引用</span></a></li></ol></div>
+          <div class="post-toc motion-element"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#%E5%85%88%E5%86%99%E4%B8%80%E4%B8%AA%E6%9C%80%E7%AE%80%E5%8D%95%E7%9A%84block"><span class="nav-number">1.</span> <span class="nav-text">先写一个最简单的block</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#block%E7%9A%84%E5%BA%95%E5%B1%82%E7%BB%93%E6%9E%84"><span class="nav-number">2.</span> <span class="nav-text">block的底层结构</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#block%E6%8D%95%E8%8E%B7%E5%A4%96%E9%83%A8%E5%8F%98%E9%87%8F"><span class="nav-number">3.</span> <span class="nav-text">block捕获外部变量</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#%E5%B1%80%E9%83%A8auto%E7%B1%BB%E5%9E%8B%E7%9A%84%E5%8F%98%E9%87%8F%E6%8D%95%E8%8E%B7"><span class="nav-number">3.1.</span> <span class="nav-text">局部auto类型的变量捕获</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E5%B1%80%E9%83%A8static%E7%B1%BB%E5%9E%8B%E7%9A%84%E5%8F%98%E9%87%8F%E6%8D%95%E8%8E%B7"><span class="nav-number">3.2.</span> <span class="nav-text">局部static类型的变量捕获</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E5%85%A8%E5%B1%80%E5%8F%98%E9%87%8F%E4%B8%8D%E6%8D%95%E8%8E%B7"><span class="nav-number">3.3.</span> <span class="nav-text">全局变量不捕获</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#block%E5%86%85%E7%9A%84self%E4%BC%9A%E8%A2%AB%E6%8D%95%E8%8E%B7%E5%90%97"><span class="nav-number">3.4.</span> <span class="nav-text">block内的self会被捕获吗</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#Block%E7%9A%84%E7%B1%BB%E5%9E%8B"><span class="nav-number">4.</span> <span class="nav-text">Block的类型</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#NSGlobalBlock"><span class="nav-number">4.1.</span> <span class="nav-text">__NSGlobalBlock__</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#NSStackBlock"><span class="nav-number">4.2.</span> <span class="nav-text">__NSStackBlock__</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#NSMallocBlock"><span class="nav-number">4.3.</span> <span class="nav-text">__NSMallocBlock__</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E6%8D%95%E8%8E%B7%E5%AF%B9%E8%B1%A1%E7%B1%BB%E5%9E%8B%E7%9A%84auto%E5%8F%98%E9%87%8F"><span class="nav-number">5.</span> <span class="nav-text">捕获对象类型的auto变量</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#block"><span class="nav-number">6.</span> <span class="nav-text">__block</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E5%BE%AA%E7%8E%AF%E5%BC%95%E7%94%A8"><span class="nav-number">7.</span> <span class="nav-text">循环引用</span></a></li></ol></div>
       </div>
       <!--/noindex-->
 
