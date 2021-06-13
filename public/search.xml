@@ -1962,24 +1962,52 @@
 </li>
 <li><p>封装的<code>__Block_byref_person_0</code>结构体内的<code>__Block_byref_id_object_copy</code>函数会管理他自己的person对象的内存，实现代码如下:<br> <code>_Block_object_assign((char*)dst + 40, *(void * *) ((char*)src + 40), 131);</code>，这里的40是person对象的偏移值，可以看到结构体内person前面的4个指针加2个整型刚好40个字节。</p>
 </li>
-<li><p><code>__Block_byref_person_0</code>在<code>__main_block_impl_0</code>内必定是强引用，跟我们上面所说的不一样，就算在<code>__block</code>之前再添加<code>__weak</code>修饰，<code>__Block_byref_person_0</code>在<code>__main_block_impl_0</code>内依旧是强引用</p>
+<li><p><code>__Block_byref_person_0</code>在<code>__main_block_impl_0</code>内必定是强引用，跟我们上面所说的不一样，就算在<code>__block</code>之前再添加<code>__weak</code>修饰，<code>__Block_byref_person_0</code>在<code>__main_block_impl_0</code>内依旧是强引用，加上<code>__weak</code>修饰受影响的只有<code>__Block_byref_person_0</code>内的person指针的引用方式</p>
 </li>
 </ol>
-<ul>
-<li><p>注意 MRC环境下，__block 不会对变量造成强引用，即以下情况person会提前释放</p>
-  <figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">__block Person *person &#x3D; [Person new];</span><br><span class="line">void(^block)(void) &#x3D; ^&#123;</span><br><span class="line">	NSLog(@&quot;%@&quot;,person);</span><br><span class="line">&#125;;</span><br><span class="line">block(); &#x2F;&#x2F;&#x2F; 这时候person已经释放了</span><br></pre></td></tr></table></figure></li>
-</ul>
+<blockquote>
+<p>注意：MRC环境下，__block 不会对变量造成强引用，即以下情况person会提前释放</p>
+</blockquote>
+<figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">__block Person *person &#x3D; [Person new];</span><br><span class="line">void(^block)(void) &#x3D; ^&#123;</span><br><span class="line">    NSLog(@&quot;%@&quot;,person);</span><br><span class="line">&#125;;</span><br><span class="line">block(); &#x2F;&#x2F;&#x2F; 这时候person已经释放了</span><br></pre></td></tr></table></figure>
+
 <blockquote>
 <p>注意：__block只能用于修饰auto变量，不能修饰全局变量和静态（static）变量</p>
 </blockquote>
-<h2 id="循环引用"><a href="#循环引用" class="headerlink" title="循环引用"></a>循环引用</h2><ul>
+<h2 id="循环引用"><a href="#循环引用" class="headerlink" title="循环引用"></a>循环引用</h2><h3 id="循环引用的发生原因与解决方式"><a href="#循环引用的发生原因与解决方式" class="headerlink" title="循环引用的发生原因与解决方式"></a>循环引用的发生原因与解决方式</h3><ul>
 <li><p>以下代码会产生循环引用</p>
-  <figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">Person *person &#x3D; [Person alloc] init];</span><br><span class="line">person.age &#x3D; 10;</span><br><span class="line">person.block &#x3D; ^&#123;</span><br><span class="line">	NSLog(@&quot;age is %d&quot;,person.age);</span><br><span class="line">&#125;;</span><br></pre></td></tr></table></figure></li>
-<li><p>__weak: 不会产生强引用，指向的对象销毁时，会自动让指针至nil</p>
+  <figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">@interface Person : NSObject</span><br><span class="line"> @property (nonatomic, copy) void(^block)(void);</span><br><span class="line">@end</span><br></pre></td></tr></table></figure>
+  <figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">Person *person &#x3D; [Person alloc] init];</span><br><span class="line">person.age &#x3D; 10;</span><br><span class="line">person.block &#x3D; ^&#123;</span><br><span class="line">	NSLog(@&quot;age is %d&quot;,person.age);</span><br><span class="line">&#125;;</span><br></pre></td></tr></table></figure>
+<p>  原因是person.block捕获了person，person又持有着block，也就是block内部对person存在一个强引用，person对block也存在一个强引用，所以均无法释放。</p>
 </li>
-<li><p>__unsafe_unretain: 不会产生强引用，不安全，指向的对象销毁时，指针存储的地址值不变</p>
+<li><p>在定义person指针的时候添加<code>__weak</code>修饰符或者<code>__unsafe_unretain</code>修饰符，就可以让block在捕获person的时候弱引用person，这样子就不会造成循环引用了.</p>
+  <img src="https://z3.ax1x.com/2021/06/13/2I2lPU.png" alt="2I2lPU.png" border="0" width="50%" />
+> __weak: 不会产生强引用，指向的对象销毁时，会自动让指针至nil，不支持MRC
+ 
+> __unsafe_unretain: 不会产生强引用，不安全，指向的对象销毁时，指针存储的地址值不变，变成野指针，支持MRC</li>
+<li><p>在定义person指针的时候添加<code>__block</code>修饰符也可以解决循环引用问题，但前提是需要调用block并手动将person指针置为nil，如下</p>
+  <figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">__block Person *person &#x3D; [Person alloc] init];</span><br><span class="line">person.age &#x3D; 10;</span><br><span class="line">person.block &#x3D; ^&#123;</span><br><span class="line">	NSLog(@&quot;age is %d&quot;,person.age);</span><br><span class="line">       person &#x3D; nil;</span><br><span class="line">&#125;;</span><br><span class="line">   person.block();</span><br></pre></td></tr></table></figure>
+<p>  为什么这样子可以解决循环引用呢?首先先分析一下内存结构</p>
+<ul>
+<li>peron持有block</li>
+<li>block持有__block对象</li>
+<li>__block持有着person</li>
+<li>peron又持有着block</li>
+<li>…</li>
+</ul>
+<p>  所以这里是三个对象相互持有形成一个三角形关系</p>
+  <img src="https://z3.ax1x.com/2021/06/13/2IcLXn.png" alt="2IcLXn.png" border="0" width="30%"/>
+  
+  当block执行，person = nil，解除了`__block`变量对person的引用的时候，循环引用就不再存在了
+  
+  <img src="https://z3.ax1x.com/2021/06/13/2IgCp4.png" alt="2IgCp4.png" border="0" width="30%"/>
+
+<ul>
+<li>MRC环境下，由于**__block不会对变量造成强引用**，所以直接用__block修饰指针也可以达到以上效果</li>
+</ul>
 </li>
 </ul>
+<h3 id="为什么block做属性不能常weak而是用copy"><a href="#为什么block做属性不能常weak而是用copy" class="headerlink" title="为什么block做属性不能常weak而是用copy"></a>为什么block做属性不能常weak而是用copy</h3><p>如果上述例子使用weak修饰block的话，那么block会在栈中，block里面的person也会在栈中，所以离开了作用域的话，里面的person就会销毁，从而无法使用。</p>
+<p>如果你希望block做完事情就释放，比如发送一个通知，修改某个单例类的属性，没有引用外部局部变量，那么用weak就可以节约内存空间</p>
 ]]></content>
       <categories>
         <category>iOS</category>
