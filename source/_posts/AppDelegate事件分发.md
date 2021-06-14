@@ -1,4 +1,3 @@
----
 title: AppDelegate事件分发
 tags:
   - iOS
@@ -8,7 +7,6 @@ categories:
 abbrlink: 7e5c9fa9
 date: 2020-03-22 11:27:11
 ---
-
 ## 引言
 
 当App发展庞大的时候，势必会导致AppDelegate类的庞大，所以如何去优化AppDelegate成为组件化工作中的主要部分之一。
@@ -175,57 +173,78 @@ Contents of (__DATA,TestModes) section
 	
 ## 封装组件
 
-有了上面的指导思想，那么我们就可以封装组件了，具体内容见[LMComponentManager](https://git.linghit.io/ios_cocoapods/LMComponentManager)
+有了上面的指导思想，那么我们就可以封装组件了，具体内容见[ALComponentManager](https://github.com/Arc-lin/ALComponentManager)
 
 ### 使用方法
 
-1. 
+#### AppDelegate继承自ALAppDelegate
 
-	在AppDelegate做分发埋点，
+只需要在实现`UIApplicationDelegate`的方法内部调用super方法即可，如
+
+```
+- (BOOL)application:(UIApplication *)application didFinishLaunchingWithOptions:(NSDictionary *)launchOptions
+{
+    [super application:application didFinishLaunchingWithOptions:launchOptions];
+    
+    return YES;
+}
+
+- (void)applicationWillResignActive:(UIApplication *)application
+{
+    [super applicationWillResignActive:application];
+}
+
+```
+
+#### AppDelegate继承自UIResponder
+
+在AppDelegate的各个方法做分发埋点，触发到埋点后事件会分发到各个组件类里面
 	
-	如`- (BOOL)application:(UIApplication *)application didFinishLaunchingWithOptions:(NSDictionary *)launchOptions`
+如
+```
+- (BOOL)application:(UIApplication *)application didFinishLaunchingWithOptions:(NSDictionary *)launchOptions;
+```
+埋点如下
+```
+- (BOOL)application:(UIApplication *)application didFinishLaunchingWithOptions:(NSDictionary *)launchOptions
+  {
+      [[ALComponentManager sharedManager] triggerEvent:ALSetupEvent];
+      [[ALComponentManager sharedManager] triggerEvent:ALInitEvent];
+
+      dispatch_async(dispatch_get_main_queue(), ^{
+          [[ALComponentManager sharedManager] triggerEvent:ALSplashEvent];
+      });
+  #if __IPHONE_OS_VERSION_MAX_ALLOWED >= 100000
+      if ([UIDevice currentDevice].systemVersion.floatValue >= 10.0f) {
+          [UNUserNotificationCenter currentNotificationCenter].delegate = self;
+      }
+  #endif
+      return YES;
+  }
+  ```
 	
-	埋点如下
+其他埋点见组件Demo
 	
+#### 给每个组件创建组件管理类
+
+1. 给每个组件创建一个类并写上注解，如`ALComponentA.m`
+
 	```
-	- (BOOL)application:(UIApplication *)application didFinishLaunchingWithOptions:(NSDictionary *)launchOptions
-	{
-		[[LMComponentManager sharedManager] triggerEvent:LMSetupEvent];
-		[[LMComponentManager sharedManager] triggerEvent:LMInitEvent];
-
-		dispatch_async(dispatch_get_main_queue(), ^{
-			[[LMComponentManager sharedManager] triggerEvent:LMSplashEvent];
-		});
-	#if __IPHONE_OS_VERSION_MAX_ALLOWED >= 100000
-		if ([UIDevice currentDevice].systemVersion.floatValue >= 10.0f) {
-			[UNUserNotificationCenter currentNotificationCenter].delegate = self;
-		}
-	#endif
-		return YES;
-	}
-
-	```
-	
-	其他埋点见组件Demo
-	
-2. 给每个组件创建一个类并写上注解，如`LMComponentA.m`
-
-	```
-	@LMMod(LMComponentA);
-	@interface LMComponentA()<LMComponentProtocol>
+	@ALMod(ALComponentA);
+	@interface ALComponentA()<ALComponentProtocol>
 
 	@end
 
-	@implementation LMComponentA
+	@implementation ALComponentA
 
 	@end
 	```
 	
-3. 实现协议`LMComponentProtocol`和需要的协议方法。
+2. 实现协议`ALComponentProtocol`和需要的协议方法。
 	这个协议里面蕴含了基本所有的`AppDelegate`方法，当然要触发这些方法都是要预先在AppDelegate写上埋点。
 	
 	```
-	@implementation LMComponentA
+	@implementation ALComponentA
 
 	+ (void)load
 	{
@@ -240,7 +259,7 @@ Contents of (__DATA,TestModes) section
 		return self;
 	}
 
-	- (void)modSetUp:(LMContext *)context
+	- (void)modSetUp:(ALContext *)context
 	{
 		NSLog(@"ComponentA setup");
 	}
@@ -248,7 +267,7 @@ Contents of (__DATA,TestModes) section
 	@end
 	```
 	
-4. 接下来你就可以尝试使用了。
+3. 接下来你就可以尝试使用了。
 
 ## 疑问
 
@@ -256,6 +275,6 @@ Contents of (__DATA,TestModes) section
 
 还能怎么办，已经违背了组件隔离的原则，就只能按原来的方法处理了。
 
-## 结束
+## 参考
 
-参考思想：[BeeHive](https://github.com/alibaba/BeeHive)
+[BeeHive](https://github.com/alibaba/BeeHive)

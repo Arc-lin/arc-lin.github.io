@@ -488,14 +488,14 @@ static void __main_block_func_0(struct __main_block_impl_0 *__cself) {
 4. `__Block_byref_person_0`在`__main_block_impl_0`内必定是强引用，跟我们上面所说的不一样，就算在`__block`之前再添加`__weak`修饰，`__Block_byref_person_0`在`__main_block_impl_0`内依旧是强引用，加上`__weak`修饰受影响的只有`__Block_byref_person_0`内的person指针的引用方式
 
 > 注意：MRC环境下，__block 不会对变量造成强引用，即以下情况person会提前释放
-
-```
-__block Person *person = [Person new];
-void(^block)(void) = ^{
-    NSLog(@"%@",person);
-};
-block(); /// 这时候person已经释放了
-```
+  
+  ```
+  __block Person *person = [Person new];
+  void(^block)(void) = ^{
+      NSLog(@"%@",person);
+  };
+  block(); /// 这时候person已经释放了
+  ```
 
 > 注意：__block只能用于修饰auto变量，不能修饰全局变量和静态（static）变量
 
@@ -521,7 +521,9 @@ block(); /// 这时候person已经释放了
     原因是person.block捕获了person，person又持有着block，也就是block内部对person存在一个强引用，person对block也存在一个强引用，所以均无法释放。
     
 - 在定义person指针的时候添加`__weak`修饰符或者`__unsafe_unretain`修饰符，就可以让block在捕获person的时候弱引用person，这样子就不会造成循环引用了.
+
 	<img src="https://z3.ax1x.com/2021/06/13/2I2lPU.png" alt="2I2lPU.png" border="0" width="50%" />
+    
   > __weak: 不会产生强引用，指向的对象销毁时，会自动让指针至nil，不支持MRC
    
   > __unsafe_unretain: 不会产生强引用，不安全，指向的对象销毁时，指针存储的地址值不变，变成野指针，支持MRC
@@ -553,7 +555,7 @@ block(); /// 这时候person已经释放了
 
 	- MRC环境下，由于**__block不会对变量造成强引用**，所以直接用__block修饰指针也可以达到以上效果
 
-### 为什么block做属性不能常weak而是用copy
+### 为什么block做属性不常用weak而是用copy
 
 如果上述例子使用weak修饰block的话，那么block会在栈中，block里面的person也会在栈中，所以离开了作用域的话，里面的person就会销毁，从而无法使用。
 
