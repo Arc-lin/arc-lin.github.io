@@ -20,23 +20,23 @@
     var CONFIG = {"hostname":"www.arclin.cn","root":"/","scheme":"Muse","version":"7.8.0","exturl":false,"sidebar":{"position":"left","display":"post","padding":18,"offset":12,"onmobile":false},"copycode":{"enable":false,"show_result":false,"style":null},"back2top":{"enable":true,"sidebar":false,"scrollpercent":false},"bookmark":{"enable":false,"color":"#222","save":"auto"},"fancybox":false,"mediumzoom":false,"lazyload":false,"pangu":false,"comments":{"style":"tabs","active":null,"storage":true,"lazyload":false,"nav":null},"algolia":{"appID":"VOFC7668C9","apiKey":"24c644edc8e7353bf2e8d8e31f03a940","indexName":"hexo","hits":{"per_page":10},"labels":{"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}},"localsearch":{"enable":true,"trigger":"auto","top_n_per_article":1,"unescape":false,"preload":false},"motion":{"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},"path":"search.xml"};
   </script>
 
-  <meta name="description" content="一行命令即可将包含 cocoapods 的iOS 项目编译打包并上传到 fir">
+  <meta name="description" content="本文讲述isa指针在runtime内部的底层实现和isa的优化方式">
 <meta property="og:type" content="article">
-<meta property="og:title" content="一句ipack命令解决iOS编译打包上传fir流程">
-<meta property="og:url" content="https://www.arclin.cn/post/4edc914d.html">
+<meta property="og:title" content="iOS 底层原理 --- isa指针">
+<meta property="og:url" content="https://www.arclin.cn/post/78ececc4.html">
 <meta property="og:site_name" content="Arclin">
-<meta property="og:description" content="一行命令即可将包含 cocoapods 的iOS 项目编译打包并上传到 fir">
+<meta property="og:description" content="本文讲述isa指针在runtime内部的底层实现和isa的优化方式">
 <meta property="og:locale">
-<meta property="og:image" content="https://www.arclin.cn/images/pasted-0.png">
-<meta property="article:published_time" content="2017-02-13T16:00:00.000Z">
-<meta property="article:modified_time" content="2021-06-06T18:52:24.969Z">
+<meta property="og:image" content="https://z3.ax1x.com/2021/06/15/2qoart.png">
+<meta property="article:published_time" content="2021-06-14T07:26:00.000Z">
+<meta property="article:modified_time" content="2021-06-15T15:52:05.333Z">
 <meta property="article:author" content="Arclin">
-<meta property="article:tag" content="Fir">
-<meta property="article:tag" content="shell">
+<meta property="article:tag" content="iOS">
+<meta property="article:tag" content="底层原理">
 <meta name="twitter:card" content="summary">
-<meta name="twitter:image" content="https://www.arclin.cn/images/pasted-0.png">
+<meta name="twitter:image" content="https://z3.ax1x.com/2021/06/15/2qoart.png">
 
-<link rel="canonical" href="https://www.arclin.cn/post/4edc914d.html">
+<link rel="canonical" href="https://www.arclin.cn/post/78ececc4.html">
 
 
 <script id="page-configurations">
@@ -49,7 +49,7 @@
   };
 </script>
 
-  <title>一句ipack命令解决iOS编译打包上传fir流程 | Arclin</title>
+  <title>iOS 底层原理 --- isa指针 | Arclin</title>
   
 
 
@@ -199,7 +199,7 @@
   
   
   <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="zh-Hans">
-    <link itemprop="mainEntityOfPage" href="https://www.arclin.cn/post/4edc914d.html">
+    <link itemprop="mainEntityOfPage" href="https://www.arclin.cn/post/78ececc4.html">
 
     <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
       <meta itemprop="image" content="https://avatars.githubusercontent.com/u/12107804?v=4">
@@ -212,7 +212,7 @@
     </span>
       <header class="post-header">
         <h1 class="post-title" itemprop="name headline">
-          一句ipack命令解决iOS编译打包上传fir流程
+          iOS 底层原理 --- isa指针
         </h1>
 
         <div class="post-meta">
@@ -222,7 +222,7 @@
               </span>
               <span class="post-meta-item-text">Posted on</span>
 
-              <time title="Created: 2017-02-14 00:00:00" itemprop="dateCreated datePublished" datetime="2017-02-14T00:00:00+08:00">2017-02-14</time>
+              <time title="Created: 2021-06-14 15:26:00" itemprop="dateCreated datePublished" datetime="2021-06-14T15:26:00+08:00">2021-06-14</time>
             </span>
             <span class="post-meta-item">
               <span class="post-meta-item-icon">
@@ -252,61 +252,140 @@
     <div class="post-body" itemprop="articleBody">
 
       
-        <p>一行命令即可将包含 cocoapods 的iOS 项目编译打包并上传到 fir</p>
+        <p>本文讲述isa指针在runtime内部的底层实现和isa的优化方式</p>
 <span id="more"></span>
 
-<h3 id="准备工具"><a href="#准备工具" class="headerlink" title="准备工具"></a>准备工具</h3><ul>
-<li>fir-cli</li>
-<li>Cocopods</li>
+<h2 id="isa指针的底层实现"><a href="#isa指针的底层实现" class="headerlink" title="isa指针的底层实现"></a>isa指针的底层实现</h2><ul>
+<li><p>在arm64架构出现之前，isa就是一个普通的指针(<code>Class isa</code>)，存储着Class,Meta-Class对象的内存地址</p>
+</li>
+<li><p>从arm64架构开始，对isa进行了优化，变成了一个共用体，还使用位域来存储更多的信息</p>
+</li>
+<li><p>isa指针的结构如下（objc4-818.2）</p>
+</li>
 </ul>
-<h3 id="功能"><a href="#功能" class="headerlink" title="功能"></a>功能</h3><p>进入任意一个有.xcodeworksapce文件的目录下，输入ipack（可以自定义）即可完成编译打包上传，加上-c 更新说明<br>参数就可以填写本次打包的更新说明，这个说明会在 fir 上面显示出来</p>
-<h3 id="编写shell脚本"><a href="#编写shell脚本" class="headerlink" title="编写shell脚本"></a>编写shell脚本</h3><p>sh代码说明</p>
-<p>变量定义</p>
-<p><code>basepath=$(pwd)</code>  命令行代码执行位置<br><code>bName=$(basename $&#123;basepath&#125;)</code>  拿到项目文件夹名字<br><code>description=$(basename $&#123;basepath&#125;)</code> 要写在 fir 的更新说明<br><code>achivepath=$&#123;basepath&#125;&#39;/build/&#39;$&#123;bName&#125;&#39;.xcarchive&#39;</code> 构建文件的储存位置</p>
-<p><code>ipaPath=$&#123;basepath&#125;&#39;/&#39;$&#123;bName&#125;&#39;.ipa&#39;</code> ipa 的储存位置</p>
-<p>拿到参数</p>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line">while getopts &quot;:c:&quot; opt; do&#96; # 遍历参数 虽然现在只有一个，不过为了拓展还是可以加上去</span><br><span class="line">case $opt in</span><br><span class="line">    c ) description&#x3D;&quot;$OPTARG&quot;;;   # 如果参数是c 的话就把内容赋值给description</span><br><span class="line">    ? ) echo &quot;参数选项不正确，应该是 -c &lt;发布内容&gt;&quot;</span><br><span class="line">        exit 1;;</span><br><span class="line">    esca</span><br><span class="line">done</span><br></pre></td></tr></table></figure>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br></pre></td><td class="code"><pre><span class="line">union isa_t &#123;</span><br><span class="line">    isa_t() &#123; &#125;</span><br><span class="line">    isa_t(uintptr_t value) : bits(value) &#123; &#125;</span><br><span class="line">    uintptr_t bits;</span><br><span class="line"></span><br><span class="line">private:</span><br><span class="line">    Class cls;</span><br><span class="line"></span><br><span class="line">public:</span><br><span class="line">    struct &#123;</span><br><span class="line">        uintptr_t nonpointer        : 1; </span><br><span class="line">        uintptr_t has_assoc         : 1;</span><br><span class="line">        uintptr_t has_cxx_dtor      : 1;</span><br><span class="line">        uintptr_t shiftcls          : 33;</span><br><span class="line">        uintptr_t magic             : 6;</span><br><span class="line">        uintptr_t weakly_referenced : 1;</span><br><span class="line">        uintptr_t unused            : 1;</span><br><span class="line">        uintptr_t has_sidetable_rc  : 1;</span><br><span class="line">        uintptr_t extra_rc          : 19</span><br><span class="line">    &#125;;</span><br><span class="line"></span><br><span class="line">    bool isDeallocating() &#123;</span><br><span class="line">        return extra_rc &#x3D;&#x3D; 0 &amp;&amp; has_sidetable_rc &#x3D;&#x3D; 0;</span><br><span class="line">    &#125;</span><br><span class="line">    void setDeallocating() &#123;</span><br><span class="line">        extra_rc &#x3D; 0;</span><br><span class="line">        has_sidetable_rc &#x3D; 0;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    void setClass(Class cls, objc_object *obj);</span><br><span class="line">    Class getClass(bool authenticated);</span><br><span class="line">    Class getDecodedClass(bool authenticated);</span><br><span class="line">&#125;;</span><br><span class="line"></span><br></pre></td></tr></table></figure>
 
-<p>判断命令是不是执行在有<code>.xcodeworksapce</code>文件的目录下</p>
-<p><code>$(ls *.xcwork* &gt;/dev/null 2&gt;&amp;1)</code></p>
-<p>清除缓存</p>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">&#x2F;usr&#x2F;bin&#x2F;xcodebuild -target　$&#123;bName&#125; clean</span><br></pre></td></tr></table></figure>
+<p>首先，共用体同结构体一样，是拥有成员变量的，但是不同的点在于所有成员变量共用一块内存，也就是说当一个成员变量有值时，其他成员变量都成了装饰。</p>
+<p>在runtime中，我们只需要用到<code>uintptr_t bits</code>，<code>uintptr_t</code>是<code>unsigned long</code>的别名，在64位系统下占用8个字节，共64位</p>
+<p>共用体内的<code>struct &#123; ... &#125;</code> 是为了增加可读性而添加的，它描述了<code>bits</code>里面存放了什么信息，我们一个个说明一下</p>
+<blockquote>
+<p>补充说明： 结构体内的冒号后面的数字表示这个成员所占的位数，举个例子，本来<code>char name</code>作为一个成员变量，是会占用一个字节，也就是8个二进制位，如果有3个这样子的成员变量，那么这个结构体就会占用3个字节，如果我们在这个成员变量的后面添加了一个数字，去限制这个成员变量所占的位数，比如<code>char name : 1</code>，那么三个这样子的成员变量就一共占用3个二进制位，也就是不到一个字节，因为系统分配内存的最小单位为1个字节，所以这个结构体就占用1个字节，这么做我们就可以节约2个字节了，这种技术叫做<strong>位域</strong>。</p>
+</blockquote>
+<ul>
+<li>nonpointer<ul>
+<li>0代表普通的指针，存储着Class、Meta-Class对象的内存地址</li>
+<li>1代表优化过，使用位域存储着更多的信息</li>
+</ul>
+</li>
+<li>has_assoc<ul>
+<li>是否有设置过关联对象（注意是“设置过”，就算以后关联对象移除了，它还会是true），如果没有，会释放得更快</li>
+</ul>
+</li>
+<li>has_cxx_dtor<ul>
+<li>是否有C++的析构函数（.cxx_destruct），如果没有，会释放得更快</li>
+</ul>
+</li>
+</ul>
+<p>上面两个<code>会释放得更快</code>的原因是，在对象销毁的时候，会调用runtime里面的这个方法</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br></pre></td><td class="code"><pre><span class="line">void *objc_destructInstance(id obj) </span><br><span class="line">&#123;</span><br><span class="line">    if (obj) &#123;</span><br><span class="line">        &#x2F;&#x2F; Read all of the flags at once for performance.</span><br><span class="line">        bool cxx &#x3D; obj-&gt;hasCxxDtor();</span><br><span class="line">        bool assoc &#x3D; obj-&gt;hasAssociatedObjects();</span><br><span class="line"></span><br><span class="line">        &#x2F;&#x2F; This order is important.</span><br><span class="line">        if (cxx) object_cxxDestruct(obj);</span><br><span class="line">        if (assoc) _object_remove_assocations(obj, &#x2F;*deallocating*&#x2F;true);</span><br><span class="line">        obj-&gt;clearDeallocating();</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    return obj;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
 
-<p>编译</p>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">&#x2F;usr&#x2F;bin&#x2F;xcodebuild -exportArchive -exportFormat ipa -archivePath $&#123;achivepath&#125; -exportPath $&#123;ipaPath&#125;</span><br></pre></td></tr></table></figure>
+<p>可以看到如果<code>has_assoc</code>或者<code>has_cxx_dtor</code>的话，就不会进入判断为true的逻辑，函数会运行得更快</p>
+<ul>
+<li>shiftcls<ul>
+<li>存储着Class、Meta-Class对象的内存信息</li>
+</ul>
+</li>
+<li>magic<ul>
+<li>用于在调试时分辨对象是否未完成初始化</li>
+</ul>
+</li>
+<li>weakly_referenced<ul>
+<li>是否有被弱引用指向过（同样注意“指向过”，有过即为true），如果没有，释放时会更快</li>
+</ul>
+</li>
+</ul>
+<p>“会释放得更快”是因为对象销毁时调用了如下runtime源码</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br></pre></td><td class="code"><pre><span class="line">NEVER_INLINE void</span><br><span class="line">objc_object::clearDeallocating_slow()</span><br><span class="line">&#123;</span><br><span class="line">    ASSERT(isa.nonpointer  &amp;&amp;  (isa.weakly_referenced || isa.has_sidetable_rc));</span><br><span class="line"></span><br><span class="line">    SideTable&amp; table &#x3D; SideTables()[this];</span><br><span class="line">    table.lock();</span><br><span class="line">    if (isa.weakly_referenced) &#123;</span><br><span class="line">        weak_clear_no_lock(&amp;table.weak_table, (id)this);</span><br><span class="line">    &#125;</span><br><span class="line">    if (isa.has_sidetable_rc) &#123;</span><br><span class="line">        table.refcnts.erase(this);</span><br><span class="line">    &#125;</span><br><span class="line">    table.unlock();</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
 
-<p>判断编译成功了吗</p>
-<p><code>if [ ! -d $&#123;achivepath&#125; ];</code></p>
-<p>打包</p>
-<p>/usr/bin/xcodebuild -exportArchive -exportFormat ipa -archivePath ${achivepath} -exportPath ${ipaPath}</p>
-<p>判断打包成功了吗</p>
-<p><code>if [ ! -f $&#123;ipaPath&#125; ];</code></p>
-<p>上传到 fir</p>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">fir publish $&#123;bName&#125;.ipa --token &lt;你的 Fir Token&gt; -c $&#123;description&#125;</span><br></pre></td></tr></table></figure>
+<ul>
+<li>deallocating<ul>
+<li>对象是否正在释放</li>
+</ul>
+</li>
+<li>extra_rc <ul>
+<li>里面存储的值是引用计数器减1后的值</li>
+</ul>
+</li>
+<li>has_sitdtable_rc<ul>
+<li>引用计数器是否过大无法存储在isa中</li>
+<li>如果为1，那么引用计数器会存储在一个叫做SideTable的类的属性中</li>
+</ul>
+</li>
+</ul>
+<h2 id="如何从isa指针中取出对应的信息"><a href="#如何从isa指针中取出对应的信息" class="headerlink" title="如何从isa指针中取出对应的信息"></a>如何从isa指针中取出对应的信息</h2><p>isa是通过位运算来取出和存入信息的。</p>
+<ul>
+<li>我们以取出<code>shiftcls</code>内的类信息为例</li>
+</ul>
+<p>首先isa里面的bits存储着64个二进制位，然后其中<code>shiftcls</code>是使用了33个（从上面的共用体里面的位域看出），当系统需要取出对应信息的时候，就使用<code>ISA_MASK</code>（ISA掩码）跟bits做一次与运算，举个例子，bits的十六进制地址为<code>0x011d8001000083a5</code></p>
+<blockquote>
+<p>补充： ISA_MASK在arm64下的值为<code>0x0000000ffffffff8ULL</code>，下面我们把他转成二进制</p>
+</blockquote>
+<table>
+<thead>
+<tr>
+<th></th>
+<th>8</th>
+<th>16</th>
+<th>24</th>
+<th>32</th>
+<th>40</th>
+<th>48</th>
+<th>56</th>
+<th>64</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>bits<br>(0x011d8001000083a5)</td>
+<td>1010 0101</td>
+<td>1100 0001</td>
+<td>0000 0000</td>
+<td>0000 0000</td>
+<td>1000 0000</td>
+<td>0000 0001</td>
+<td>1011 1000</td>
+<td>1000 0000</td>
+</tr>
+<tr>
+<td>ISA_MASK<br>(0x0000000ffffffff8)</td>
+<td>0001 1111</td>
+<td>1111 1111</td>
+<td>1111 1111</td>
+<td>1111 1111</td>
+<td>1111 0000</td>
+<td>0000 0000</td>
+<td>0000 0000</td>
+<td>0000 0000</td>
+</tr>
+<tr>
+<td>与运算后的结果<br>(0x00000001000083a0)</td>
+<td>0000 0101</td>
+<td>1100 0001</td>
+<td>0000 0000</td>
+<td>0000 0000</td>
+<td>1000 0000</td>
+<td>0000 0000</td>
+<td>0000 0000</td>
+<td>0000 0000</td>
+</tr>
+</tbody></table>
+<p>我们可以来验证一下</p>
+<img src="https://z3.ax1x.com/2021/06/15/2qoart.png" width="80%">
 
-<p>firToken 的位置</p>
-<p><img src="/images/pasted-0.png"></p>
-<p>清理编译打包的文件</p>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">rm -rf $&#123;ipaPath&#125; $&#123;achivepath&#125;</span><br></pre></td></tr></table></figure>
 
-<p>完事</p>
-<p>执行<br>如果你把 sh文件放在桌面的话，一般来说现在去到有.xcodeworksapce文件的目录下，执行</p>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">~&#x2F;Desktop&#x2F;iosPackage.sh</span><br></pre></td></tr></table></figure>
-
-<p>就可以了，加个参数就是</p>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">~&#x2F;Desktop&#x2F;iosPackage.sh -c &quot;测试测试&quot;&#96;</span><br></pre></td></tr></table></figure>
-
-<p>但是<code>~/Desktop/iosPackage.sh</code>太长了，所以得给他加个别名</p>
-<p>所以执行</p>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">cd ~</span><br><span class="line">touch .bash_profile</span><br></pre></td></tr></table></figure>
-
-<p>创建一个<code>.bash_profile</code>文件</p>
-<p>然后在里面填写 <code>alias ipack=&#39;~/Desktop/iosPackage.sh&#39;</code><br>这个<code>ipack</code>你想写啥就啥</p>
-<p>然后保存之后执行</p>
-<p><code>source ./bash_profile</code></p>
-<p>之后就可以直接用 ipack 代替 <code>~/Desktop/iosPackage.sh</code></p>
-<p><code>ipack ipack -c &quot;测试测试&quot;</code></p>
-<p>END</p>
+<p>可以看到 isa一开始的值跟<code>[person class]</code>的值是不相同的，跟<code>ISA_MASK</code>进行一次与运算之后就相同了，所以可以看出实例对象的isa不是直接指向类对象的，是需要进行一次运算取出来的。</p>
+<ul>
+<li>其他的信息如<code>nonpointer</code>等，取出的方式也类似这样，这么做的好处是充分利用了64个二进制位的内存，而不用像以前一样一个属性就占用了多个字节，造成二进制位的浪费。</li>
+</ul>
 
     </div>
 
@@ -316,8 +395,8 @@
 
       <footer class="post-footer">
           <div class="post-tags">
-              <a href="/tags/Fir/" rel="tag"># Fir</a>
-              <a href="/tags/shell/" rel="tag"># shell</a>
+              <a href="/tags/iOS/" rel="tag"># iOS</a>
+              <a href="/tags/%E5%BA%95%E5%B1%82%E5%8E%9F%E7%90%86/" rel="tag"># 底层原理</a>
           </div>
 
         
@@ -326,13 +405,10 @@
         
     <div class="post-nav">
       <div class="post-nav-item">
-    <a href="/post/13ecfb47.html" rel="prev" title="Jenkins+Git+Cocoapods+Fir.im实现iOS应用持续集成">
-      <i class="fa fa-chevron-left"></i> Jenkins+Git+Cocoapods+Fir.im实现iOS应用持续集成
+    <a href="/post/8275b854.html" rel="prev" title="iOS 底层原理 --- Block、__block及其底层实现">
+      <i class="fa fa-chevron-left"></i> iOS 底层原理 --- Block、__block及其底层实现
     </a></div>
-      <div class="post-nav-item">
-    <a href="/post/8c9c88ab.html" rel="next" title="iOS从服务器下载DAE文件并动态加载到SCNScene">
-      iOS从服务器下载DAE文件并动态加载到SCNScene <i class="fa fa-chevron-right"></i>
-    </a></div>
+      <div class="post-nav-item"></div>
     </div>
       </footer>
     
@@ -392,7 +468,7 @@
 
       <!--noindex-->
       <div class="post-toc-wrap sidebar-panel">
-          <div class="post-toc motion-element"><ol class="nav"><li class="nav-item nav-level-3"><a class="nav-link" href="#%E5%87%86%E5%A4%87%E5%B7%A5%E5%85%B7"><span class="nav-number">1.</span> <span class="nav-text">准备工具</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E5%8A%9F%E8%83%BD"><span class="nav-number">2.</span> <span class="nav-text">功能</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E7%BC%96%E5%86%99shell%E8%84%9A%E6%9C%AC"><span class="nav-number">3.</span> <span class="nav-text">编写shell脚本</span></a></li></ol></div>
+          <div class="post-toc motion-element"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#isa%E6%8C%87%E9%92%88%E7%9A%84%E5%BA%95%E5%B1%82%E5%AE%9E%E7%8E%B0"><span class="nav-number">1.</span> <span class="nav-text">isa指针的底层实现</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E5%A6%82%E4%BD%95%E4%BB%8Eisa%E6%8C%87%E9%92%88%E4%B8%AD%E5%8F%96%E5%87%BA%E5%AF%B9%E5%BA%94%E7%9A%84%E4%BF%A1%E6%81%AF"><span class="nav-number">2.</span> <span class="nav-text">如何从isa指针中取出对应的信息</span></a></li></ol></div>
       </div>
       <!--/noindex-->
 
@@ -576,7 +652,7 @@ NexT.utils.loadComments(document.querySelector('#gitalk-container'), () => {
       repo        : 'arc-lin.github.io',
       owner       : 'Arc-lin',
       admin       : ['Arc-lin'],
-      id          : '6a917726d948aaedf01b14f113070c12',
+      id          : 'a09d6e867184acab87c1eccbc97e5668',
         language: 'zh-CN',
       distractionFreeMode: false
     });
