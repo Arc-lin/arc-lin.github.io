@@ -18,7 +18,7 @@ date: 2021-06-29 01:11:00
 
 ```
 struct objc_class {
-	Class isa;
+    Class isa;
     Class superclass;
     cache_t cache; // 方法缓存
     class_data_bits_t bits; // 用于获取具体的类信息
@@ -29,7 +29,7 @@ struct objc_class {
 
 ```
 struct class_rw_t {
-	uint32_t flags;
+    uint32_t flags;
     uint32_t version;
     const clsss_ro_t *ro;
     method_array_t * methods; // 方法列表
@@ -45,13 +45,13 @@ struct class_rw_t {
 
 ```
 struct class_ro_t {
-	uint32_t flags;
+    uint32_t flags;
     unit32_t instanceStart;
     uint32_t instanceSize; // instance对象占用的内存空间
 #ifdef __LP__64__
 	uint32_t reserved;
 #endif
-	const uint8_t *ivarLayout;
+    const uint8_t *ivarLayout;
     const char * name; // 类名
     method_list_t * baseMethodList;
     protocol_list_t * baseProtocols;
@@ -68,7 +68,7 @@ struct class_ro_t {
 
 ```
 method_array_t: [
-	method_list_t : [
+    method_list_t : [
       method_t,
       method_t,
       method_t
@@ -86,7 +86,7 @@ method_array_t: [
 ```
 static Class realizeClassWithoutSwift(Class cls, Class previously)
 {
-		...
+	...
 	auto ro = (const class_ro_t *)cls->data();
     auto isMeta = ro->flags & RO_META;
     if (ro->flags & RO_FUTURE) {
@@ -139,7 +139,7 @@ if (mlist) {
 
 ```
 struct method_t {
-	SEL name; // 函数名
+    SEL name; // 函数名
     const char; // 编码（返回值类型、参数类型）
     IMP imp; // 指向函数的指针（函数地址）
 }
@@ -167,18 +167,19 @@ struct method_t {
 
 ```
 struct cache_t {
-	explicit_atomic<uintptr_t> _bucketsAndMaybeMask;
+    explicit_atomic<uintptr_t> _bucketsAndMaybeMask;
     union {
         struct {
             explicit_atomic<mask_t>    _maybeMask; // 散列表的长度 - 1
             uint16_t                   _flags;
             uint16_t                   _occupied; // 已经缓存的方法数量
         };
-        explicit_atomic<preopt_cache_t *> _originalPreoptCache;    
-	    struct bucket_t *buckets() const;
-        mask_t mask() const;
-        mask_t occupied() const;
-    };
+        explicit_atomic<preopt_cache_t *> _originalPreoptCache;
+    };   
+    struct bucket_t *buckets() const;
+    mask_t mask() const;
+    mask_t occupied() const;
+};
 ```
 
 其中，通过`buckets()`函数我们可以得知`_bucketsAndMaybeMask`是一个存放`bucket_t`数组的指针（即`_bucketsAndMaybeMask`指针指向的是数组的第一个元素），是通过位运算取出来的
@@ -319,14 +320,13 @@ void cache_t::insert(SEL sel, IMP imp, id receiver)
 - 如果通过计算后的下标值，插入列表的时候发现已经有东西了那怎么办？
 
 	这也就是所谓的Hash冲突。为了处理这种问题，系统会调用`cache_next`函数
-    
-    ```
-    static inline mask_t cache_next(mask_t i, mask_t mask) {
-    	return i ? i-1 : mask;
+	    
+	```
+ static inline mask_t cache_next(mask_t i, mask_t mask) {
+		return i ? i-1 : mask;
 	}
-    ```
+	```
 
 	也就是说如果`@selector(personTest) & mask = 4`的4已经有东西了，那么就取 4 - 1 = 3，如果3还有东西，就放在2的位置，如果2还有，就放在1，以此类推，如果直到0都还没有可以插入的位置，那么就从mask的位置开始找，也就是9，然后再找9看看是否可以插入，插不进去再找8，以此类推，找到为止。
     
     由于列表在存放数量达到容量的87.5%的时候就会两倍的扩容（arm64），扩容后又会清空缓存，所以一定能找到合适的位置插入的。
-
