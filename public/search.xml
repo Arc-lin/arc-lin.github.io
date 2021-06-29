@@ -5308,4 +5308,61 @@
         <tag>底层原理</tag>
       </tags>
   </entry>
+  <entry>
+    <title>iOS 底层原理 --- 方法缓存、消息发送与super关键字</title>
+    <url>/post/5ed61a9.html</url>
+    <content><![CDATA[<p>本文主要简述类（元类）对象里面的方法缓存、消息发送（包括消息发送，动态方法解析与消息转发）与super关键字的底层原理</p>
+<span id="more"></span>
+
+<h2 id="方法"><a href="#方法" class="headerlink" title="方法"></a>方法</h2><h3 id="Class对象的结构"><a href="#Class对象的结构" class="headerlink" title="Class对象的结构"></a>Class对象的结构</h3><figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">struct objc_class &#123;</span><br><span class="line">	Class isa;</span><br><span class="line">    Class superclass;</span><br><span class="line">    cache_t cache; &#x2F;&#x2F; 方法缓存</span><br><span class="line">    class_data_bits_t bits; &#x2F;&#x2F; 用于获取具体的类信息</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>其中<code>bits</code>成员变量与<code>FAST_DATA_MASK</code>进行一次与运算之后，会获得一个其属性可读可写的对象的地址，这个对象长这样</p>
+<figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">struct class_rw_t &#123;</span><br><span class="line">	uint32_t flags;</span><br><span class="line">    uint32_t version;</span><br><span class="line">    const clsss_ro_t *ro;</span><br><span class="line">    method_array_t * methods; &#x2F;&#x2F; 方法列表</span><br><span class="line">    property_array_t *properties; &#x2F;&#x2F; 属性列表</span><br><span class="line">    protocol_array_t protocols; &#x2F;&#x2F; 协议列表</span><br><span class="line">    Class firstSubclass;</span><br><span class="line">    Class nextSiblingClass;</span><br><span class="line">    char *demangledName;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>其中 <code>class_ro_t</code>里面存放的是类的原始信息(不包括分类里面的东西)，是仅可读的，结构如下</p>
+<figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">struct class_ro_t &#123;</span><br><span class="line">	uint32_t flags;</span><br><span class="line">    unit32_t instanceStart;</span><br><span class="line">    uint32_t instanceSize; &#x2F;&#x2F; instance对象占用的内存空间</span><br><span class="line">#ifdef __LP__64__</span><br><span class="line">	uint32_t reserved;</span><br><span class="line">#endif</span><br><span class="line">	const uint8_t *ivarLayout;</span><br><span class="line">    const char * name; &#x2F;&#x2F; 类名</span><br><span class="line">    method_list_t * baseMethodList;</span><br><span class="line">    protocol_list_t * baseProtocols;</span><br><span class="line">    const ivar_list_t * ivars; &#x2F;&#x2F; 成员变量列表</span><br><span class="line">    const uint8_t * weakIverLayout;</span><br><span class="line">    property_list_t * baseProperties;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+
+<h3 id="class-rw-t"><a href="#class-rw-t" class="headerlink" title="class_rw_t"></a>class_rw_t</h3><p><code>class_rw_t</code>里面的methods、properties、protocols是二维数组，是可读可写的，比如方法列表随时可以新增<code>method_list_t</code>类型的数据进去。<code>class_rw_t</code>包含了类的初始内容和分类的内容，其中方法列表类似如下结构</p>
+<figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">method_array_t: [</span><br><span class="line">	method_list_t : [</span><br><span class="line">      method_t,</span><br><span class="line">      method_t,</span><br><span class="line">      method_t</span><br><span class="line">    ],</span><br><span class="line">    method_list_t : [</span><br><span class="line">      method_t,</span><br><span class="line">      method_t,</span><br><span class="line">      method_t</span><br><span class="line">    ],</span><br><span class="line">]</span><br></pre></td></tr></table></figure>
+
+<p><code>objc_class</code>内有一个<code>data()</code>函数，其返回值一开始是指向<code>class_ro_t</code>类型的对象的。在合并分类内的内容时，才会产生<code>class_rw_t</code>类型的对象，并指向这个对象。可以参考runtime源码，<code>objc-runtime-new.mm</code>中<code>realizeClassWithoutSwift</code>函数的实现</p>
+<h3 id="class-ro-t"><a href="#class-ro-t" class="headerlink" title="class_ro_t"></a>class_ro_t</h3><p><code>class_ro_t</code>里面的baseMethodList、baseProtocols、ivars、baseProperties是一维数组，是只读的，所以不能新增内容，包含了类的初始内容，其中方法列表类似如下结构</p>
+<figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">method_list_t : [</span><br><span class="line">  method_t,</span><br><span class="line">  method_t,</span><br><span class="line">  method_t</span><br><span class="line">]</span><br></pre></td></tr></table></figure>
+
+<blockquote>
+<p>在runtime源码，<code>objc-runtime-new.mm</code>中的<code>attachCategories</code>方法中我们可以看到分类合并到<code>class_rw_t</code>对象的过程</p>
+</blockquote>
+<h3 id="method-t"><a href="#method-t" class="headerlink" title="method_t"></a>method_t</h3><ul>
+<li><code>method_t</code>是对方法/函数的封装</li>
+</ul>
+<figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">struct method_t &#123;</span><br><span class="line">	SEL name; &#x2F;&#x2F; 函数名</span><br><span class="line">    const char; &#x2F;&#x2F; 编码（返回值类型、参数类型）</span><br><span class="line">    IMP imp; &#x2F;&#x2F; 指向函数的指针（函数地址）</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<ul>
+<li><p><code>IMP</code>代表具体函数的实现</p>
+<p>  <code>typedef id _Nullable (*IMP)(id _Nonnull, SEL _Nonnull, ...);</code></p>
+</li>
+<li><p><code>SEL</code>可以代表方法\函数名，一般叫做选择器，底层结构跟<code>char *</code>类似</p>
+<p>  <code>typedef struct objc_selector *SEL</code>;</p>
+<ul>
+<li>可以通过<code>@selector()</code>和<code>sel_registerName()</code>获得</li>
+<li>可以通过<code>sel_getName()</code>和<code>NSStringFromSelector()</code>转成字符串</li>
+<li>不同类中相同名字的方法，所对应的方法选择器是相同的</li>
+</ul>
+</li>
+<li><p><code>types</code>包含了函数返回值、参数编码的字符串，称作<code>Type Encodings</code>，具体可以参考<a href="https://developer.apple.com/library/archive/documentation/Cocoa/Conceptual/ObjCRuntimeGuide/Articles/ocrtTypeEncodings.html#//apple_ref/doc/uid/TP40008048-CH100">苹果官方文档</a></p>
+<ul>
+<li>比如<code>-（void）test:(int)a;</code>的方法编码为<code>v@:i</code>，v = void,@表示指针变量(因为编译后第一个参数是self)，：表示选择器(因为编译后第二个参数是_cmd)，i表示int</li>
+</ul>
+</li>
+</ul>
+]]></content>
+      <categories>
+        <category>iOS</category>
+      </categories>
+      <tags>
+        <tag>iOS</tag>
+        <tag>底层原理</tag>
+      </tags>
+  </entry>
 </search>
