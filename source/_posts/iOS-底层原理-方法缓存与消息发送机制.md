@@ -49,7 +49,7 @@ struct class_ro_t {
     unit32_t instanceStart;
     uint32_t instanceSize; // instance对象占用的内存空间
 #ifdef __LP__64__
-	uint32_t reserved;
+    uint32_t reserved;
 #endif
     const uint8_t *ivarLayout;
     const char * name; // 类名
@@ -86,8 +86,8 @@ method_array_t: [
 ```
 static Class realizeClassWithoutSwift(Class cls, Class previously)
 {
-	...
-	auto ro = (const class_ro_t *)cls->data();
+    ...
+    auto ro = (const class_ro_t *)cls->data();
     auto isMeta = ro->flags & RO_META;
     if (ro->flags & RO_FUTURE) {
         // This was a future class. rw data is already allocated.
@@ -197,7 +197,7 @@ struct bucket_t *cache_t::buckets() const
 ```
 struct bucket_t {
     explicit_atomic<uintptr_t> _imp; 	// 函数的内存地址
-	explicit_atomic<SEL> _sel; // SEL作为key
+    explicit_atomic<SEL> _sel; // SEL作为key
 };
 ```
 
@@ -226,7 +226,7 @@ mask_t cache_t::mask() const
 ```
 void cache_t::insert(SEL sel, IMP imp, id receiver)
 {
-	...
+    ...
     //对_occupied赋值 + 1。首次 newOccupied = 1。
     mask_t newOccupied = occupied() + 1;
     //旧容量，（mask + 1） 或者 0
@@ -300,7 +300,7 @@ void cache_t::insert(SEL sel, IMP imp, id receiver)
  - mask值为capacity - 1
  - 通过cache_hash（下文会提及的散列表算法）计算插入的index，后面会通过cache_next再进行计算hash解决冲突问题。
  - 循环判断通过b[i].set插入bucket数据。
- - **reallocate函数在开辟控件的同时，把缓存给直接清空了**
+ - **reallocate函数在开辟控件的同时，把缓存给直接清空了**，清空之后再把现在要缓存的方法放进去，所以扩容后occupied会为1。
  
 
 #### 散列表（哈希表）缓存
@@ -322,11 +322,133 @@ void cache_t::insert(SEL sel, IMP imp, id receiver)
 	这也就是所谓的Hash冲突。为了处理这种问题，系统会调用`cache_next`函数
 	    
 	```
- static inline mask_t cache_next(mask_t i, mask_t mask) {
-		return i ? i-1 : mask;
-	}
+    static inline mask_t cache_next(mask_t i, mask_t mask) {
+        return i ? i-1 : mask;
+    }
 	```
 
 	也就是说如果`@selector(personTest) & mask = 4`的4已经有东西了，那么就取 4 - 1 = 3，如果3还有东西，就放在2的位置，如果2还有，就放在1，以此类推，如果直到0都还没有可以插入的位置，那么就从mask的位置开始找，也就是9，然后再找9看看是否可以插入，插不进去再找8，以此类推，找到为止。
     
     由于列表在存放数量达到容量的87.5%的时候就会两倍的扩容（arm64），扩容后又会清空缓存，所以一定能找到合适的位置插入的。
+    
+    
+## 消息发送
+
+调用一个不存在的方法的时候，他会经历这么一个流程
+
+消息发送 - （找不到方法的话） -> 动态方法解析 - （没有实现的话） -> 消息转发 -> （没有实现的话） -> 抛出异常
+
+### 消息发送
+
+假如我们这么调用一个方法
+
+```
+[person personTest];
+```
+
+底层会转换为
+
+```
+objc_msgSend(person,sel_registerName("personTest"));
+```
+
+- 这里的person我们称作消息接受者（receiver），就是调用方法的对象，如果这里还是调用类方法的话，那么这里就会传入一个类对象
+- `sel_registerName()`函数等价于`@selector`
+- 为了性能，`objc_msgSend`方法底层是使用汇编和C++实现的
+
+消息发送的流程如下：
+
+1. receiver 是否为空，如果是退出，否则继续
+2. 从receiver的类对象（如果传入的是类则找的是元类对象，下文统称为receiverClass）的cache中查找方法，如果找到则调用方法，如果找不到则继续
+3. 从receiverClass中的`class_rw_t`中查找方法，如果找到则调用方法，并将方法插入缓存，如果找不到则继续
+4. 从`superClass`的cache中查找方法，有则调用并缓存到当前receiverClass的cache中(不是superClass的cache),否则继续
+5. 从`superClass`的`class_rw_t`中找，有则调用并缓存到receiverClass的cache中，否则继续
+6. 继续通过`superClass`的`superClass`找方法，流程回到4，直到再也没有父类了，并且也找不到方法，那么将会进入动态方法解析阶段。
+
+其中：
+- 如果是从`class_rw_t`中查找方法，若方法列表已经排序好，那么就使用二分查找法查找
+- 如果是还没排序的方法，那么就使用遍历的方法查找
+- 在缓存中查找方法的过程也称作快速查找（使用汇编实现），在`class_rw_t`中查找方法的过程也称作慢速查找(使用汇编和C++实现)，C++部分方法源码在`lookUpImpOrForward`函数中，如下：
+
+```
+IMP lookUpImpOrForward(id inst, SEL sel, Class cls, int behavior)
+{
+    const IMP forward_imp = (IMP)_objc_msgForward_impcache;
+    IMP imp = nil;
+    Class curClass;
+    runtimeLock.assertUnlocked();
+    // Optimistic cache lookup
+    if (fastpath(behavior & LOOKUP_CACHE)) {
+        imp = cache_getImp(cls, sel);
+        if (imp) goto done_nolock;
+    }
+    runtimeLock.lock();
+    checkIsKnownClass(cls);
+    if (slowpath(!cls->isRealized())) {
+        cls = realizeClassMaybeSwiftAndLeaveLocked(cls, runtimeLock);
+    }
+    if (slowpath((behavior & LOOKUP_INITIALIZE) && !cls->isInitialized())) {
+        cls = initializeAndLeaveLocked(cls, inst, runtimeLock);
+    }
+    runtimeLock.assertLocked();
+    curClass = cls;
+    for (unsigned attempts = unreasonableClassCount();;) {
+        // curClass method list.
+        Method meth = getMethodNoSuper_nolock(curClass, sel);
+        if (meth) {
+            imp = meth->imp;
+            goto done;
+        }
+        if (slowpath((curClass = curClass->superclass) == nil)) {
+            imp = forward_imp;
+            break;
+        }
+        if (slowpath(--attempts == 0)) {
+            _objc_fatal("Memory corruption in class list.");
+        }
+
+        // Superclass cache.
+        imp = cache_getImp(curClass, sel);
+        if (slowpath(imp == forward_imp)) {
+            break;
+        }
+        if (fastpath(imp)) {
+            // Found the method in a superclass. Cache it in this class.
+            goto done;
+        }
+    }
+    if (slowpath(behavior & LOOKUP_RESOLVER)) {
+        behavior ^= LOOKUP_RESOLVER;
+        return resolveMethod_locked(inst, sel, cls, behavior);
+    }
+ done:
+    log_and_fill_cache(cls, imp, sel, inst, curClass);
+    runtimeLock.unlock();
+ done_nolock:
+    if (slowpath((behavior & LOOKUP_NIL) && imp == forward_imp)) {
+        return nil;
+    }
+    return imp;
+}
+```
+
+慢速查找流程图：
+
+<img src="https://p5-tt.byteimg.com/origin/pgc-image/47b512631098428e8bc60162e1df4ab7.png" >
+
+消息发送流程图：
+
+<img src="https://p9-tt.byteimg.com/origin/pgc-image/70dfbbc7f61a4a9fac15e5ff1af809b4.png">
+
+
+
+### 动态方法解析（也称：动态方法决议）
+
+当消息发送流程找不到方法后就会进入动态方法解析流程。
+
+动态方法解析是需要开发者重写特定方法，给原先不存在的方法添加方法实现。主要是用到runtime里面的`class_addMethod`函数，并且动态解析后，会重新走”消息发送“的流程
+
+### 消息转发
+
+
+## super
