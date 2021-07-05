@@ -8,6 +8,7 @@ categories:
 abbrlink: 5ed61a9
 date: 2021-06-29 01:11:00
 ---
+
 本文主要简述类（元类）对象里面的方法缓存、消息发送（包括消息发送，动态方法解析与消息转发）与super关键字的底层原理
 
 <!--more-->
@@ -135,13 +136,15 @@ if (mlist) {
 
 ### method_t
 
-- `method_t`是对方法/函数的封装
+- `method_t`是对方法/函数的封装（下面是缩减版定义）
 
 ```
 struct method_t {
-    SEL name; // 函数名
-    const char; // 编码（返回值类型、参数类型）
-    IMP imp; // 指向函数的指针（函数地址）
+    ...
+    SEL name(); // 函数名
+    const char *types(); // 编码（返回值类型、参数类型）
+    IMP imp(bool needsLock); // 指向函数的指针（函数地址）
+    ...
 }
 ```
 
@@ -446,7 +449,128 @@ IMP lookUpImpOrForward(id inst, SEL sel, Class cls, int behavior)
 
 当消息发送流程找不到方法后就会进入动态方法解析流程。
 
-动态方法解析是需要开发者重写特定方法，给原先不存在的方法添加方法实现。主要是用到runtime里面的`class_addMethod`函数，并且动态解析后，会重新走”消息发送“的流程
+动态方法解析是当消息发送阶段找不到方法的时候，开发者可以通过重写特定方法（如果是类方法就重写`+ (BOOL)resolveClassMethod:(SEL)sel`，如果是对象方法就重写`+ (BOOL)resolveInstanceMethod:(SEL)sel`），给原先不存在的方法添加方法实现。主要是用到runtime里面的`class_addMethod`函数，并且动态解析后，会重新走”消息发送“的流程
+
+#### 使用
+
+假如这里的person没有实现print方法
+
+```
+Person *person = [Person new];
+[person print];
+```
+
+那我们可以在`Person.m`添加一个方法实现用来替换丢失的`print`，这里我们用`truePrint`来替代
+```
+- (void)truePrint {
+    NSLog(@"true print");
+}
+
++ (BOOL)resolveInstanceMethod:(SEL)sel {
+    if (sel == @selector(print)) {
+        
+        // 获取truePrint方法的Method对象
+        Method truePrint = class_getInstanceMethod(self, @selector(truePrint));
+        
+        // 动态添加print方法的实现，通过method_getImplementation获取到方法的函数指针，通过method_getTypeEncoding拿到方法的函数编码即 v@: 或 v16@0:8
+        class_addMethod(self, sel, method_getImplementation(truePrint), method_getTypeEncoding(truePrint));
+        
+        // 返回YES代表有动态添加方法
+        return YES;
+    }
+    return [super resolveInstanceMethod:sel];
+}
+```
+
+
+#### Method的结构
+
+
+点击Method我们可以看到结构如下
+```
+typedef struct objc_method *Method;
+```
+
+而`ojbc_method`的定义如下
+
+```
+struct objc_method {
+    SEL _Nonnull method_name;	
+    char * _Nullable method_types;
+    IMP _Nonnull method_imp;
+}  
+```
+
+可以看到跟上面所说的`method_t`是类似的东西
+
+以下是一些拿到`Method`对象后可以使用的一些函数
+
+```
+// 函数调用，但是不接收返回值类型为结构体
+method_invoke
+// 函数调用，但是接收返回值类型为结构体
+method_invoke_stret
+// 获取函数名
+method_getName
+// 获取函数实现IMP
+method_getImplementation
+// 获取函数type encoding
+method_getTypeEncoding
+// 复制返回值类型
+method_copyReturnType
+// 复制参数类型
+method_copyArgumentType
+// 获取返回值类型
+method_getReturnType
+// 获取参数个数
+method_getNumberOfArguments
+// 获取函数参数类型
+method_getArgumentType
+// 获取函数描述
+method_getDescription
+// 设置函数实现IMP
+method_setImplementation
+// 交换函数的实现IMP
+method_exchangeImplementations
+```
+
+
+#### Runtime中的原理
+
+在上面的消息发送的流程函数`lookUpImpOrForward`中，有一段代码如下
+
+```
+if (slowpath(behavior & LOOKUP_RESOLVER)) {
+    behavior ^= LOOKUP_RESOLVER;
+    return resolveMethod_locked(inst, sel, cls, behavior);
+}
+```
+
+当找不到消息的时候就会进入动态方法解析的流程即`resolveMethod_locked`，如下
+
+```
+static NEVER_INLINE IMP resolveMethod_locked(id inst, SEL sel, Class cls, int behavior) {
+    runtimeLock.assertLocked();
+    ASSERT(cls->isRealized());
+
+    runtimeLock.unlock();
+
+    if (! cls->isMetaClass()) {
+        // try [cls resolveInstanceMethod:sel]
+        resolveInstanceMethod(inst, sel, cls);
+    } else {
+        // try [nonMetaClass resolveClassMethod:sel]
+        // and [cls resolveInstanceMethod:sel]
+        resolveClassMethod(inst, sel, cls);
+        if (!lookUpImpOrNilTryCache(inst, sel, cls)) {
+            resolveInstanceMethod(inst, sel, cls);
+        }
+    }
+
+    return lookUpImpOrForwardTryCache(inst, sel, cls, behavior);
+}
+```
+
 
 ### 消息转发
 

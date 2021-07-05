@@ -1,4 +1,3 @@
----
 title: iOS动态加载字体
 tags:
   - iOS
@@ -7,7 +6,6 @@ categories:
 abbrlink: f82939c6
 date: 2021-03-17 10:42:42
 ---
-
 当你某个在开发某个SDK时需要使用到特殊字体，因为无法修改应用的info.plist，所以这时候我们需要采用动态注册字体的方式加载字体，方法如下
 
 <!--more-->
@@ -22,7 +20,7 @@ date: 2021-03-17 10:42:42
 
 	如果上述方法返回nil,则你需要注册你的字体
 	```
-	  NSBundle *bundle = [NSBundle bundleForClass:[self class]];
+	    NSBundle *bundle = [NSBundle bundleForClass:[self class]];
 		NSURL *fontURL = [bundle URLForResource:<#fontName#> withExtension:@"otf"/*or TTF*/];
 		NSData *inData = [NSData dataWithContentsOfURL:fontURL];
 		CFErrorRef error;
