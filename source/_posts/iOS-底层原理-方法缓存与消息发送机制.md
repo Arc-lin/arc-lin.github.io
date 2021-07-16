@@ -8,7 +8,6 @@ categories:
 abbrlink: 5ed61a9
 date: 2021-06-29 01:11:00
 ---
-
 本文主要简述类（元类）对象里面的方法缓存、消息发送（包括消息发送，动态方法解析与消息转发）与super关键字的底层原理
 
 <!--more-->
@@ -335,7 +334,7 @@ void cache_t::insert(SEL sel, IMP imp, id receiver)
     由于列表在存放数量达到容量的87.5%的时候就会两倍的扩容（arm64），扩容后又会清空缓存，所以一定能找到合适的位置插入的。
     
     
-## 消息发送
+## 消息发送机制
 
 调用一个不存在的方法的时候，他会经历这么一个流程
 
@@ -571,8 +570,174 @@ static NEVER_INLINE IMP resolveMethod_locked(id inst, SEL sel, Class cls, int be
 }
 ```
 
+这里面我们可以发现`resolveInstanceMethod`和`resolveClassMethod`两个函数，分别是实现实例方法的动态消息解析和类方法的动态消息解析，这两个长得差不多，所以我们拿实例对象的函数查看一下
+
+```
+static void resolveInstanceMethod(id inst, SEL sel, Class cls)
+{
+    runtimeLock.assertUnlocked();
+    ASSERT(cls->isRealized());
+    SEL resolve_sel = @selector(resolveInstanceMethod:);
+
+    if (!lookUpImpOrNilTryCache(cls, resolve_sel, cls->ISA(/*authenticated*/true))) {
+        // Resolver not implemented.
+        return;
+    }
+
+    BOOL (*msg)(Class, SEL, SEL) = (typeof(msg))objc_msgSend;
+    bool resolved = msg(cls, resolve_sel, sel);
+
+    // Cache the result (good or bad) so the resolver doesn't fire next time.
+    // +resolveInstanceMethod adds to self a.k.a. cls
+    IMP imp = lookUpImpOrNilTryCache(inst, sel, cls);
+
+    if (resolved  &&  PrintResolving) {
+        if (imp) {
+            _objc_inform("RESOLVE: method %c[%s %s] "
+                         "dynamically resolved to %p", 
+                         cls->isMetaClass() ? '+' : '-', 
+                         cls->nameForLogging(), sel_getName(sel), imp);
+        }
+        else {
+            // Method resolver didn't add anything?
+            _objc_inform("RESOLVE: +[%s resolveInstanceMethod:%s] returned YES"
+                         ", but no new implementation of %c[%s %s] was found",
+                         cls->nameForLogging(), sel_getName(sel), 
+                         cls->isMetaClass() ? '+' : '-', 
+                         cls->nameForLogging(), sel_getName(sel));
+        }
+    }
+}
+```
+
+在这里我们可以看到对`resolveInstanceMethod`方法进行了一次`objc_msgSend`调用，调用之后又执行了`lookUpImpOrNilTryCache`函数进行了缓存，如果缓存成功，那么下次调用这个方法就不会在进入动态方法解析阶段，直接通过消息发送阶段就调用成功了。
+
+#### 优化
+
+根据我们以前所学的知识可以知道，方法查找的流程为
+
+实例方法：类 -- 父类 -- 父类 -- ... -- 根类 -- nil
+
+类方法：元类 -- 父元类 -- 父元类 -- ... -- 根元类 -- 根类 -- nil
+
+也就是说丢失的方法最后都会回到根类去找方法，一般情况下是`NSObject`
+
+通过这个特性，我们可以直接在`NSObject`上添加分类，然后实现动态解析方法，根据方法名前缀进行判断，然后统一处理未被找到的方法添加默认实现。通过这种方式我们可以减少一些找不到方法导致的崩溃问题，提升用户体验。
+
 
 ### 消息转发
+
+如果没有实现动态方法解析，那么将进入消息转发阶段。消息转发即把消息交给别人发送的意思。
+
+从上面的`lookUpImpOrForward`函数的源码我们可以看到，最后是调用了`_objc_msgForward_impcache`这个函数，这个函数是通过汇编实现的
+
+要实现消息转发，我们有两种方式，一种是实现一个方法`-forwardingTargetForSelector`，一种是实现`-methodSignatureForSelector`和`-forwardInvocation`，比如
+
+```
+- (id)forwardingTargetForSelector:(SEL)aSelector {
+    if (aSelector == @selector(print)) {
+        return [[Student alloc] init];
+    }
+    return [super forwardingTargetForSelector:aSelector];
+}
+```
+
+实现了这个方法之后，最后系统会去我们提供的`Student`对象去寻找`print`方法，找到了的话就会进行调用。注意这个方法每次都会进来，每次都会生成新的`Student`对象对其`print`方法进行调用。
+
+如果`forwardingTargetForSelector`没实现或者返回空的话
+
+```
+- (id)forwardingTargetForSelector:(SEL)aSelector {
+    if (aSelector == @selector(print)) {
+        return nil;
+    }
+    return [super forwardingTargetForSelector:aSelector];
+}
+```
+
+那么就会寻找`-methodSignatureForSelector`和`-forwardInvocation`
+
+```
+/// 方法签名： 返回值类型、参数类型
+- (NSMethodSignature *)methodSignatureForSelector:(SEL)aSelector {
+    if (aSelector == @selector(print)) {
+        return [NSMethodSignature signatureWithObjCTypes:"v16@0:8"];
+    }
+    return [super methodSignatureForSelector:aSelector];
+}
+
+/// NSInvocation封装了一个方法调用，包括：方法调用者、方法名、方法参数
+/// anInvocation.target 方法调用者
+/// anInvocation.selector 方法名
+//// [anInvocation getArgument:NULL atIndex:0] 方法参数
+- (void)forwardInvocation:(NSInvocation *)anInvocation {
+    [anInvocation invokeWithTarget:[[Student alloc] init]];
+}
+```
+
+首先我们在方法签名中指定方法类型，然后在`forwardInvocation`方法中，修改target，然后直接调用，这样子就会直接调用Student的print方法了
+
+<img src="https://p3-tt.byteimg.com/origin/pgc-image/ba2d1d5ff71a49c8913690d6f69fb7d7.png" width=80%>
+
+#### NSInvocation
+
+当系统执行到`forwardInvocation`的时候，无论在方法内有任何实现，都不会执行到`doseNotRecognizeSelector`（抛出异常），所以实现了就不会崩，即便什么都不做。
+
+在`forwardInvocation`内我们可以拿到方法调用的很多信息，比如方法调用者`anInvocation.target`、方法名`anInvocation.selector`和方法参数
+
+比如调用方法为`[person print:1]`，进入到`forwardInvocation`后我们可以通过以下方法拿到`1`这个参数
+
+```
+- (void)forwardInvocation:(NSInvocation *)anInvocation {
+    int a;
+    [anInvocation getArgument:&a atIndex:2]; // 第一个参数是self，第二个是_cmd，所以从下标2开始取
+}
+```
+
+如果要拿返回值的话，就可以这么做
+
+```
+- (void)forwardInvocation:(NSInvocation *)anInvocation {
+    [anInvocation invokeWithTarget:[[Student alloc] init]]; // 要先调用一下Student的print方法，这里假设返回值是整型
+    int result;
+    [anInvocation getReturnValue:&result];
+    NSLog(@"%d",result); /// 这里可以拿到返回值
+}
+```
+
+#### NSMethodSignature
+
+`[NSMethodSignature signatureWithObjCTypes:"v16@0:8"]`，注意这里的方法编码要跟下面`forwardInvocation`要调用的方法的方法编码一致 
+
+我们除了可以通过方法编码拿到`NSMethodSignature`对象之外，还可以这么做
+
+```
+- (NSMethodSignature *)methodSignatureForSelector:(SEL)aSelector {
+    if (aSelector == @selector(print)) {
+        return [[Student new] methodSignatureForSelector:@selector(print)];
+    }
+    return [super methodSignatureForSelector:aSelector];
+}
+```
+
+#### 类方法的消息转发
+
+`+ (id)forwardingTargetForSelector:(SEL)aSelector`
+
+`+ (NSMethodSignature *)methodSignatureForSelector:(SEL)aSelector`
+
+`+ (void)forwardInvocation:(NSInvocation *)anInvocation`
+
+这几个方法也有类方法版本，但是代码补全没出来，但是实际使用是可行的
+
+`+ (id)forwardingTargetForSelector:(SEL)aSelector`在这个方法里面返回的消息接受者既可以是类对象也可以是实例对象。
+
+
+#### @synthesize 和 @dynamic
+
+`@synthesize`用来自动给成员变量名生成`setter`和`getter`的声明和实现
+
+`@dynamic`用来告诉编译器不要自动生成`setter`和`getter`的实现（声明还是会声明的），待到运行时开发者自己实现，并且不会为属性实现带下划线的成员变量
 
 
 ## super
