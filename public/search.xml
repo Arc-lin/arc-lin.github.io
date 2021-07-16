@@ -3247,9 +3247,9 @@
 <p>  由于列表在存放数量达到容量的87.5%的时候就会两倍的扩容（arm64），扩容后又会清空缓存，所以一定能找到合适的位置插入的。</p>
 </li>
 </ul>
-<h2 id="消息发送"><a href="#消息发送" class="headerlink" title="消息发送"></a>消息发送</h2><p>调用一个不存在的方法的时候，他会经历这么一个流程</p>
+<h2 id="消息发送机制"><a href="#消息发送机制" class="headerlink" title="消息发送机制"></a>消息发送机制</h2><p>调用一个不存在的方法的时候，他会经历这么一个流程</p>
 <p>消息发送 - （找不到方法的话） -&gt; 动态方法解析 - （没有实现的话） -&gt; 消息转发 -&gt; （没有实现的话） -&gt; 抛出异常</p>
-<h3 id="消息发送-1"><a href="#消息发送-1" class="headerlink" title="消息发送"></a>消息发送</h3><p>假如我们这么调用一个方法</p>
+<h3 id="消息发送"><a href="#消息发送" class="headerlink" title="消息发送"></a>消息发送</h3><p>假如我们这么调用一个方法</p>
 <figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">[person personTest];</span><br></pre></td></tr></table></figure>
 
 <p>底层会转换为</p>
@@ -3311,8 +3311,56 @@
 <p>当找不到消息的时候就会进入动态方法解析的流程即<code>resolveMethod_locked</code>，如下</p>
 <figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">static NEVER_INLINE IMP resolveMethod_locked(id inst, SEL sel, Class cls, int behavior) &#123;</span><br><span class="line">    runtimeLock.assertLocked();</span><br><span class="line">    ASSERT(cls-&gt;isRealized());</span><br><span class="line"></span><br><span class="line">    runtimeLock.unlock();</span><br><span class="line"></span><br><span class="line">    if (! cls-&gt;isMetaClass()) &#123;</span><br><span class="line">        &#x2F;&#x2F; try [cls resolveInstanceMethod:sel]</span><br><span class="line">        resolveInstanceMethod(inst, sel, cls);</span><br><span class="line">    &#125; else &#123;</span><br><span class="line">        &#x2F;&#x2F; try [nonMetaClass resolveClassMethod:sel]</span><br><span class="line">        &#x2F;&#x2F; and [cls resolveInstanceMethod:sel]</span><br><span class="line">        resolveClassMethod(inst, sel, cls);</span><br><span class="line">        if (!lookUpImpOrNilTryCache(inst, sel, cls)) &#123;</span><br><span class="line">            resolveInstanceMethod(inst, sel, cls);</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    return lookUpImpOrForwardTryCache(inst, sel, cls, behavior);</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
 
+<p>这里面我们可以发现<code>resolveInstanceMethod</code>和<code>resolveClassMethod</code>两个函数，分别是实现实例方法的动态消息解析和类方法的动态消息解析，这两个长得差不多，所以我们拿实例对象的函数查看一下</p>
+<figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">static void resolveInstanceMethod(id inst, SEL sel, Class cls)</span><br><span class="line">&#123;</span><br><span class="line">    runtimeLock.assertUnlocked();</span><br><span class="line">    ASSERT(cls-&gt;isRealized());</span><br><span class="line">    SEL resolve_sel &#x3D; @selector(resolveInstanceMethod:);</span><br><span class="line"></span><br><span class="line">    if (!lookUpImpOrNilTryCache(cls, resolve_sel, cls-&gt;ISA(&#x2F;*authenticated*&#x2F;true))) &#123;</span><br><span class="line">        &#x2F;&#x2F; Resolver not implemented.</span><br><span class="line">        return;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    BOOL (*msg)(Class, SEL, SEL) &#x3D; (typeof(msg))objc_msgSend;</span><br><span class="line">    bool resolved &#x3D; msg(cls, resolve_sel, sel);</span><br><span class="line"></span><br><span class="line">    &#x2F;&#x2F; Cache the result (good or bad) so the resolver doesn&#39;t fire next time.</span><br><span class="line">    &#x2F;&#x2F; +resolveInstanceMethod adds to self a.k.a. cls</span><br><span class="line">    IMP imp &#x3D; lookUpImpOrNilTryCache(inst, sel, cls);</span><br><span class="line"></span><br><span class="line">    if (resolved  &amp;&amp;  PrintResolving) &#123;</span><br><span class="line">        if (imp) &#123;</span><br><span class="line">            _objc_inform(&quot;RESOLVE: method %c[%s %s] &quot;</span><br><span class="line">                         &quot;dynamically resolved to %p&quot;, </span><br><span class="line">                         cls-&gt;isMetaClass() ? &#39;+&#39; : &#39;-&#39;, </span><br><span class="line">                         cls-&gt;nameForLogging(), sel_getName(sel), imp);</span><br><span class="line">        &#125;</span><br><span class="line">        else &#123;</span><br><span class="line">            &#x2F;&#x2F; Method resolver didn&#39;t add anything?</span><br><span class="line">            _objc_inform(&quot;RESOLVE: +[%s resolveInstanceMethod:%s] returned YES&quot;</span><br><span class="line">                         &quot;, but no new implementation of %c[%s %s] was found&quot;,</span><br><span class="line">                         cls-&gt;nameForLogging(), sel_getName(sel), </span><br><span class="line">                         cls-&gt;isMetaClass() ? &#39;+&#39; : &#39;-&#39;, </span><br><span class="line">                         cls-&gt;nameForLogging(), sel_getName(sel));</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
 
-<h3 id="消息转发"><a href="#消息转发" class="headerlink" title="消息转发"></a>消息转发</h3><h2 id="super"><a href="#super" class="headerlink" title="super"></a>super</h2>]]></content>
+<p>在这里我们可以看到对<code>resolveInstanceMethod</code>方法进行了一次<code>objc_msgSend</code>调用，调用之后又执行了<code>lookUpImpOrNilTryCache</code>函数进行了缓存，如果缓存成功，那么下次调用这个方法就不会在进入动态方法解析阶段，直接通过消息发送阶段就调用成功了。</p>
+<h4 id="优化"><a href="#优化" class="headerlink" title="优化"></a>优化</h4><p>根据我们以前所学的知识可以知道，方法查找的流程为</p>
+<p>实例方法：类 – 父类 – 父类 – … – 根类 – nil</p>
+<p>类方法：元类 – 父元类 – 父元类 – … – 根元类 – 根类 – nil</p>
+<p>也就是说丢失的方法最后都会回到根类去找方法，一般情况下是<code>NSObject</code></p>
+<p>通过这个特性，我们可以直接在<code>NSObject</code>上添加分类，然后实现动态解析方法，根据方法名前缀进行判断，然后统一处理未被找到的方法添加默认实现。通过这种方式我们可以减少一些找不到方法导致的崩溃问题，提升用户体验。</p>
+<h3 id="消息转发"><a href="#消息转发" class="headerlink" title="消息转发"></a>消息转发</h3><p>如果没有实现动态方法解析，那么将进入消息转发阶段。消息转发即把消息交给别人发送的意思。</p>
+<p>从上面的<code>lookUpImpOrForward</code>函数的源码我们可以看到，最后是调用了<code>_objc_msgForward_impcache</code>这个函数，这个函数是通过汇编实现的</p>
+<p>要实现消息转发，我们有两种方式，一种是实现一个方法<code>-forwardingTargetForSelector</code>，一种是实现<code>-methodSignatureForSelector</code>和<code>-forwardInvocation</code>，比如</p>
+<figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">- (id)forwardingTargetForSelector:(SEL)aSelector &#123;</span><br><span class="line">    if (aSelector &#x3D;&#x3D; @selector(print)) &#123;</span><br><span class="line">        return [[Student alloc] init];</span><br><span class="line">    &#125;</span><br><span class="line">    return [super forwardingTargetForSelector:aSelector];</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>实现了这个方法之后，最后系统会去我们提供的<code>Student</code>对象去寻找<code>print</code>方法，找到了的话就会进行调用。注意这个方法每次都会进来，每次都会生成新的<code>Student</code>对象对其<code>print</code>方法进行调用。</p>
+<p>如果<code>forwardingTargetForSelector</code>没实现或者返回空的话</p>
+<figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">- (id)forwardingTargetForSelector:(SEL)aSelector &#123;</span><br><span class="line">    if (aSelector &#x3D;&#x3D; @selector(print)) &#123;</span><br><span class="line">        return nil;</span><br><span class="line">    &#125;</span><br><span class="line">    return [super forwardingTargetForSelector:aSelector];</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>那么就会寻找<code>-methodSignatureForSelector</code>和<code>-forwardInvocation</code></p>
+<figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">&#x2F;&#x2F;&#x2F; 方法签名： 返回值类型、参数类型</span><br><span class="line">- (NSMethodSignature *)methodSignatureForSelector:(SEL)aSelector &#123;</span><br><span class="line">    if (aSelector &#x3D;&#x3D; @selector(print)) &#123;</span><br><span class="line">        return [NSMethodSignature signatureWithObjCTypes:&quot;v16@0:8&quot;];</span><br><span class="line">    &#125;</span><br><span class="line">    return [super methodSignatureForSelector:aSelector];</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line">&#x2F;&#x2F;&#x2F; NSInvocation封装了一个方法调用，包括：方法调用者、方法名、方法参数</span><br><span class="line">&#x2F;&#x2F;&#x2F; anInvocation.target 方法调用者</span><br><span class="line">&#x2F;&#x2F;&#x2F; anInvocation.selector 方法名</span><br><span class="line">&#x2F;&#x2F;&#x2F;&#x2F; [anInvocation getArgument:NULL atIndex:0] 方法参数</span><br><span class="line">- (void)forwardInvocation:(NSInvocation *)anInvocation &#123;</span><br><span class="line">    [anInvocation invokeWithTarget:[[Student alloc] init]];</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>首先我们在方法签名中指定方法类型，然后在<code>forwardInvocation</code>方法中，修改target，然后直接调用，这样子就会直接调用Student的print方法了</p>
+<img src="https://p3-tt.byteimg.com/origin/pgc-image/ba2d1d5ff71a49c8913690d6f69fb7d7.png" width=80%>
+
+<h4 id="NSInvocation"><a href="#NSInvocation" class="headerlink" title="NSInvocation"></a>NSInvocation</h4><p>当系统执行到<code>forwardInvocation</code>的时候，无论在方法内有任何实现，都不会执行到<code>doseNotRecognizeSelector</code>（抛出异常），所以实现了就不会崩，即便什么都不做。</p>
+<p>在<code>forwardInvocation</code>内我们可以拿到方法调用的很多信息，比如方法调用者<code>anInvocation.target</code>、方法名<code>anInvocation.selector</code>和方法参数</p>
+<p>比如调用方法为<code>[person print:1]</code>，进入到<code>forwardInvocation</code>后我们可以通过以下方法拿到<code>1</code>这个参数</p>
+<figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">- (void)forwardInvocation:(NSInvocation *)anInvocation &#123;</span><br><span class="line">    int a;</span><br><span class="line">    [anInvocation getArgument:&amp;a atIndex:2]; &#x2F;&#x2F; 第一个参数是self，第二个是_cmd，所以从下标2开始取</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>如果要拿返回值的话，就可以这么做</p>
+<figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">- (void)forwardInvocation:(NSInvocation *)anInvocation &#123;</span><br><span class="line">    [anInvocation invokeWithTarget:[[Student alloc] init]]; &#x2F;&#x2F; 要先调用一下Student的print方法，这里假设返回值是整型</span><br><span class="line">    int result;</span><br><span class="line">    [anInvocation getReturnValue:&amp;result];</span><br><span class="line">    NSLog(@&quot;%d&quot;,result); &#x2F;&#x2F;&#x2F; 这里可以拿到返回值</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<h4 id="NSMethodSignature"><a href="#NSMethodSignature" class="headerlink" title="NSMethodSignature"></a>NSMethodSignature</h4><p><code>[NSMethodSignature signatureWithObjCTypes:&quot;v16@0:8&quot;]</code>，注意这里的方法编码要跟下面<code>forwardInvocation</code>要调用的方法的方法编码一致 </p>
+<p>我们除了可以通过方法编码拿到<code>NSMethodSignature</code>对象之外，还可以这么做</p>
+<figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">- (NSMethodSignature *)methodSignatureForSelector:(SEL)aSelector &#123;</span><br><span class="line">    if (aSelector &#x3D;&#x3D; @selector(print)) &#123;</span><br><span class="line">        return [[Student new] methodSignatureForSelector:@selector(print)];</span><br><span class="line">    &#125;</span><br><span class="line">    return [super methodSignatureForSelector:aSelector];</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<h4 id="类方法的消息转发"><a href="#类方法的消息转发" class="headerlink" title="类方法的消息转发"></a>类方法的消息转发</h4><p><code>+ (id)forwardingTargetForSelector:(SEL)aSelector</code></p>
+<p><code>+ (NSMethodSignature *)methodSignatureForSelector:(SEL)aSelector</code></p>
+<p><code>+ (void)forwardInvocation:(NSInvocation *)anInvocation</code></p>
+<p>这几个方法也有类方法版本，但是代码补全没出来，但是实际使用是可行的</p>
+<p><code>+ (id)forwardingTargetForSelector:(SEL)aSelector</code>在这个方法里面返回的消息接受者既可以是类对象也可以是实例对象。</p>
+<h4 id="synthesize-和-dynamic"><a href="#synthesize-和-dynamic" class="headerlink" title="@synthesize 和 @dynamic"></a>@synthesize 和 @dynamic</h4><p><code>@synthesize</code>用来自动给成员变量名生成<code>setter</code>和<code>getter</code>的声明和实现</p>
+<p><code>@dynamic</code>用来告诉编译器不要自动生成<code>setter</code>和<code>getter</code>的实现（声明还是会声明的），待到运行时开发者自己实现，并且不会为属性实现带下划线的成员变量</p>
+<h2 id="super"><a href="#super" class="headerlink" title="super"></a>super</h2><p>假如我们调用<code>Student</code>实例的一个父类方法</p>
+<p><code>[super run]</code></p>
+<p>那么编译后会变成如下代码</p>
+<p><code>objc_msgSendSuper2(self,class_getSuperclass(objc_getClass(&quot;Student&quot;)),@selector(run));</code></p>
+<p>所以<code>super</code>发送消息的本质是调用<code>objc_msgSendSuper2</code>函数，最终的消息接受者依旧是<code>self</code>，只是实例方法寻找从父类的类对象开始寻找，类方法从父类的元类对象开始寻找。</p>
+<p>所以当我们调用方法<code>[super class]</code>的时候，跟<code>[self class]</code>没区别，返回结果是一致的</p>
+]]></content>
       <categories>
         <category>iOS</category>
       </categories>
