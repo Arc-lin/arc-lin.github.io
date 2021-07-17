@@ -3355,9 +3355,9 @@
 <h4 id="synthesize-和-dynamic"><a href="#synthesize-和-dynamic" class="headerlink" title="@synthesize 和 @dynamic"></a>@synthesize 和 @dynamic</h4><p><code>@synthesize</code>用来自动给成员变量名生成<code>setter</code>和<code>getter</code>的声明和实现</p>
 <p><code>@dynamic</code>用来告诉编译器不要自动生成<code>setter</code>和<code>getter</code>的实现（声明还是会声明的），待到运行时开发者自己实现，并且不会为属性实现带下划线的成员变量</p>
 <h2 id="super"><a href="#super" class="headerlink" title="super"></a>super</h2><p>假如我们调用<code>Student</code>实例的一个父类方法</p>
-<p><code>[super run]</code></p>
+<p><code>[super run:xx]</code></p>
 <p>那么编译后会变成如下代码</p>
-<p><code>objc_msgSendSuper2(self,class_getSuperclass(objc_getClass(&quot;Student&quot;)),@selector(run));</code></p>
+<p><code>objc_msgSendSuper(self,class_getSuperclass(objc_getClass(&quot;Student&quot;)),sel_registerName(&quot;run&quot;),xx);</code></p>
 <p>所以<code>super</code>发送消息的本质是调用<code>objc_msgSendSuper2</code>函数，最终的消息接受者依旧是<code>self</code>，只是实例方法寻找从父类的类对象开始寻找，类方法从父类的元类对象开始寻找。</p>
 <p>所以当我们调用方法<code>[super class]</code>的时候，跟<code>[self class]</code>没区别，返回结果是一致的</p>
 ]]></content>
