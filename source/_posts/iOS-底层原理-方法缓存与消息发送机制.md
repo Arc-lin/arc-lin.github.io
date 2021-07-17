@@ -744,11 +744,11 @@ static void resolveInstanceMethod(id inst, SEL sel, Class cls)
 
 假如我们调用`Student`实例的一个父类方法
 
-`[super run]`
+`[super run:xx]`
 
 那么编译后会变成如下代码
 
-`objc_msgSendSuper2(self,class_getSuperclass(objc_getClass("Student")),@selector(run));`
+`objc_msgSendSuper(self,class_getSuperclass(objc_getClass("Student")),sel_registerName("run"),xx);`
 
 所以`super`发送消息的本质是调用`objc_msgSendSuper2`函数，最终的消息接受者依旧是`self`，只是实例方法寻找从父类的类对象开始寻找，类方法从父类的元类对象开始寻找。
 
