@@ -30,7 +30,7 @@
 <meta property="og:locale">
 <meta property="og:image" content="https://p6-tt.byteimg.com/origin/pgc-image/8f8201d352eb44a7aab4b0b68ba6e9e2.png">
 <meta property="article:published_time" content="2021-07-18T02:13:00.000Z">
-<meta property="article:modified_time" content="2021-07-18T18:22:07.005Z">
+<meta property="article:modified_time" content="2021-07-18T18:27:40.208Z">
 <meta property="article:author" content="Arclin">
 <meta property="article:tag" content="iOS">
 <meta property="article:tag" content="Swift">
@@ -258,7 +258,7 @@
 
 <h2 id="需求"><a href="#需求" class="headerlink" title="需求"></a>需求</h2><p>假如我们有一个需求，需要往ScrollView上加入不同类型的View，并且根据不确定的的顺序从上往下进行排列，所以一般情况下我们可以这样子设计框架</p>
 <ol>
-<li>首先定义一个协议，遵循协议的对象使用一个Build方法返回一个View</li>
+<li>首先定义一个协议，遵循协议的对象使用一个build方法返回一个View</li>
 </ol>
   <figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">protocol ViewBuilder &#123;</span><br><span class="line">    func build() -&gt; UIView</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
 <ol start="2">
@@ -341,7 +341,10 @@
     <a href="/post/11ed4e5e.html" rel="prev" title="iOS 底层原理 -- Runtime API">
       <i class="fa fa-chevron-left"></i> iOS 底层原理 -- Runtime API
     </a></div>
-      <div class="post-nav-item"></div>
+      <div class="post-nav-item">
+    <a href="/post/fee6666f.html" rel="next" title="iOS 底层原理 -- Runloop">
+      iOS 底层原理 -- Runloop <i class="fa fa-chevron-right"></i>
+    </a></div>
     </div>
       </footer>
     
@@ -417,7 +420,7 @@
       <div class="site-state-item site-state-posts">
           <a href="/archives/">
         
-          <span class="site-state-item-count">88</span>
+          <span class="site-state-item-count">89</span>
           <span class="site-state-item-name">posts</span>
         </a>
       </div>

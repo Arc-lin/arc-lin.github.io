@@ -1,8 +1,12 @@
 title: iOS 底层原理 -- Runloop
 author: Arclin
 abbrlink: fee6666f
-date: 2021-07-21 22:10:50
 tags:
+  - iOS
+  - 底层原理
+categories:
+  - iOS
+date: 2021-07-21 22:10:50
 ---
 本文讲述iOS中Runloop的一些使用以及原理
 
@@ -79,8 +83,8 @@ Core Foundation 中关于Runloop的5个类
 typedef struct __CFRunLoop * CFRunloopRef;
 
 struct __CFRunLoop {
-	...
-	pthread_t _pthread;
+    ...
+    pthread_t _pthread;
     CFMutableSetRef _commonModes;
     CFMutableSetRef _commonModeItems;
     CFRunloopModeRef _currentMode;
@@ -91,8 +95,8 @@ struct __CFRunLoop {
 typedef struct __CFRunLoopMode *CFRunLoopModeRef;
 
 struct __CFRunLoopMode {
-	...
-	CFStringRef _name;
+    ...
+    CFStringRef _name;
     CFMutableSetRef _sources0; // CFRunloopSourceRef数组
     CFMutableSetRef _sources1; // CFRunloopSourceRef数组
     CFMutableArrayRef _observers; // CFRunloopObserverRef数组
@@ -141,7 +145,7 @@ Runloop的几种状态
 /* Run Loop Observer Activities */
 typedef CF_OPTIONS(CFOptionFlags, CFRunLoopActivity) {
     kCFRunLoopEntry = (1UL << 0),         // 即将进入Loop 
-    kCFRunLoopBeforeTimers = (1UL << 1),  // 即将处理TImer
+    kCFRunLoopBeforeTimers = (1UL << 1),  // 即将处理Timer
     kCFRunLoopBeforeSources = (1UL << 2), // 即将处理Source
     kCFRunLoopBeforeWaiting = (1UL << 5), // 即将进入休眠
     kCFRunLoopAfterWaiting = (1UL << 6),  // 刚从休眠中唤醒
@@ -579,4 +583,3 @@ while(1) {
 
 @end
 ```
-
