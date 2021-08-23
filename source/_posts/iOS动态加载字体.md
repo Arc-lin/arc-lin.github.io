@@ -14,44 +14,44 @@ date: 2021-03-17 10:42:42
 
 	方法调用
 	
-	```
+	```oc
 	[UIFont fontWithName:<#(nonnull NSString *)#> size:<#(CGFloat)#>]
 	```
 
 	如果上述方法返回nil,则你需要注册你的字体
-	```
-	    NSBundle *bundle = [NSBundle bundleForClass:[self class]];
-		NSURL *fontURL = [bundle URLForResource:<#fontName#> withExtension:@"otf"/*or TTF*/];
-		NSData *inData = [NSData dataWithContentsOfURL:fontURL];
-		CFErrorRef error;
-		CGDataProviderRef provider = CGDataProviderCreateWithCFData((CFDataRef)inData);
-		CGFontRef font = CGFontCreateWithDataProvider(provider);
-		if (!CTFontManagerRegisterGraphicsFont(font, &error)) {
-			CFStringRef errorDescription = CFErrorCopyDescription(error);
-			NSLog(@"Failed to load font: %@", errorDescription);
-			CFRelease(errorDescription);
-		}
-		CFSafeRelease(font);
-		CFSafeRelease(provider);
+	```oc
+    NSBundle *bundle = [NSBundle bundleForClass:[self class]];
+    NSURL *fontURL = [bundle URLForResource:<#fontName#> withExtension:@"otf"/*or TTF*/];
+    NSData *inData = [NSData dataWithContentsOfURL:fontURL];
+    CFErrorRef error;
+    CGDataProviderRef provider = CGDataProviderCreateWithCFData((CFDataRef)inData);
+    CGFontRef font = CGFontCreateWithDataProvider(provider);
+    if (!CTFontManagerRegisterGraphicsFont(font, &error)) {
+    CFStringRef errorDescription = CFErrorCopyDescription(error);
+    NSLog(@"Failed to load font: %@", errorDescription);
+    CFRelease(errorDescription);
+    }
+    CFSafeRelease(font);
+    CFSafeRelease(provider);
 	```
 
-	```
-	void CFSafeRelease(CFTypeRef cf) {
-		if (cf != NULL) {
-			CFRelease(cf);
-		}
-	}
+	```objective-c
+    void CFSafeRelease(CFTypeRef cf) {
+        if (cf != NULL) {
+            CFRelease(cf);
+        }
+    }
 	```
 	
 - Swift
 
 	方法调用
-	```
+	```swift
 	UIFont.customFont(name:"xxx" size: 12)
 	```
 
-	```
-extension UIFont {
+	```swift
+    extension UIFont {
 	    static func customFont(fontName:String, size: CGFloat) -> UIFont {
         if let font = UIFont(name: fontName, size: size) {
             return font

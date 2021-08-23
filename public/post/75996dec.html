@@ -1,0 +1,668 @@
+<!DOCTYPE html>
+<html lang="zh-Hans">
+<head>
+  <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=2">
+<meta name="theme-color" content="#222">
+<meta name="generator" content="Hexo 5.4.0">
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png">
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32-next.png">
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next.png">
+  <link rel="mask-icon" href="/images/logo.svg" color="#222">
+
+<link rel="stylesheet" href="/css/main.css">
+
+
+<link rel="stylesheet" href="/lib/font-awesome/css/all.min.css">
+  <link rel="stylesheet" href="//cdn.jsdelivr.net/gh/fancyapps/fancybox@3/dist/jquery.fancybox.min.css">
+
+<script id="hexo-configurations">
+    var NexT = window.NexT || {};
+    var CONFIG = {"hostname":"www.arclin.cn","root":"/","scheme":"Muse","version":"7.8.0","exturl":false,"sidebar":{"position":"left","display":"post","padding":18,"offset":12,"onmobile":false},"copycode":{"enable":false,"show_result":false,"style":null},"back2top":{"enable":true,"sidebar":false,"scrollpercent":false},"bookmark":{"enable":false,"color":"#222","save":"auto"},"fancybox":true,"mediumzoom":false,"lazyload":false,"pangu":false,"comments":{"style":"tabs","active":null,"storage":true,"lazyload":false,"nav":null},"algolia":{"appID":"VOFC7668C9","apiKey":"24c644edc8e7353bf2e8d8e31f03a940","indexName":"hexo","hits":{"per_page":10},"labels":{"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}},"localsearch":{"enable":true,"trigger":"auto","top_n_per_article":1,"unescape":false,"preload":false},"motion":{"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},"path":"search.xml"};
+  </script>
+
+  <meta name="description" content="本文主要简述Swift 5.5新特性 async与await的常用方式">
+<meta property="og:type" content="article">
+<meta property="og:title" content="Swift 5.5 新特性 async与 await">
+<meta property="og:url" content="https://www.arclin.cn/post/75996dec.html">
+<meta property="og:site_name" content="Arclin">
+<meta property="og:description" content="本文主要简述Swift 5.5新特性 async与await的常用方式">
+<meta property="og:locale">
+<meta property="article:published_time" content="2021-08-23T14:55:00.000Z">
+<meta property="article:modified_time" content="2021-08-23T15:01:33.174Z">
+<meta property="article:author" content="Arclin">
+<meta property="article:tag" content="iOS">
+<meta property="article:tag" content="Swift">
+<meta name="twitter:card" content="summary">
+
+<link rel="canonical" href="https://www.arclin.cn/post/75996dec.html">
+
+
+<script id="page-configurations">
+  // https://hexo.io/docs/variables.html
+  CONFIG.page = {
+    sidebar: "",
+    isHome : false,
+    isPost : true,
+    lang   : 'zh-Hans'
+  };
+</script>
+
+  <title>Swift 5.5 新特性 async与 await | Arclin</title>
+  
+
+
+
+
+
+
+  <noscript>
+  <style>
+  .use-motion .brand,
+  .use-motion .menu-item,
+  .sidebar-inner,
+  .use-motion .post-block,
+  .use-motion .pagination,
+  .use-motion .comments,
+  .use-motion .post-header,
+  .use-motion .post-body,
+  .use-motion .collection-header { opacity: initial; }
+
+  .use-motion .site-title,
+  .use-motion .site-subtitle {
+    opacity: initial;
+    top: initial;
+  }
+
+  .use-motion .logo-line-before i { left: initial; }
+  .use-motion .logo-line-after i { right: initial; }
+  </style>
+</noscript>
+
+<link rel="alternate" href="/atom.xml" title="Arclin" type="application/atom+xml">
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage">
+  <div class="container use-motion">
+    <div class="headband"></div>
+
+    <header class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-container">
+  <div class="site-nav-toggle">
+    <div class="toggle" aria-label="切换导航栏">
+      <span class="toggle-line toggle-line-first"></span>
+      <span class="toggle-line toggle-line-middle"></span>
+      <span class="toggle-line toggle-line-last"></span>
+    </div>
+  </div>
+
+  <div class="site-meta">
+
+    <a href="/" class="brand" rel="start">
+      <span class="logo-line-before"><i></i></span>
+      <h1 class="site-title">Arclin</h1>
+      <span class="logo-line-after"><i></i></span>
+    </a>
+      <p class="site-subtitle" itemprop="description">Advocate Technology. Enjoy Technology.</p>
+  </div>
+
+  <div class="site-nav-right">
+    <div class="toggle popup-trigger">
+        <i class="fa fa-search fa-fw fa-lg"></i>
+    </div>
+  </div>
+</div>
+
+
+
+
+<nav class="site-nav">
+  <ul id="menu" class="main-menu menu">
+        <li class="menu-item menu-item-home">
+
+    <a href="/" rel="section"><i class="fa fa-home fa-fw"></i>首页</a>
+
+  </li>
+        <li class="menu-item menu-item-tags">
+
+    <a href="/tags/" rel="section"><i class="fa fa-tags fa-fw"></i>标签</a>
+
+  </li>
+        <li class="menu-item menu-item-categories">
+
+    <a href="/categories/" rel="section"><i class="fa fa-th fa-fw"></i>分类</a>
+
+  </li>
+        <li class="menu-item menu-item-archives">
+
+    <a href="/archives/" rel="section"><i class="fa fa-archive fa-fw"></i>归档</a>
+
+  </li>
+        <li class="menu-item menu-item-about">
+
+    <a href="/about/" rel="section"><i class="fa fa-user fa-fw"></i>关于</a>
+
+  </li>
+      <li class="menu-item menu-item-search">
+        <a role="button" class="popup-trigger"><i class="fa fa-search fa-fw"></i>搜索
+        </a>
+      </li>
+  </ul>
+</nav>
+
+
+
+  <div class="search-pop-overlay">
+    <div class="popup search-popup">
+        <div class="search-header">
+  <span class="search-icon">
+    <i class="fa fa-search"></i>
+  </span>
+  <div class="search-input-container">
+    <input autocomplete="off" autocapitalize="off"
+           placeholder="搜索..." spellcheck="false"
+           type="search" class="search-input">
+  </div>
+  <span class="popup-btn-close">
+    <i class="fa fa-times-circle"></i>
+  </span>
+</div>
+<div id="search-result">
+  <div id="no-result">
+    <i class="fa fa-spinner fa-pulse fa-5x fa-fw"></i>
+  </div>
+</div>
+
+    </div>
+  </div>
+
+</div>
+    </header>
+
+    
+  <div class="back-to-top">
+    <i class="fa fa-arrow-up"></i>
+    <span>0%</span>
+  </div>
+
+
+    <main class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          
+
+          <div class="content post posts-expand">
+            
+
+    
+  
+  
+  <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="zh-Hans">
+    <link itemprop="mainEntityOfPage" href="https://www.arclin.cn/post/75996dec.html">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="https://avatars.githubusercontent.com/u/12107804?v=4">
+      <meta itemprop="name" content="Arclin">
+      <meta itemprop="description" content="Stay hungry,stay foolish">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="Arclin">
+    </span>
+      <header class="post-header">
+        <h1 class="post-title" itemprop="name headline">
+          Swift 5.5 新特性 async与 await
+        </h1>
+
+        <div class="post-meta">
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-calendar"></i>
+              </span>
+              <span class="post-meta-item-text">发表于</span>
+
+              <time title="创建时间：2021-08-23 22:55:00" itemprop="dateCreated datePublished" datetime="2021-08-23T22:55:00+08:00">2021-08-23</time>
+            </span>
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-folder"></i>
+              </span>
+              <span class="post-meta-item-text">分类于</span>
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/iOS/" itemprop="url" rel="index"><span itemprop="name">iOS</span></a>
+                </span>
+            </span>
+
+          
+            <span class="post-meta-item" title="阅读次数" id="busuanzi_container_page_pv" style="display: none;">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-eye"></i>
+              </span>
+              <span class="post-meta-item-text">阅读次数：</span>
+              <span id="busuanzi_value_page_pv"></span>
+            </span>
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+        <p>本文主要简述Swift 5.5新特性 async与await的常用方式</p>
+<span id="more"></span>
+
+<h2 id="举个例子"><a href="#举个例子" class="headerlink" title="举个例子"></a>举个例子</h2><p>首先我们来做一个简单的下载图片的任务</p>
+<figure class="highlight swift"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br></pre></td><td class="code"><pre><span class="line"><span class="class"><span class="keyword">struct</span> <span class="title">Download</span> </span>&#123;</span><br><span class="line">    <span class="keyword">static</span> <span class="function"><span class="keyword">func</span> <span class="title">image</span>(<span class="params">url</span>: <span class="type">URL</span>, <span class="params">completeHandler</span>: <span class="keyword">@escaping</span> (<span class="type">UIImage</span>?, <span class="type">Error</span>?) -&gt; <span class="type">Void</span>)</span> &#123;</span><br><span class="line">        <span class="keyword">let</span> task <span class="operator">=</span> <span class="type">URLSession</span>.shared.dataTask(with: url) &#123; data, response, error <span class="keyword">in</span></span><br><span class="line">            <span class="keyword">if</span> <span class="keyword">let</span> error <span class="operator">=</span> error &#123;</span><br><span class="line">                <span class="type">DispatchQueue</span>.main.async &#123;</span><br><span class="line">                    completeHandler(<span class="literal">nil</span>,error)</span><br><span class="line">                &#125;</span><br><span class="line">                <span class="keyword">return</span></span><br><span class="line">            &#125;</span><br><span class="line">            <span class="keyword">if</span> <span class="keyword">let</span> data <span class="operator">=</span> data, <span class="keyword">let</span> httpResponse <span class="operator">=</span> response <span class="keyword">as?</span> <span class="type">HTTPURLResponse</span>, httpResponse.statusCode <span class="operator">==</span> <span class="number">200</span> &#123;</span><br><span class="line">                <span class="keyword">let</span> image <span class="operator">=</span> <span class="type">UIImage</span>(data: data)</span><br><span class="line">                <span class="keyword">if</span> image <span class="operator">!=</span> <span class="literal">nil</span> &#123;</span><br><span class="line">                    <span class="type">DispatchQueue</span>.main.async &#123;</span><br><span class="line">                        completeHandler(image, <span class="literal">nil</span>)</span><br><span class="line">                    &#125;</span><br><span class="line">                &#125; <span class="keyword">else</span> &#123;</span><br><span class="line">                    <span class="type">DispatchQueue</span>.main.async &#123;</span><br><span class="line">                        completeHandler(<span class="literal">nil</span>, <span class="type">NSError</span>(domain: <span class="string">&quot;org.swift&quot;</span>, code: <span class="operator">-</span><span class="number">2</span>))</span><br><span class="line">                    &#125;</span><br><span class="line">                &#125;</span><br><span class="line">            &#125; <span class="keyword">else</span> &#123;</span><br><span class="line">                <span class="type">DispatchQueue</span>.main.async &#123;</span><br><span class="line">                    completeHandler(<span class="literal">nil</span>, <span class="type">NSError</span>(domain: <span class="string">&quot;org.swift&quot;</span>, code: <span class="operator">-</span><span class="number">1</span>))</span><br><span class="line">                &#125;</span><br><span class="line">            &#125;</span><br><span class="line">        &#125;</span><br><span class="line">        task.resume()</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>可以发现，这个简单的任务里面涉及到了block嵌套，子线程与主线程的切换等等上下文切换的逻辑。</p>
+<p>代码首先会执行第一行，然后就直接执行最后一行，再回到第二行执行，然后还得判断各种异常状态，最后才回到主线程刷新。可以发现这里面最深的嵌套达到了4层，而且上下文的切换也不利于代码阅读。可想而知要是逻辑稍微再多一点，就远远不止这种复杂度了。</p>
+<h2 id="用-async-和-await-来拯救一下"><a href="#用-async-和-await-来拯救一下" class="headerlink" title="用 async 和 await 来拯救一下"></a>用 async 和 await 来拯救一下</h2><p>改造完之后，代码如下</p>
+<figure class="highlight swift"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">static</span> <span class="function"><span class="keyword">func</span> <span class="title">image</span>(<span class="params">url</span>: <span class="type">URL</span>)</span> <span class="keyword">async</span> <span class="keyword">throws</span> -&gt; <span class="type">UIImage</span> &#123;</span><br><span class="line">    <span class="keyword">let</span> (data, response) <span class="operator">=</span> <span class="keyword">try</span> <span class="keyword">await</span> <span class="type">URLSession</span>.shared.data(from: url)</span><br><span class="line">    <span class="keyword">guard</span> (response <span class="keyword">as?</span> <span class="type">HTTPURLResponse</span>)<span class="operator">?</span>.statusCode <span class="operator">==</span> <span class="number">200</span> <span class="keyword">else</span> &#123; <span class="keyword">throw</span> <span class="type">NSError</span>(domain: <span class="string">&quot;org,swift&quot;</span>, code: <span class="operator">-</span><span class="number">1</span>) &#125;</span><br><span class="line">    <span class="keyword">guard</span> <span class="keyword">let</span> maybeImage <span class="operator">=</span> <span class="type">UIImage</span>(data: data) <span class="keyword">else</span> &#123; <span class="keyword">throw</span> <span class="type">NSError</span>(domain: <span class="string">&quot;org,swift&quot;</span>, code: <span class="operator">-</span><span class="number">1</span>) &#125;</span><br><span class="line">    <span class="keyword">return</span> maybeImage</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>调用方式如下（如果需要捕获异常的话就需要加上<code>do-catch</code>）</p>
+<figure class="highlight swift"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line"><span class="type">Task</span> &#123;</span><br><span class="line">   <span class="keyword">try</span> <span class="keyword">self</span>.imageView.image <span class="operator">=</span> <span class="keyword">await</span> <span class="type">AsyncTest</span>.image(url: <span class="type">URL</span>(string: <span class="string">&quot;https://images.xiaozhuanlan.com/photo/2021/fb4d1bcda193cdfb5ccc380d1a008fe1.png&quot;</span>)<span class="operator">!</span>)</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>可以看到我们的代码精简了许多，嵌套最深也就是判断到异常的时候抛出的1层，接下来我们来逐行讲解一下</p>
+<h3 id="发起请求"><a href="#发起请求" class="headerlink" title="发起请求"></a>发起请求</h3><p>首先<code>URLSession.shared.data(from: url) </code>是iOS 15 新出的方法，用于发起网络请求，方法定义如下</p>
+<figure class="highlight swift"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">/// Convenience method to load data using an URL, creates and resumes an URLSessionDataTask internally.</span></span><br><span class="line"><span class="comment">///</span></span><br><span class="line"><span class="comment">/// - Parameter url: The URL for which to load data.</span></span><br><span class="line"><span class="comment">/// - Parameter delegate: Task-specific delegate.</span></span><br><span class="line"><span class="comment">/// - Returns: Data and response.</span></span><br><span class="line"><span class="keyword">public</span> <span class="function"><span class="keyword">func</span> <span class="title">data</span>(<span class="params">from</span> <span class="params">url</span>: <span class="type">URL</span>, <span class="params">delegate</span>: <span class="type">URLSessionTaskDelegate</span>? <span class="operator">=</span> <span class="literal">nil</span>)</span> <span class="keyword">async</span> <span class="keyword">throws</span> -&gt; (<span class="type">Data</span>, <span class="type">URLResponse</span>)</span><br></pre></td></tr></table></figure>
+
+<p>其中 <code>async</code> 表示这是一个异步方法，如同我们前面定义的方法一样<code>static func image(url: URL) async throws -&gt; UIImage</code>，同样也有<code>async</code>这个关键字，只要方法里面有<code>await</code>关键字，那么方法名就得带上<code>async</code>关键字。带有<code>async</code>的方法就意味着需要使用<code>await</code>去调用，然后其返回值可以直接赋值给某个变量。举例如下:</p>
+<figure class="highlight swift"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">func</span> <span class="title">getName</span>()</span> <span class="keyword">async</span> -&gt; <span class="type">String</span> &#123;</span><br><span class="line">	<span class="comment">/// 发起网络请求获取名字，这时候线程会卡住，直到请求完成了，就会把这个请求方法的返回值直接赋值给name，然后就会继续往下执行，把拿到的name给返回出去</span></span><br><span class="line">	<span class="keyword">let</span> name <span class="operator">=</span> <span class="keyword">await</span> requestName()</span><br><span class="line">	<span class="keyword">return</span> name</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="comment">/// 同理，当代码执行到这里的时候，调用异步方法，线程会卡住，然后方法里面去调用网络请求获取名字，然后等待网络请求返回之后，name就会被赋上值</span></span><br><span class="line"><span class="keyword">let</span> name <span class="operator">=</span> <span class="keyword">await</span> getName()</span><br></pre></td></tr></table></figure>
+
+<p>以上面的<code>URLSession</code>的<code>data(from:delegate:)</code>方法为例，返回的是一个元组，所以就是</p>
+<figure class="highlight swift"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">let</span> (data, response) <span class="operator">=</span> <span class="keyword">try</span> <span class="keyword">await</span> <span class="type">URLSession</span>.shared.data(from: url)</span><br></pre></td></tr></table></figure>
+<p>表示请求后，<code>data</code>和<code>response</code>变量都会被赋上值，分别是<code>Data</code>类型和<code>URLResponse</code>类型</p>
+<p>另外我们注意到，和通过block方式返回请求结果不同，这个新方法返回的元组中的<code>data</code>和<code>response</code>都不是可选类型，而是确切有值的，如果发生网络异常则会通过<code>throw</code>抛出异常，这样子的设计能够让我们节省加下来针对空值的判断，可以放心地使用返回值</p>
+<blockquote>
+<p>当然，不仅仅是网络请求可以用<code>await</code>，任意的异步行为（比如读取本地文件）都可以使用<code>await</code></p>
+</blockquote>
+<p>目前在iOS 15 SDK的<code>URLSession</code>中，不仅仅提供了上述请求数据，返回元组的方法，还提供了其他上传，下载的方法，可供异步调用，这里简单列举一下</p>
+<figure class="highlight swift"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">/// Convenience method to upload data using an URLRequest, creates and resumes an URLSessionUploadTask internally.</span></span><br><span class="line"><span class="comment">///</span></span><br><span class="line"><span class="comment">/// - Parameter request: The URLRequest for which to upload data.</span></span><br><span class="line"><span class="comment">/// - Parameter fileURL: File to upload.</span></span><br><span class="line"><span class="comment">/// - Parameter delegate: Task-specific delegate.</span></span><br><span class="line"><span class="comment">/// - Returns: Data and response.</span></span><br><span class="line"><span class="keyword">public</span> <span class="function"><span class="keyword">func</span> <span class="title">upload</span>(<span class="params">for</span> <span class="params">request</span>: <span class="type">URLRequest</span>, <span class="params">fromFile</span> <span class="params">fileURL</span>: <span class="type">URL</span>, <span class="params">delegate</span>: <span class="type">URLSessionTaskDelegate</span>? <span class="operator">=</span> <span class="literal">nil</span>)</span> <span class="keyword">async</span> <span class="keyword">throws</span> -&gt; (<span class="type">Data</span>, <span class="type">URLResponse</span>)</span><br><span class="line"></span><br><span class="line"><span class="comment">/// Convenience method to upload data using an URLRequest, creates and resumes an URLSessionUploadTask internally.</span></span><br><span class="line"><span class="comment">///</span></span><br><span class="line"><span class="comment">/// - Parameter request: The URLRequest for which to upload data.</span></span><br><span class="line"><span class="comment">/// - Parameter bodyData: Data to upload.</span></span><br><span class="line"><span class="comment">/// - Parameter delegate: Task-specific delegate.</span></span><br><span class="line"><span class="comment">/// - Returns: Data and response.</span></span><br><span class="line"><span class="keyword">public</span> <span class="function"><span class="keyword">func</span> <span class="title">upload</span>(<span class="params">for</span> <span class="params">request</span>: <span class="type">URLRequest</span>, <span class="params">from</span> <span class="params">bodyData</span>: <span class="type">Data</span>, <span class="params">delegate</span>: <span class="type">URLSessionTaskDelegate</span>? <span class="operator">=</span> <span class="literal">nil</span>)</span> <span class="keyword">async</span> <span class="keyword">throws</span> -&gt; (<span class="type">Data</span>, <span class="type">URLResponse</span>)</span><br><span class="line"></span><br><span class="line"><span class="comment">/// Convenience method to download using an URLRequest, creates and resumes an URLSessionDownloadTask internally.</span></span><br><span class="line"><span class="comment">///</span></span><br><span class="line"><span class="comment">/// - Parameter request: The URLRequest for which to download.</span></span><br><span class="line"><span class="comment">/// - Parameter delegate: Task-specific delegate.</span></span><br><span class="line"><span class="comment">/// - Returns: Downloaded file URL and response. The file will not be removed automatically.</span></span><br><span class="line"><span class="keyword">public</span> <span class="function"><span class="keyword">func</span> <span class="title">download</span>(<span class="params">for</span> <span class="params">request</span>: <span class="type">URLRequest</span>, <span class="params">delegate</span>: <span class="type">URLSessionTaskDelegate</span>? <span class="operator">=</span> <span class="literal">nil</span>)</span> <span class="keyword">async</span> <span class="keyword">throws</span> -&gt; (<span class="type">URL</span>, <span class="type">URLResponse</span>)</span><br><span class="line"></span><br><span class="line"><span class="comment">/// Convenience method to download using an URL, creates and resumes an URLSessionDownloadTask internally.</span></span><br><span class="line"><span class="comment">///</span></span><br><span class="line"><span class="comment">/// - Parameter url: The URL for which to download.</span></span><br><span class="line"><span class="comment">/// - Parameter delegate: Task-specific delegate.</span></span><br><span class="line"><span class="comment">/// - Returns: Downloaded file URL and response. The file will not be removed automatically.</span></span><br><span class="line"><span class="keyword">public</span> <span class="function"><span class="keyword">func</span> <span class="title">download</span>(<span class="params">from</span> <span class="params">url</span>: <span class="type">URL</span>, <span class="params">delegate</span>: <span class="type">URLSessionTaskDelegate</span>? <span class="operator">=</span> <span class="literal">nil</span>)</span> <span class="keyword">async</span> <span class="keyword">throws</span> -&gt; (<span class="type">URL</span>, <span class="type">URLResponse</span>)</span><br><span class="line"></span><br><span class="line"><span class="comment">/// Convenience method to resume download, creates and resumes an URLSessionDownloadTask internally.</span></span><br><span class="line"><span class="comment">///</span></span><br><span class="line"><span class="comment">/// - Parameter resumeData: Resume data from an incomplete download.</span></span><br><span class="line"><span class="comment">/// - Parameter delegate: Task-specific delegate.</span></span><br><span class="line"><span class="comment">/// - Returns: Downloaded file URL and response. The file will not be removed automatically.</span></span><br><span class="line"><span class="keyword">public</span> <span class="function"><span class="keyword">func</span> <span class="title">download</span>(<span class="params">resumeFrom</span> <span class="params">resumeData</span>: <span class="type">Data</span>, <span class="params">delegate</span>: <span class="type">URLSessionTaskDelegate</span>? <span class="operator">=</span> <span class="literal">nil</span>)</span> <span class="keyword">async</span> <span class="keyword">throws</span> -&gt; (<span class="type">URL</span>, <span class="type">URLResponse</span>)</span><br></pre></td></tr></table></figure>
+
+<h3 id="容错-amp-转码"><a href="#容错-amp-转码" class="headerlink" title="容错 &amp; 转码"></a>容错 &amp; 转码</h3><figure class="highlight swift"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">guard</span> (response <span class="keyword">as?</span> <span class="type">HTTPURLResponse</span>)<span class="operator">?</span>.statusCode <span class="operator">==</span> <span class="number">200</span> <span class="keyword">else</span> &#123; <span class="keyword">throw</span> <span class="type">NSError</span>(domain: <span class="string">&quot;org,swift&quot;</span>, code: <span class="operator">-</span><span class="number">1</span>) &#125;</span><br></pre></td></tr></table></figure>
+<p>这一行用来处理响应体的异常情况，当<code>statusCode</code> 为 200的判断不成立时，就会抛出异常，则外部需要通过<code>do-catch</code>去捕获</p>
+<p>如果判断成立时，则程序继续往下走</p>
+<figure class="highlight swift"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">guard</span> <span class="keyword">let</span> maybeImage <span class="operator">=</span> <span class="type">UIImage</span>(data: data) <span class="keyword">else</span> &#123; <span class="keyword">throw</span> <span class="type">NSError</span>(domain: <span class="string">&quot;org,swift&quot;</span>, code: <span class="operator">-</span><span class="number">1</span>) &#125;</span><br></pre></td></tr></table></figure>
+
+<p>这里将<code>data</code>转成了<code>UIImage</code>，由于该方法返回的是一个可选值，所以这里同样需要通过<code>guard</code>去判断转换失败的情况</p>
+<figure class="highlight swift"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">return</span> maybeImage</span><br></pre></td></tr></table></figure>
+
+<p>最后得到了确切的结果之后，我们就可以将转好的图片给发送出去了，并且外面使用这个返回值的时候也不用判空，可以放心地确定返回的图片是有值的。</p>
+<h3 id="调用方法"><a href="#调用方法" class="headerlink" title="调用方法"></a>调用方法</h3><p>当我们的方法被标记为<code>async</code>的时候，我们就需要加上<code>await</code>进行调用，并且调用的环境是需要在异步环境内的，即如下所示</p>
+<figure class="highlight swift"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">async</span> &#123;</span><br><span class="line">	<span class="keyword">try</span> <span class="keyword">let</span> image <span class="operator">=</span> <span class="keyword">await</span> <span class="type">AsyncTest</span>.image(url: xxxx)</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>在Xcode 13.0 bata 4 中这个<code>async &#123;&#125; </code>环境的建立代码被提示即将被废弃，所以改成了如下所示</p>
+<figure class="highlight swift"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line"><span class="type">Task</span>(priority: .userInitiated) &#123;</span><br><span class="line">    <span class="keyword">try</span> <span class="keyword">let</span> image <span class="operator">=</span> <span class="keyword">await</span> <span class="type">AsyncTest</span>.image(url: xxxx)</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>这里的<code>userInitiated</code>表示线程优先级为<code>用户发起</code>，当然<code>priority</code>参数也可以不填，默认优先级是<code>Task.currentPriority</code>，返回值默认是<code>default</code></p>
+<p>目前有六种优先级，这里从高到低进行排列如下：</p>
+<figure class="highlight swift"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">/// 优先级最高</span></span><br><span class="line"><span class="keyword">public</span> <span class="keyword">static</span> <span class="keyword">let</span> high: <span class="type">TaskPriority</span></span><br><span class="line"></span><br><span class="line"><span class="comment">/// 等同于default</span></span><br><span class="line"><span class="keyword">public</span> <span class="keyword">static</span> <span class="keyword">var</span> medium: <span class="type">TaskPriority</span> &#123; <span class="keyword">get</span> &#125;</span><br><span class="line"></span><br><span class="line"><span class="keyword">public</span> <span class="keyword">static</span> <span class="keyword">let</span> low: <span class="type">TaskPriority</span></span><br><span class="line"></span><br><span class="line"><span class="keyword">public</span> <span class="keyword">static</span> <span class="keyword">let</span> userInitiated: <span class="type">TaskPriority</span></span><br><span class="line"></span><br><span class="line"><span class="keyword">public</span> <span class="keyword">static</span> <span class="keyword">let</span> utility: <span class="type">TaskPriority</span></span><br><span class="line"></span><br><span class="line"><span class="comment">/// 优先级最低</span></span><br><span class="line"><span class="keyword">public</span> <span class="keyword">static</span> <span class="keyword">let</span> background: <span class="type">TaskPriority</span></span><br></pre></td></tr></table></figure>
+
+<h3 id="总结"><a href="#总结" class="headerlink" title="总结"></a>总结</h3><p>当你标记一个函数为<code>async</code>时，即表示该函数可以被挂起。在<code>async</code>函数内部，使用<code>await</code>关键词标记在哪里可以一次或多次挂起。当<code>async</code>函数挂起时，线程并未阻塞，系统会自由安排其他任务。有时后启动的任务，可能先被执行。即你的程序状态可能在挂起时发生显著变化。当<code>async</code>函数恢复执行时，其返回的结果会自然融入到<code>async</code>函数的调用者，并在先前挂起的地方接续执行。</p>
+<h3 id="注意"><a href="#注意" class="headerlink" title="注意"></a>注意</h3><p><code>await</code>关键字表示该异步（async）函数可能会被挂起，而不是畅通无阻地继续执行下去，甚至从挂起恢复回来时，函数可能已经跑到了另一个线程上去了，为了解决这个问题，我们可以用Swift的<code>actor</code>保护可变状态，这个我们后面再讲</p>
+<h2 id="Async序列"><a href="#Async序列" class="headerlink" title="Async序列"></a>Async序列</h2><p>Async序列顾名思义就是异步的序列，比如读取一个很大的文件，我们希望一边下载一边展示读取的内容，这时候我们可以通过使用<code>for await-in</code> 来遍历一个异步的序列，如下</p>
+<figure class="highlight swift"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">static</span> <span class="function"><span class="keyword">func</span> <span class="title">eatchquakes</span>()</span> <span class="keyword">async</span> <span class="keyword">throws</span> &#123;</span><br><span class="line">    <span class="keyword">let</span> endpointURL <span class="operator">=</span> <span class="type">URL</span>(string: <span class="string">&quot;https://earthquake.usgs.gov/earthquakes/feed/v1.0/summary/all_month.csv&quot;</span>)<span class="operator">!</span></span><br><span class="line"></span><br><span class="line">    <span class="comment">// 跳过首行 因为是header描述不是地震数据</span></span><br><span class="line">    <span class="comment">// 接着遍历提取强度、时间、经纬度信息</span></span><br><span class="line">    <span class="keyword">for</span> <span class="keyword">try</span> <span class="keyword">await</span> event <span class="keyword">in</span> endpointURL.lines.dropFirst() &#123;</span><br><span class="line">        <span class="keyword">let</span> values <span class="operator">=</span> event.split(separator: <span class="string">&quot;,&quot;</span>)</span><br><span class="line">        <span class="keyword">let</span> time <span class="operator">=</span> values[<span class="number">0</span>]</span><br><span class="line">        <span class="keyword">let</span> latitude <span class="operator">=</span> values[<span class="number">1</span>]</span><br><span class="line">        <span class="keyword">let</span> longtitude <span class="operator">=</span> values[<span class="number">2</span>]</span><br><span class="line">        <span class="keyword">let</span> magnitude <span class="operator">=</span> values[<span class="number">4</span>]</span><br><span class="line">        <span class="built_in">print</span>(<span class="string">&quot;Magnitude <span class="subst">\(magnitude)</span> on <span class="subst">\(time)</span> at <span class="subst">\(latitude)</span> <span class="subst">\(longtitude)</span>&quot;</span>)</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>也就是说，异步序列就是对随着时间推移如何产生值或对象的一种描述方式。由于值的产生是异步的，所以可能会在读取的过程中出现异常，当异常发生的时候，遍历终止，并抛出异常。</p>
+<p>其中，<code>lines</code>方法是iOS 15 新增的一个<code>URL</code>的拓展属性，同时还有<code>resourceBytes</code>属性，完整定义如下</p>
+<figure class="highlight swift"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br></pre></td><td class="code"><pre><span class="line"><span class="class"><span class="keyword">extension</span> <span class="title">URL</span> </span>&#123;</span><br><span class="line">    <span class="keyword">public</span> <span class="class"><span class="keyword">struct</span> <span class="title">AsyncBytes</span> : <span class="title">AsyncSequence</span>, <span class="title">AsyncIteratorProtocol</span> </span>&#123;</span><br><span class="line"></span><br><span class="line">        <span class="keyword">public</span> <span class="keyword">typealias</span> <span class="type">AsyncIterator</span> <span class="operator">=</span> <span class="type">URL</span>.<span class="type">AsyncBytes</span></span><br><span class="line">        </span><br><span class="line">        <span class="keyword">public</span> <span class="keyword">typealias</span> <span class="type">Element</span> <span class="operator">=</span> <span class="type">UInt8</span></span><br><span class="line"></span><br><span class="line">        <span class="comment">/// Asynchronously advances to the next element and returns it, or ends the</span></span><br><span class="line">        <span class="comment">/// sequence if there is no next element.</span></span><br><span class="line">        <span class="comment">/// </span></span><br><span class="line">        <span class="comment">/// - Returns: The next element, if it exists, or `nil` to signal the end of</span></span><br><span class="line">        <span class="comment">///   the sequence.</span></span><br><span class="line">        <span class="keyword">@inlinable</span> <span class="keyword">public</span> <span class="keyword">mutating</span> <span class="function"><span class="keyword">func</span> <span class="title">next</span>()</span> <span class="keyword">async</span> <span class="keyword">throws</span> -&gt; <span class="type">UInt8</span>?</span><br><span class="line"></span><br><span class="line">        <span class="comment">/// Creates the asynchronous iterator that produces elements of this</span></span><br><span class="line">        <span class="comment">/// asynchronous sequence.</span></span><br><span class="line">        <span class="comment">///</span></span><br><span class="line">        <span class="comment">/// - Returns: An instance of the `AsyncIterator` type used to produce</span></span><br><span class="line">        <span class="comment">/// elements of the asynchronous sequence.</span></span><br><span class="line">        <span class="keyword">public</span> <span class="function"><span class="keyword">func</span> <span class="title">makeAsyncIterator</span>()</span> -&gt; <span class="type">URL</span>.<span class="type">AsyncBytes</span></span><br><span class="line">    &#125;</span><br><span class="line">    <span class="keyword">public</span> <span class="keyword">var</span> resourceBytes: <span class="type">URL</span>.<span class="type">AsyncBytes</span> &#123; <span class="keyword">get</span> &#125;</span><br><span class="line">    <span class="keyword">public</span> <span class="keyword">var</span> lines: <span class="type">AsyncLineSequence</span>&lt;<span class="type">URL</span>.<span class="type">AsyncBytes</span>&gt; &#123; <span class="keyword">get</span> &#125;</span><br></pre></td></tr></table></figure>
+
+<p>因为异步序列的遍历是一个耗时操作，所以我们也可以在需要的时候中断遍历（取消请求）</p>
+<figure class="highlight swift"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">let</span> task <span class="operator">=</span> <span class="type">Task</span>(priority: .userInitiated) &#123;</span><br><span class="line">    <span class="keyword">do</span> &#123;</span><br><span class="line">        <span class="keyword">try</span> <span class="keyword">await</span> <span class="type">AsyncTest</span>.eatchquakes()</span><br><span class="line">    &#125; <span class="keyword">catch</span> &#123;</span><br><span class="line">        <span class="built_in">print</span>(error)</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="comment">/// 取消</span></span><br><span class="line">task.cancel()</span><br></pre></td></tr></table></figure>
+
+<p>除了<code>URL</code>新增的<code>lines</code>方法，iOS 15 还给<code>FileHandle</code>和<code>URLSession</code>添加了异步序列方法，比如<code>FileHandle</code>新增的<code>bytes</code>属性，能提供字节流的异步序列。配合异步序列的扩展能力（把字节流变成<code>lines</code>），我们就可以从文件中异步地获得逐行内容并进行处理了。</p>
+<figure class="highlight swift"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">// 从FileHandle异步读取bytes</span></span><br><span class="line"><span class="keyword">public</span> <span class="keyword">var</span> bytes: <span class="type">AsyncBytes</span></span><br><span class="line"></span><br><span class="line"><span class="keyword">for</span> <span class="keyword">try</span> <span class="keyword">await</span> line <span class="keyword">in</span> <span class="type">FileHandle</span>.standardInput.bytes.lines &#123;</span><br><span class="line"></span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>不仅如此，现在通知也支持异步序列了</p>
+<figure class="highlight swift"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">// 异步await通知</span></span><br><span class="line"><span class="keyword">public</span> <span class="function"><span class="keyword">func</span> <span class="title">notifications</span>(<span class="params">named</span>: <span class="type">Notification</span>.<span class="type">Name</span>, <span class="params">object</span>: <span class="type">AnyObject</span>)</span> -&gt; notifications</span><br><span class="line"></span><br><span class="line"><span class="keyword">let</span> center <span class="operator">=</span> <span class="type">NotificationCenter</span>.default</span><br><span class="line"></span><br><span class="line"><span class="comment">/// 返回第一个userInfo的NSStoreUUIDKey值为storeUUID的通知</span></span><br><span class="line"><span class="keyword">let</span> notification <span class="operator">=</span> <span class="keyword">await</span> center.notifications(named: .<span class="type">NSPersistentStoreRemoteChange</span>).first &#123;</span><br><span class="line">    <span class="variable">$0</span>.userInfo[<span class="type">NSStoreUUIDKey</span>] <span class="operator">==</span> storeUUID</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<h2 id="将异步回调的闭包方法改造成async方法"><a href="#将异步回调的闭包方法改造成async方法" class="headerlink" title="将异步回调的闭包方法改造成async方法"></a>将异步回调的闭包方法改造成async方法</h2><p>上面提到的都是基于系统提供的<code>async</code>方法，如果要改造我们原有的异步回调block方法，我们可以使用<code>withCheckedContinuation</code>或者<code>withCheckedThrowingContinuation</code>函数，区别在于前者用于确定不会抛出错误的场景，举例如下：</p>
+<ul>
+<li>三秒后返回Hello World</li>
+</ul>
+<figure class="highlight swift"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">static</span> <span class="function"><span class="keyword">func</span> <span class="title">getItem</span>(<span class="params">callback</span>: <span class="keyword">@escaping</span> (<span class="type">String</span>)-&gt;(<span class="type">Void</span>))</span> &#123;</span><br><span class="line">    <span class="type">DispatchQueue</span>.main.asyncAfter(deadline: .now() <span class="operator">+</span> <span class="number">3.0</span>) &#123;</span><br><span class="line">        callback(<span class="string">&quot;Hello World&quot;</span>);</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>改造后</p>
+<figure class="highlight swift"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">static</span> <span class="function"><span class="keyword">func</span> <span class="title">getItem</span>()</span> <span class="keyword">async</span> -&gt; <span class="type">String</span> &#123;</span><br><span class="line">    <span class="keyword">return</span> <span class="keyword">await</span> withCheckedContinuation &#123; continuation <span class="keyword">in</span></span><br><span class="line">        <span class="type">DispatchQueue</span>.main.asyncAfter(deadline: .now() <span class="operator">+</span> <span class="number">3.0</span>) &#123;</span><br><span class="line">            continuation.resume(returning: <span class="string">&quot;Hello World&quot;</span>);</span><br><span class="line">            <span class="comment">/// 如果需要抛出错误，使用 continuation.resume(throwing: error)</span></span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>continuation 有个简单但是重要的原则，resume方法必须在每个路径上执行，有且只有一次。但是不用担心，如果在有的路径上没有执行resume方法，Swift runtime 会发出 warning 警告。</p>
+<p>但如果在某个路径上，resume执行了不止一次，这会是严重得多的问题。Swift runtime 会在第二次 resume 调用处触发 fatal error。</p>
+<p>如果使用的是<code>withTaskCancellationHandler</code>，那么可以在异步操作被取消的时候执行某些行为</p>
+<figure class="highlight swift"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">static</span> <span class="function"><span class="keyword">func</span> <span class="title">getItem</span>()</span> <span class="keyword">async</span> <span class="keyword">throws</span> -&gt; <span class="type">String</span> &#123;</span><br><span class="line">    <span class="keyword">return</span> <span class="keyword">try</span> <span class="keyword">await</span> withTaskCancellationHandler &#123;</span><br><span class="line">        <span class="built_in">print</span>(<span class="string">&quot;Cancel&quot;</span>)</span><br><span class="line">    &#125; operation: &#123;</span><br><span class="line">        <span class="keyword">let</span> result <span class="operator">=</span> <span class="keyword">try</span> <span class="keyword">await</span> withCheckedThrowingContinuation &#123; continuation <span class="keyword">in</span></span><br><span class="line">            <span class="type">DispatchQueue</span>.main.asyncAfter(deadline: .now() <span class="operator">+</span> <span class="number">3.0</span>) &#123;</span><br><span class="line">                continuation.resume(returning: <span class="string">&quot;Hello World&quot;</span>)</span><br><span class="line">            &#125;</span><br><span class="line">        &#125;</span><br><span class="line">        <span class="keyword">return</span> result</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="comment">/// 调用</span></span><br><span class="line"><span class="keyword">let</span> task <span class="operator">=</span> <span class="type">Task</span> &#123;</span><br><span class="line">    <span class="keyword">do</span> &#123;</span><br><span class="line">        <span class="keyword">let</span> item <span class="operator">=</span> <span class="keyword">try</span> <span class="keyword">await</span> <span class="type">AsyncTest</span>.getItem()</span><br><span class="line">        <span class="built_in">print</span>(item)</span><br><span class="line">    &#125; <span class="keyword">catch</span> &#123;</span><br><span class="line">        <span class="built_in">print</span>(<span class="string">&quot;Error&quot;</span> <span class="operator">+</span> error.localizedDescription)</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="comment">/// 调用取消的时候会打印`Cancel`</span></span><br><span class="line">task.cancel()</span><br></pre></td></tr></table></figure>
+
+<h2 id="只读属性使用async"><a href="#只读属性使用async" class="headerlink" title="只读属性使用async"></a>只读属性使用async</h2><p>只读属性可以在其<code>get</code>方法中使用<code>async</code>标记是一个异步读取的属性，如下所示</p>
+<figure class="highlight swift"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br></pre></td><td class="code"><pre><span class="line"><span class="class"><span class="keyword">struct</span> <span class="title">AsyncTest</span> </span>&#123;</span><br><span class="line">  <span class="class"><span class="keyword">enum</span> <span class="title">FileError</span> : <span class="title">Error</span> </span>&#123;</span><br><span class="line">      <span class="keyword">case</span> missing, unreadable</span><br><span class="line">  &#125;</span><br><span class="line"></span><br><span class="line">  <span class="keyword">var</span> content : <span class="type">String</span> &#123;</span><br><span class="line">      <span class="keyword">get</span> <span class="keyword">async</span> <span class="keyword">throws</span> &#123;</span><br><span class="line">          <span class="keyword">guard</span> <span class="keyword">let</span> url <span class="operator">=</span> <span class="type">Bundle</span>.main.url(forResource: <span class="string">&quot;Empty&quot;</span>, withExtension: <span class="string">&quot;md&quot;</span>) <span class="keyword">else</span> &#123; <span class="keyword">throw</span> <span class="type">FileError</span>.missing &#125;</span><br><span class="line">          <span class="keyword">do</span> &#123;</span><br><span class="line">              <span class="keyword">return</span> <span class="keyword">try</span> <span class="type">String</span>(contentsOf: url)</span><br><span class="line">          &#125; <span class="keyword">catch</span> &#123;</span><br><span class="line">              <span class="keyword">throw</span> <span class="type">FileError</span>.unreadable</span><br><span class="line">          &#125;</span><br><span class="line">      &#125;</span><br><span class="line">  &#125;</span><br><span class="line"></span><br><span class="line">  <span class="function"><span class="keyword">func</span> <span class="title">readContent</span>()</span> <span class="keyword">async</span> <span class="keyword">throws</span> -&gt; <span class="type">String</span> &#123;</span><br><span class="line">      <span class="keyword">let</span> result <span class="operator">=</span> <span class="keyword">try</span> <span class="keyword">await</span> <span class="keyword">self</span>.content</span><br><span class="line">      <span class="keyword">return</span> result</span><br><span class="line">  &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<h2 id="结构化并发"><a href="#结构化并发" class="headerlink" title="结构化并发"></a>结构化并发</h2><p>假如我们有多个异步函数，比如<code>切菜</code>、<code>切洋葱</code>、<code>切肉</code></p>
+<figure class="highlight swift"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br></pre></td><td class="code"><pre><span class="line"><span class="class"><span class="keyword">struct</span> <span class="title">Cooking</span> </span>&#123;</span><br><span class="line">    <span class="keyword">static</span> <span class="function"><span class="keyword">func</span> <span class="title">cutVegetable</span>()</span> <span class="keyword">async</span> -&gt; <span class="type">String</span> &#123;</span><br><span class="line">        <span class="keyword">await</span> <span class="type">Task</span>.sleep(<span class="number">10_000_000_000</span>) <span class="comment">// 暂停10秒的意思</span></span><br><span class="line">        <span class="keyword">return</span> <span class="string">&quot;cut vegetable&quot;</span></span><br><span class="line">    &#125;</span><br><span class="line">    </span><br><span class="line">    <span class="keyword">static</span> <span class="function"><span class="keyword">func</span> <span class="title">cutOnion</span>()</span> <span class="keyword">async</span> -&gt; <span class="type">String</span> &#123;</span><br><span class="line">        <span class="keyword">await</span> <span class="type">Task</span>.sleep(<span class="number">5_000_000_000</span>)</span><br><span class="line">        <span class="keyword">return</span> <span class="string">&quot;cut onion&quot;</span></span><br><span class="line">    &#125;</span><br><span class="line">    </span><br><span class="line">    <span class="keyword">static</span> <span class="function"><span class="keyword">func</span> <span class="title">cutMeet</span>()</span> <span class="keyword">async</span> -&gt; <span class="type">String</span> &#123;</span><br><span class="line">        <span class="keyword">await</span> <span class="type">Task</span>.sleep(<span class="number">5_000_000_000</span>)</span><br><span class="line">        <span class="keyword">return</span> <span class="string">&quot;cut meet&quot;</span></span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>如果我们这么调用的话，那么整个过程将是串行的，一共会花费20秒左右</p>
+<figure class="highlight swift"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line"><span class="type">Task</span> &#123;</span><br><span class="line">    <span class="keyword">let</span> step1 <span class="operator">=</span> <span class="keyword">await</span> <span class="type">Cooking</span>.cutVegetable()</span><br><span class="line">    <span class="keyword">let</span> step2 <span class="operator">=</span> <span class="keyword">await</span> <span class="type">Cooking</span>.cutOnion()</span><br><span class="line">    <span class="keyword">let</span> step3 <span class="operator">=</span> <span class="keyword">await</span> <span class="type">Cooking</span>.cutMeet()</span><br><span class="line">    </span><br><span class="line">    <span class="built_in">print</span>([step1,step2,step3])</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>但是实际三个步骤之间并没有依赖关系，是可以同时进行的，所以我们需要使用结构化并发，让他们并发执行</p>
+<figure class="highlight swift"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">func</span> <span class="title">cooking</span>()</span> <span class="keyword">async</span> -&gt; [<span class="type">String</span>] &#123;</span><br><span class="line">    <span class="keyword">return</span> <span class="keyword">await</span> withTaskGroup(of: <span class="type">String</span>.<span class="keyword">self</span>) &#123; group <span class="keyword">in</span></span><br><span class="line">        group.addTask &#123;</span><br><span class="line">            <span class="keyword">await</span> <span class="type">Cooking</span>.cutVegetable()</span><br><span class="line">        &#125;</span><br><span class="line">        group.addTask &#123;</span><br><span class="line">            <span class="keyword">await</span> <span class="type">Cooking</span>.cutOnion()</span><br><span class="line">        &#125;</span><br><span class="line">        group.addTask &#123;</span><br><span class="line">            <span class="keyword">await</span> <span class="type">Cooking</span>.cutMeet()</span><br><span class="line">        &#125;</span><br><span class="line">        <span class="keyword">var</span> steps : [<span class="type">String</span>] <span class="operator">=</span> []</span><br><span class="line">        <span class="keyword">for</span> <span class="keyword">await</span> finishedStep <span class="keyword">in</span> group &#123;</span><br><span class="line">            steps.append(finishedStep)</span><br><span class="line">        &#125;</span><br><span class="line">        <span class="keyword">return</span> steps</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>这样子只要10秒左右就可以完成任务了</p>
+<figure class="highlight swift"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line"><span class="type">Task</span> &#123;</span><br><span class="line">    <span class="keyword">let</span> result <span class="operator">=</span> <span class="keyword">await</span> cooking()</span><br><span class="line">    <span class="built_in">print</span>(result)</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>如果在执行子任务的过程中发生了异常，那么<code>cooking()</code>方法将会退出，任何尚未完成的子任务都将自动取消。</p>
+<h2 id="Actor"><a href="#Actor" class="headerlink" title="Actor"></a>Actor</h2><p>由于我们现在已经多很多异步操作的场景，所以自然我们在设计类的时候，也要注意这个类要是被多个线程同时访问的时候引起的状态变化的问题。</p>
+<p>Swift 5.5引入了Actor，它在概念上类似于在并发环境中可以安全使用的类。Swift 确保在任何给定时间只能由单个线程访问 Actor 内的可变状态，这有助于在编译器级别消除各种严重的错误。</p>
+<p>比如以下代码在单线程情况下是安全的，但是如果是多线程访问的话<code>deck</code>属性会出现资源竞争的问题</p>
+<figure class="highlight swift"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br></pre></td><td class="code"><pre><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">RiskyCollector</span> </span>&#123;</span><br><span class="line">    <span class="keyword">var</span> deck: <span class="type">Set</span>&lt;<span class="type">String</span>&gt;</span><br><span class="line">    </span><br><span class="line">    <span class="function"><span class="keyword">init</span>(<span class="params">deck</span>: <span class="type">Set</span>&lt;<span class="type">String</span>&gt;)</span> &#123;</span><br><span class="line">        <span class="keyword">self</span>.deck <span class="operator">=</span> deck</span><br><span class="line">    &#125;</span><br><span class="line">    </span><br><span class="line">    <span class="function"><span class="keyword">func</span> <span class="title">send</span>(<span class="params">card</span> <span class="params">selected</span>: <span class="type">String</span>, <span class="params">to</span> <span class="params">person</span>: <span class="type">RiskyCollector</span>)</span> -&gt; <span class="type">Bool</span> &#123;</span><br><span class="line">        <span class="keyword">guard</span> deck.contains(selected) <span class="keyword">else</span> &#123; <span class="keyword">return</span> <span class="literal">false</span> &#125;</span><br><span class="line">        deck.remove(selected)</span><br><span class="line">        person.transfer(card: selected)</span><br><span class="line">        <span class="keyword">return</span> <span class="literal">true</span></span><br><span class="line">    &#125;</span><br><span class="line">    </span><br><span class="line">    <span class="function"><span class="keyword">func</span> <span class="title">transfer</span>(<span class="params">card</span>: <span class="type">String</span>)</span> &#123;</span><br><span class="line">        deck.insert(card)</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>危险：</p>
+<figure class="highlight vim"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">let</span> <span class="keyword">set</span> = Set<span class="symbol">&lt;String&gt;</span>([<span class="string">&quot;1&quot;</span>,<span class="string">&quot;2&quot;</span>,<span class="string">&quot;3&quot;</span>,<span class="string">&quot;4&quot;</span>,<span class="string">&quot;5&quot;</span>,<span class="string">&quot;6&quot;</span>,<span class="string">&quot;7&quot;</span>,<span class="string">&quot;8&quot;</span>,<span class="string">&quot;9&quot;</span>,<span class="string">&quot;10&quot;</span>,<span class="string">&quot;11&quot;</span>,<span class="string">&quot;12&quot;</span>])</span><br><span class="line"><span class="keyword">let</span> risky = RiskyCollector(deck:<span class="keyword">set</span>)</span><br><span class="line"><span class="keyword">for</span> i in <span class="number">1</span>...<span class="number">12</span> &#123;</span><br><span class="line">    DispatchQueue.<span class="keyword">global</span>().async &#123;</span><br><span class="line">        _ = risky.send(card: <span class="string">&quot;\(i)&quot;</span>, <span class="keyword">to</span>: risky)</span><br><span class="line">        <span class="keyword">print</span>(risky.deck)</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>Actor 通过引入 Actor 隔离解决了这个问题：除非异步执行，否则无法从 Actor 对象外部读取属性和方法，并且根本无法从 Actor 对象外部写入属性。 Swift 会自动将这些请求放入一个按顺序处理的队列中，以避免出现多线程竞争。</p>
+<p>我们可以使用Actor重新实现一个SafeCollector，如下:</p>
+<figure class="highlight swift"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br></pre></td><td class="code"><pre><span class="line">actor <span class="type">SafeCollector</span> &#123;</span><br><span class="line">  <span class="keyword">var</span> deck: <span class="type">Set</span>&lt;<span class="type">String</span>&gt;</span><br><span class="line">  <span class="function"><span class="keyword">init</span>(<span class="params">deck</span>: <span class="type">Set</span>&lt;<span class="type">String</span>&gt;)</span> &#123;</span><br><span class="line">      <span class="keyword">self</span>.deck <span class="operator">=</span> deck</span><br><span class="line">  &#125;</span><br><span class="line"></span><br><span class="line">  <span class="function"><span class="keyword">func</span> <span class="title">send</span>(<span class="params">card</span> <span class="params">selected</span>: <span class="type">String</span>, <span class="params">to</span> <span class="params">person</span>: <span class="type">SafeCollector</span>)</span> <span class="keyword">async</span> -&gt; <span class="type">Bool</span> &#123;</span><br><span class="line">      <span class="keyword">guard</span> deck.contains(selected) <span class="keyword">else</span> &#123; <span class="keyword">return</span> <span class="literal">false</span> &#125;</span><br><span class="line">      deck.remove(selected)</span><br><span class="line">      <span class="keyword">await</span> person.transfer(card: selected)</span><br><span class="line">      <span class="keyword">return</span> <span class="literal">true</span></span><br><span class="line">  &#125;</span><br><span class="line"></span><br><span class="line">  <span class="function"><span class="keyword">func</span> <span class="title">transfer</span>(<span class="params">card</span>: <span class="type">String</span>)</span> &#123;</span><br><span class="line">      deck.insert(card)</span><br><span class="line">  &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>安全：</p>
+<figure class="highlight swift"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">let</span> <span class="keyword">set</span> <span class="operator">=</span> <span class="type">Set</span>&lt;<span class="type">String</span>&gt;([<span class="string">&quot;1&quot;</span>,<span class="string">&quot;2&quot;</span>,<span class="string">&quot;3&quot;</span>,<span class="string">&quot;4&quot;</span>,<span class="string">&quot;5&quot;</span>,<span class="string">&quot;6&quot;</span>,<span class="string">&quot;7&quot;</span>,<span class="string">&quot;8&quot;</span>,<span class="string">&quot;9&quot;</span>,<span class="string">&quot;10&quot;</span>,<span class="string">&quot;11&quot;</span>,<span class="string">&quot;12&quot;</span>])</span><br><span class="line"><span class="keyword">let</span> risky <span class="operator">=</span> <span class="type">SafeCollector</span>(deck:<span class="keyword">set</span>)</span><br><span class="line"><span class="keyword">for</span> i <span class="keyword">in</span> <span class="number">1</span><span class="operator">...</span><span class="number">12</span> &#123;</span><br><span class="line">    <span class="type">Task</span> &#123;</span><br><span class="line">        <span class="keyword">_</span> <span class="operator">=</span> <span class="keyword">await</span> risky.send(card: <span class="string">&quot;<span class="subst">\(i)</span>&quot;</span>, to: risky)</span><br><span class="line">        <span class="built_in">print</span>(<span class="keyword">await</span> risky.deck)</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>在这个例子中有几件事情需要注意：</p>
+<ul>
+<li><p>actor内对外暴露的方法都是异步方法，即使没有标记async，因为它会等到另一个 SafeCollector actor 能够处理请求。</p>
+</li>
+<li><p>actor 可以自由地、异步或以其他方式使用自己的属性和方法，但是当与不同的 actor 交互时，它必须始终异步完成。通过这些特性，Swift 可以确保永远不会同时访问所有与 actor 隔离的状态，更重要的是，这是在编译时完成的，以保证线程安全。</p>
+</li>
+</ul>
+<p>Actor 和 Class 有一些相似之处：</p>
+<ul>
+<li><p>两者都是引用类型，因此它们可用于共享状态。</p>
+</li>
+<li><p>它们可以有方法、属性、初始值设定项和下标。</p>
+</li>
+<li><p>它们可以实现协议。任何静态属性和方法在这两种类型中的行为都相同。</p>
+</li>
+</ul>
+<p>除了 Actor 隔离之外，Actor 和 Class之间还有另外两个重要的区别：</p>
+<ul>
+<li><p>Actor 目前不支持继承，这在未来可能会改变</p>
+</li>
+<li><p>所有 Actor 都隐式遵守一个新的 Actor Protocol</p>
+</li>
+</ul>
+<h3 id="Global-Actor"><a href="#Global-Actor" class="headerlink" title="Global Actor"></a>Global Actor</h3><p>Global Actor 将 actor 隔离的概念扩展到了全局状态，即使状态和函数分散在许多不同的模块中，Global Actor 可以在并发程序中安全地使用全局变量，例如 Swift 提供的 <code>@MainActor</code> 限制属性和方法只能在主线程访问</p>
+<figure class="highlight swift"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br></pre></td><td class="code"><pre><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">ViewController</span> </span>&#123;</span><br><span class="line">    <span class="meta">@MainActor</span> <span class="function"><span class="keyword">func</span> <span class="title">refreshUI</span>()</span> &#123;</span><br><span class="line">        <span class="built_in">print</span>(<span class="string">&quot;updating ui…&quot;</span>)</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="meta">@MainActor</span> <span class="keyword">var</span> globalTextSize: <span class="type">Int</span></span><br><span class="line"></span><br><span class="line"><span class="meta">@MainActor</span> <span class="function"><span class="keyword">func</span> <span class="title">increaseTextSize</span>()</span> &#123;</span><br><span class="line">  globalTextSize <span class="operator">+=</span> <span class="number">2</span>   <span class="comment">// okay:</span></span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">func</span> <span class="title">notOnTheMainActor</span>()</span> <span class="keyword">async</span> &#123;</span><br><span class="line">  globalTextSize <span class="operator">=</span> <span class="number">12</span>  <span class="comment">// error: globalTextSize is isolated to MainActor</span></span><br><span class="line">  increaseTextSize()   <span class="comment">// error: increaseTextSize is isolated to MainActor, cannot call synchronously</span></span><br><span class="line">  <span class="keyword">await</span> increaseTextSize() <span class="comment">// okay: asynchronous call hops over to the main thread and executes there</span></span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+    </div>
+
+    
+    
+    
+
+      <footer class="post-footer">
+          <div class="post-tags">
+              <a href="/tags/iOS/" rel="tag"># iOS</a>
+              <a href="/tags/Swift/" rel="tag"># Swift</a>
+          </div>
+
+        
+
+
+        
+    <div class="post-nav">
+      <div class="post-nav-item">
+    <a href="/post/1bf095f2.html" rel="prev" title="Swift 5 Property Wrapper">
+      <i class="fa fa-chevron-left"></i> Swift 5 Property Wrapper
+    </a></div>
+      <div class="post-nav-item"></div>
+    </div>
+      </footer>
+    
+  </article>
+  
+  
+  
+
+
+
+          </div>
+          
+    <div class="comments" id="gitalk-container"></div>
+
+<script>
+  window.addEventListener('tabs:register', () => {
+    let { activeClass } = CONFIG.comments;
+    if (CONFIG.comments.storage) {
+      activeClass = localStorage.getItem('comments_active') || activeClass;
+    }
+    if (activeClass) {
+      let activeTab = document.querySelector(`a[href="#comment-${activeClass}"]`);
+      if (activeTab) {
+        activeTab.click();
+      }
+    }
+  });
+  if (CONFIG.comments.storage) {
+    window.addEventListener('tabs:click', event => {
+      if (!event.target.matches('.tabs-comment .tab-content .tab-pane')) return;
+      let commentClass = event.target.classList[1];
+      localStorage.setItem('comments_active', commentClass);
+    });
+  }
+</script>
+
+        </div>
+          
+  
+  <div class="toggle sidebar-toggle">
+    <span class="toggle-line toggle-line-first"></span>
+    <span class="toggle-line toggle-line-middle"></span>
+    <span class="toggle-line toggle-line-last"></span>
+  </div>
+
+  <aside class="sidebar">
+    <div class="sidebar-inner">
+
+      <ul class="sidebar-nav motion-element">
+        <li class="sidebar-nav-toc">
+          文章目录
+        </li>
+        <li class="sidebar-nav-overview">
+          站点概览
+        </li>
+      </ul>
+
+      <!--noindex-->
+      <div class="post-toc-wrap sidebar-panel">
+          <div class="post-toc motion-element"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#%E4%B8%BE%E4%B8%AA%E4%BE%8B%E5%AD%90"><span class="nav-number">1.</span> <span class="nav-text">举个例子</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E7%94%A8-async-%E5%92%8C-await-%E6%9D%A5%E6%8B%AF%E6%95%91%E4%B8%80%E4%B8%8B"><span class="nav-number">2.</span> <span class="nav-text">用 async 和 await 来拯救一下</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#%E5%8F%91%E8%B5%B7%E8%AF%B7%E6%B1%82"><span class="nav-number">2.1.</span> <span class="nav-text">发起请求</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E5%AE%B9%E9%94%99-amp-%E8%BD%AC%E7%A0%81"><span class="nav-number">2.2.</span> <span class="nav-text">容错 &amp; 转码</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E8%B0%83%E7%94%A8%E6%96%B9%E6%B3%95"><span class="nav-number">2.3.</span> <span class="nav-text">调用方法</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E6%80%BB%E7%BB%93"><span class="nav-number">2.4.</span> <span class="nav-text">总结</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E6%B3%A8%E6%84%8F"><span class="nav-number">2.5.</span> <span class="nav-text">注意</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#Async%E5%BA%8F%E5%88%97"><span class="nav-number">3.</span> <span class="nav-text">Async序列</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E5%B0%86%E5%BC%82%E6%AD%A5%E5%9B%9E%E8%B0%83%E7%9A%84%E9%97%AD%E5%8C%85%E6%96%B9%E6%B3%95%E6%94%B9%E9%80%A0%E6%88%90async%E6%96%B9%E6%B3%95"><span class="nav-number">4.</span> <span class="nav-text">将异步回调的闭包方法改造成async方法</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E5%8F%AA%E8%AF%BB%E5%B1%9E%E6%80%A7%E4%BD%BF%E7%94%A8async"><span class="nav-number">5.</span> <span class="nav-text">只读属性使用async</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E7%BB%93%E6%9E%84%E5%8C%96%E5%B9%B6%E5%8F%91"><span class="nav-number">6.</span> <span class="nav-text">结构化并发</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#Actor"><span class="nav-number">7.</span> <span class="nav-text">Actor</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#Global-Actor"><span class="nav-number">7.1.</span> <span class="nav-text">Global Actor</span></a></li></ol></li></ol></div>
+      </div>
+      <!--/noindex-->
+
+      <div class="site-overview-wrap sidebar-panel">
+        <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+    <img class="site-author-image" itemprop="image" alt="Arclin"
+      src="https://avatars.githubusercontent.com/u/12107804?v=4">
+  <p class="site-author-name" itemprop="name">Arclin</p>
+  <div class="site-description" itemprop="description">Stay hungry,stay foolish</div>
+</div>
+<div class="site-state-wrap motion-element">
+  <nav class="site-state">
+      <div class="site-state-item site-state-posts">
+          <a href="/archives/">
+        
+          <span class="site-state-item-count">91</span>
+          <span class="site-state-item-name">日志</span>
+        </a>
+      </div>
+      <div class="site-state-item site-state-categories">
+            <a href="/categories/">
+          
+        <span class="site-state-item-count">12</span>
+        <span class="site-state-item-name">分类</span></a>
+      </div>
+      <div class="site-state-item site-state-tags">
+            <a href="/tags/">
+          
+        <span class="site-state-item-count">37</span>
+        <span class="site-state-item-name">标签</span></a>
+      </div>
+  </nav>
+</div>
+  <div class="links-of-author motion-element">
+      <span class="links-of-author-item">
+        <a href="https://github.com/Arc-lin" title="GitHub → https://github.com/Arc-lin" rel="noopener" target="_blank"><i class="fab fa-github fa-fw"></i>GitHub</a>
+      </span>
+      <span class="links-of-author-item">
+        <a href="mailto:arclin325@gmail.com" title="E-Mail → mailto:arclin325@gmail.com" rel="noopener" target="_blank"><i class="fa fa-envelope fa-fw"></i>E-Mail</a>
+      </span>
+  </div>
+
+
+
+      </div>
+
+    </div>
+  </aside>
+  <div id="sidebar-dimmer"></div>
+
+
+      </div>
+    </main>
+
+    <footer class="footer">
+      <div class="footer-inner">
+        
+
+        
+
+<div class="copyright">
+  
+  &copy; 
+  <span itemprop="copyrightYear">2021</span>
+  <span class="with-love">
+    <i class="fa fa-heart"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">Arclin</span>
+</div>
+  <div class="powered-by">由 <a href="https://hexo.io" class="theme-link" rel="noopener" target="_blank">Hexo</a> & <a href="https://muse.theme-next.org" class="theme-link" rel="noopener" target="_blank">NexT.Muse</a> 强力驱动
+  </div>
+
+        
+<div class="busuanzi-count">
+  <script async src="https://busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js"></script>
+    <span class="post-meta-item" id="busuanzi_container_site_uv" style="display: none;">
+      <span class="post-meta-item-icon">
+        <i class="fa fa-user"></i>
+      </span>
+      <span class="site-uv" title="总访客量">
+        <span id="busuanzi_value_site_uv"></span>
+      </span>
+    </span>
+    <span class="post-meta-divider">|</span>
+    <span class="post-meta-item" id="busuanzi_container_site_pv" style="display: none;">
+      <span class="post-meta-item-icon">
+        <i class="fa fa-eye"></i>
+      </span>
+      <span class="site-pv" title="总访问量">
+        <span id="busuanzi_value_site_pv"></span>
+      </span>
+    </span>
+</div>
+
+
+
+
+
+
+
+
+      </div>
+    </footer>
+  </div>
+
+  
+  <script src="/lib/anime.min.js"></script>
+  <script src="//cdn.jsdelivr.net/npm/jquery@3/dist/jquery.min.js"></script>
+  <script src="//cdn.jsdelivr.net/gh/fancyapps/fancybox@3/dist/jquery.fancybox.min.js"></script>
+  <script src="/lib/velocity/velocity.min.js"></script>
+  <script src="/lib/velocity/velocity.ui.min.js"></script>
+
+<script src="/js/utils.js"></script>
+
+<script src="/js/motion.js"></script>
+
+
+<script src="/js/schemes/muse.js"></script>
+
+
+<script src="/js/next-boot.js"></script>
+
+
+
+
+  
+  <script>
+    (function(){
+      var canonicalURL, curProtocol;
+      //Get the <link> tag
+      var x=document.getElementsByTagName("link");
+		//Find the last canonical URL
+		if(x.length > 0){
+			for (i=0;i<x.length;i++){
+				if(x[i].rel.toLowerCase() == 'canonical' && x[i].href){
+					canonicalURL=x[i].href;
+				}
+			}
+		}
+    //Get protocol
+	    if (!canonicalURL){
+	    	curProtocol = window.location.protocol.split(':')[0];
+	    }
+	    else{
+	    	curProtocol = canonicalURL.split(':')[0];
+	    }
+      //Get current URL if the canonical URL does not exist
+	    if (!canonicalURL) canonicalURL = window.location.href;
+	    //Assign script content. Replace current URL with the canonical URL
+      !function(){var e=/([http|https]:\/\/[a-zA-Z0-9\_\.]+\.baidu\.com)/gi,r=canonicalURL,t=document.referrer;if(!e.test(r)){var n=(String(curProtocol).toLowerCase() === 'https')?"https://sp0.baidu.com/9_Q4simg2RQJ8t7jm9iCKT-xh_/s.gif":"//api.share.baidu.com/s.gif";t?(n+="?r="+encodeURIComponent(document.referrer),r&&(n+="&l="+r)):r&&(n+="?l="+r);var i=new Image;i.src=n}}(window);})();
+  </script>
+
+
+
+
+  
+<script src="/js/local-search.js"></script>
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+  
+
+<link rel="stylesheet" href="//cdn.jsdelivr.net/npm/gitalk@1/dist/gitalk.min.css">
+
+<script>
+NexT.utils.loadComments(document.querySelector('#gitalk-container'), () => {
+  NexT.utils.getScript('//cdn.jsdelivr.net/npm/gitalk@1/dist/gitalk.min.js', () => {
+    var gitalk = new Gitalk({
+      clientID    : 'df6d1f33bb4a66f5fa60',
+      clientSecret: '5fcc9fb756ac9d4b16381288da7b29f691b45e0a',
+      repo        : 'arc-lin.github.io',
+      owner       : 'Arc-lin',
+      admin       : ['Arc-lin'],
+      id          : 'bbe213028855715137c515b142ddadde',
+        language: 'zh-CN',
+      distractionFreeMode: false
+    });
+    gitalk.render('gitalk-container');
+  }, window.Gitalk);
+});
+</script>
+
+</body>
+</html>

@@ -18,7 +18,7 @@ date: 2021-07-18 10:13:00
 
 1. 首先定义一个协议，遵循协议的对象使用一个build方法返回一个View
 
-  ```
+  ```swift
   protocol ViewBuilder {
       func build() -> UIView
   }
@@ -26,7 +26,7 @@ date: 2021-07-18 10:13:00
  
 2. 这里我们设计四种颜色的View，宽度均为屏幕宽度，高度不定
 
-  ```
+  ```swift
   struct WhiteView : ViewBuilder {
       func build() -> UIView {
           let view = UIView(frame: CGRect(x: 0, y: 0, width: UIScreen.main.bounds.width, height: 100))
@@ -62,7 +62,7 @@ date: 2021-07-18 10:13:00
   
 3. 最后我们再定义一个ScrollView的容器，传入一个数组，让其从上到下进行排列
 
-	```
+	```swift
     struct ScrollableContainer : ViewBuilder {
     var contents : [ViewBuilder]
     func build() -> UIView {
@@ -80,7 +80,7 @@ date: 2021-07-18 10:13:00
     
 4. 这样子我们就可以开始布局了
 
-	```
+	```swift
     let scrollView = ScrollableContainer(contents: [
         RedView(),
         BlueView(),
@@ -99,7 +99,7 @@ date: 2021-07-18 10:13:00
 
 但是上述方法有一个缺点，就是当如果要重复添加多个相同的View或者说想要通过某个条件再添加View，就会有点复杂，比如当`needBlue == true`成立的时候再添加`BlueView`，那么可能需要这么写
 
-```
+```swift
 var contents = [
     RedView(),
     GreenView()
@@ -121,7 +121,7 @@ view.addSubview(scrollView.build())
     
 1. 首先我们要添加一个容器结构体，因为从上到下写的`View`会被整成一个数组或者多参数传进来，所以要加一个容器把他们从上到下排列好，最后排列完了，再把这个容器放进去ScrollView中
 
-	```
+	```swift
 	struct ViewContainer : ViewBuilder {
       var contents : [ViewBuilder]
       func build() -> UIView {
@@ -141,7 +141,7 @@ view.addSubview(scrollView.build())
 2. 创建一个Result builder，使用`@resultBuilder`注解会要求我们添加一个`buildBlock`方法，实现这个方法，把我们外面传进来的多个View放进去`VieContainer`容器中，然后实现`buildFinalResult`在编写结束的时候把
 `VieContainer`放进去`ScrollView`容器中
 
-	```
+	```swift
     @resultBuilder
     struct ScrollableViewBuilder {
         static func buildBlock(_ components: ViewBuilder...) -> ViewBuilder {
@@ -155,7 +155,7 @@ view.addSubview(scrollView.build())
     
 3. 这时候我们通过新增的`ScrollableViewBuilder`来创建一个方法，这里的闭包就是待会我们要写DSL的地方
 
-	```
+	```swift
     func build(@ScrollableViewBuilder content: () -> ViewBuilder) -> ViewBuilder {
         return content()
     }
@@ -163,21 +163,21 @@ view.addSubview(scrollView.build())
     
     这个方法传入一个闭包，这个由于我们已经实现了`buildBlock`，所以`content`被`@ScrollableViewBuilder`修饰之后，会自动将闭包内的东西转化成多参数，传入`buildBlock`方法，在那里面我们把各种各样的`View`给添加到`ViewContainer`上，方法调用如下
     
-    ```
+    ```swift
     let result = build {
         RedView()
         BlueView()
         GreenView()
     }
         
-	view.addSubview(result.build())
+    view.addSubview(result.build())
     ```
 
 	这时候运行效果同上图一致
     
 4. 接下来我们需要让这个闭包内支持if语句、else if语句、else语句和for语句，
 
-	```
+	```swift
     struct ScrollableViewBuilder {
       static func buildBlock(_ components: ViewBuilder...) -> ViewBuilder {
           return ScrollableContainer(contents: components)
@@ -199,7 +199,7 @@ view.addSubview(scrollView.build())
     
     然后我们试一试这么写
     
-    ```
+    ```swift
     let flag = 2
     let result = build {
         RedView()
@@ -230,7 +230,7 @@ view.addSubview(scrollView.build())
     
 5. 处理for语句，比如这样
 
-    ```
+    ```swift
     let result = build {
         RedView()
         BlueView()
@@ -244,7 +244,7 @@ view.addSubview(scrollView.build())
     
     `for`里面需要返回3个`GreenView+BlueView`，这里他每次调用for的括号里面的内容，都会走一遍`buildBlock`把里面的`GreenView+BlueView`封装成一个`ViewContainer`，所以这里会产生3个`ViewContainer`，最后这三个会变成一个数组，进入`buildArray`方法，再封装成一个`ViewContainer`，代码如下
     
-    ```
+    ```swift
     @resultBuilder
     struct ScrollableViewBuilder {
         static func buildBlock(_ components: ViewBuilder...) -> ViewBuilder {
@@ -270,7 +270,7 @@ view.addSubview(scrollView.build())
     
 6. 处理表达式，如果我们要在DSL里面插一些除了`View`之外的一些东西，那么就需要添加对应的处理方法，比如
 
-	```
+	```swift
     let result = build {
         print("a123")
         RedView()
@@ -283,7 +283,7 @@ view.addSubview(scrollView.build())
     
     ScrollableViewBuilder
     
-    ```
+    ```swift
     /// 针对正常的表达式，就直接返回
     static func buildExpression(_ expression: ViewBuilder) -> ViewBuilder {
         return expression
@@ -297,7 +297,7 @@ view.addSubview(scrollView.build())
     
     EmptyBuilder
     
-    ```
+    ```swift
     struct EmptyBuilder : ViewBuilder {
       func build() -> UIView {
           return UIView.init()
@@ -310,4 +310,3 @@ view.addSubview(scrollView.build())
 到这里就说的差不多了，其他本文没提及到的内容可以参阅[Write a DSL in Swift using result builders](https://developer.apple.com/videos/play/wwdc2021/10253/)
 
 本文[Demo](https://github.com/Arc-lin/ResultBuilderDemo)地址
-    

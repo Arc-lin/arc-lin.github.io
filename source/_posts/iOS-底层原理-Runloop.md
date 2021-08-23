@@ -24,7 +24,7 @@ date: 2021-07-21 22:10:50
 
 获取当前Runloop的两个方法
 
-```
+```objective-c
 NSRunLoop *runloop = [NSRunLoop currentRunLoop];
 CFRunLoopRef runloopRef = CFRunLoopGetCurrent();
 ```

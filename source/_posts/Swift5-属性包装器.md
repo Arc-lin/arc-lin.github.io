@@ -22,7 +22,7 @@ Property Wrapper即属性包装器，用于对某个属性进行包装，包装�
 
 我们可以提供两种属性包装器的初始化方法，一种是设置默认字符串长度上下限，一种是设置特定的字符串长度上下限
 
-```
+```swift
 @propertyWrapper
 struct StringWrapper {
     private var value : String
@@ -60,7 +60,7 @@ struct StringWrapper {
 
 使用属性包装器的方式如下
 
-```
+```swift
 struct Person {
      /// 自定义初始化方式
     @StringWrapper(minLength: 3, maxLength: 5) var name: String
@@ -79,7 +79,7 @@ print(person.title) /// 字符串太长了
 
 属性包装器还提供了另外一个属性，这个属性一般情况下可以用来标记被包装的属性是否被修改过
 
-```
+```swift
 @propertyWrapper
 struct StringWrapper {
   ···
@@ -105,7 +105,7 @@ struct StringWrapper {
 
 我们可以通过`$`符号来调用这个值
 
-```
+```swift
 struct Person {
     @StringWrapper(minLength: 3, maxLength: 5) var name: String
 }
@@ -119,7 +119,7 @@ print(person.$name) // 打印true，因为这时候长度太长了
 
 这个属性也用来可以返回别的东西
 
-```
+```swift
 @propertyWrapper
 struct StringWrapper {
   ···
@@ -147,7 +147,7 @@ struct StringWrapper {
 }
 ```
 
-```
+```swift
 struct Person {
     @StringWrapper(minLength: 3, maxLength: 5) var name: String
 }

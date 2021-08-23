@@ -29,7 +29,7 @@
 <meta property="og:description" content="当你某个在开发某个SDK时需要使用到特殊字体，因为无法修改应用的info.plist，所以这时候我们需要采用动态注册字体的方式加载字体，方法如下">
 <meta property="og:locale">
 <meta property="article:published_time" content="2021-03-17T02:42:42.000Z">
-<meta property="article:modified_time" content="2021-07-01T15:01:43.613Z">
+<meta property="article:modified_time" content="2021-08-21T09:03:39.407Z">
 <meta property="article:author" content="Arclin">
 <meta property="article:tag" content="iOS">
 <meta name="twitter:card" content="summary">
@@ -88,7 +88,7 @@
     <header class="header" itemscope itemtype="http://schema.org/WPHeader">
       <div class="header-inner"><div class="site-brand-container">
   <div class="site-nav-toggle">
-    <div class="toggle" aria-label="Toggle navigation bar">
+    <div class="toggle" aria-label="切换导航栏">
       <span class="toggle-line toggle-line-first"></span>
       <span class="toggle-line toggle-line-middle"></span>
       <span class="toggle-line toggle-line-last"></span>
@@ -119,31 +119,31 @@
   <ul id="menu" class="main-menu menu">
         <li class="menu-item menu-item-home">
 
-    <a href="/" rel="section"><i class="fa fa-home fa-fw"></i>Home</a>
+    <a href="/" rel="section"><i class="fa fa-home fa-fw"></i>首页</a>
 
   </li>
         <li class="menu-item menu-item-tags">
 
-    <a href="/tags/" rel="section"><i class="fa fa-tags fa-fw"></i>Tags</a>
+    <a href="/tags/" rel="section"><i class="fa fa-tags fa-fw"></i>标签</a>
 
   </li>
         <li class="menu-item menu-item-categories">
 
-    <a href="/categories/" rel="section"><i class="fa fa-th fa-fw"></i>Categories</a>
+    <a href="/categories/" rel="section"><i class="fa fa-th fa-fw"></i>分类</a>
 
   </li>
         <li class="menu-item menu-item-archives">
 
-    <a href="/archives/" rel="section"><i class="fa fa-archive fa-fw"></i>Archives</a>
+    <a href="/archives/" rel="section"><i class="fa fa-archive fa-fw"></i>归档</a>
 
   </li>
         <li class="menu-item menu-item-about">
 
-    <a href="/about/" rel="section"><i class="fa fa-user fa-fw"></i>About</a>
+    <a href="/about/" rel="section"><i class="fa fa-user fa-fw"></i>关于</a>
 
   </li>
       <li class="menu-item menu-item-search">
-        <a role="button" class="popup-trigger"><i class="fa fa-search fa-fw"></i>Search
+        <a role="button" class="popup-trigger"><i class="fa fa-search fa-fw"></i>搜索
         </a>
       </li>
   </ul>
@@ -159,7 +159,7 @@
   </span>
   <div class="search-input-container">
     <input autocomplete="off" autocapitalize="off"
-           placeholder="Searching..." spellcheck="false"
+           placeholder="搜索..." spellcheck="false"
            type="search" class="search-input">
   </div>
   <span class="popup-btn-close">
@@ -218,26 +218,26 @@
               <span class="post-meta-item-icon">
                 <i class="far fa-calendar"></i>
               </span>
-              <span class="post-meta-item-text">Posted on</span>
+              <span class="post-meta-item-text">发表于</span>
 
-              <time title="Created: 2021-03-17 10:42:42" itemprop="dateCreated datePublished" datetime="2021-03-17T10:42:42+08:00">2021-03-17</time>
+              <time title="创建时间：2021-03-17 10:42:42" itemprop="dateCreated datePublished" datetime="2021-03-17T10:42:42+08:00">2021-03-17</time>
             </span>
             <span class="post-meta-item">
               <span class="post-meta-item-icon">
                 <i class="far fa-folder"></i>
               </span>
-              <span class="post-meta-item-text">In</span>
+              <span class="post-meta-item-text">分类于</span>
                 <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
                   <a href="/categories/iOS/" itemprop="url" rel="index"><span itemprop="name">iOS</span></a>
                 </span>
             </span>
 
           
-            <span class="post-meta-item" title="Views" id="busuanzi_container_page_pv" style="display: none;">
+            <span class="post-meta-item" title="阅读次数" id="busuanzi_container_page_pv" style="display: none;">
               <span class="post-meta-item-icon">
                 <i class="fa fa-eye"></i>
               </span>
-              <span class="post-meta-item-text">Views: </span>
+              <span class="post-meta-item-text">阅读次数：</span>
               <span id="busuanzi_value_page_pv"></span>
             </span>
 
@@ -259,15 +259,15 @@
   <figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">[UIFont fontWithName:&lt;#(nonnull NSString *)#&gt; size:&lt;#(CGFloat)#&gt;]</span><br></pre></td></tr></table></figure>
 
 <p>  如果上述方法返回nil,则你需要注册你的字体</p>
-  <figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br></pre></td><td class="code"><pre><span class="line">   NSBundle *bundle &#x3D; [NSBundle bundleForClass:[self class]];</span><br><span class="line">NSURL *fontURL &#x3D; [bundle URLForResource:&lt;#fontName#&gt; withExtension:@&quot;otf&quot;&#x2F;*or TTF*&#x2F;];</span><br><span class="line">NSData *inData &#x3D; [NSData dataWithContentsOfURL:fontURL];</span><br><span class="line">CFErrorRef error;</span><br><span class="line">CGDataProviderRef provider &#x3D; CGDataProviderCreateWithCFData((CFDataRef)inData);</span><br><span class="line">CGFontRef font &#x3D; CGFontCreateWithDataProvider(provider);</span><br><span class="line">if (!CTFontManagerRegisterGraphicsFont(font, &amp;error)) &#123;</span><br><span class="line">	CFStringRef errorDescription &#x3D; CFErrorCopyDescription(error);</span><br><span class="line">	NSLog(@&quot;Failed to load font: %@&quot;, errorDescription);</span><br><span class="line">	CFRelease(errorDescription);</span><br><span class="line">&#125;</span><br><span class="line">CFSafeRelease(font);</span><br><span class="line">CFSafeRelease(provider);</span><br></pre></td></tr></table></figure>
+  <figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br></pre></td><td class="code"><pre><span class="line">NSBundle *bundle &#x3D; [NSBundle bundleForClass:[self class]];</span><br><span class="line">NSURL *fontURL &#x3D; [bundle URLForResource:&lt;#fontName#&gt; withExtension:@&quot;otf&quot;&#x2F;*or TTF*&#x2F;];</span><br><span class="line">NSData *inData &#x3D; [NSData dataWithContentsOfURL:fontURL];</span><br><span class="line">CFErrorRef error;</span><br><span class="line">CGDataProviderRef provider &#x3D; CGDataProviderCreateWithCFData((CFDataRef)inData);</span><br><span class="line">CGFontRef font &#x3D; CGFontCreateWithDataProvider(provider);</span><br><span class="line">if (!CTFontManagerRegisterGraphicsFont(font, &amp;error)) &#123;</span><br><span class="line">CFStringRef errorDescription &#x3D; CFErrorCopyDescription(error);</span><br><span class="line">NSLog(@&quot;Failed to load font: %@&quot;, errorDescription);</span><br><span class="line">CFRelease(errorDescription);</span><br><span class="line">&#125;</span><br><span class="line">CFSafeRelease(font);</span><br><span class="line">CFSafeRelease(provider);</span><br></pre></td></tr></table></figure>
 
-  <figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">void CFSafeRelease(CFTypeRef cf) &#123;</span><br><span class="line">	if (cf !&#x3D; NULL) &#123;</span><br><span class="line">		CFRelease(cf);</span><br><span class="line">	&#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+  <figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">void CFSafeRelease(CFTypeRef cf) &#123;</span><br><span class="line">    if (cf !&#x3D; NULL) &#123;</span><br><span class="line">        CFRelease(cf);</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
 </li>
 <li><p>Swift</p>
 <p>  方法调用</p>
-  <figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">UIFont.customFont(name:&quot;xxx&quot; size: 12)</span><br></pre></td></tr></table></figure>
+  <figure class="highlight swift"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="type">UIFont</span>.customFont(name:<span class="string">&quot;xxx&quot;</span> size: <span class="number">12</span>)</span><br></pre></td></tr></table></figure>
 
-  <figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br></pre></td><td class="code"><pre><span class="line">extension UIFont &#123;</span><br><span class="line">	    static func customFont(fontName:String, size: CGFloat) -&gt; UIFont &#123;</span><br><span class="line">        if let font &#x3D; UIFont(name: fontName, size: size) &#123;</span><br><span class="line">            return font</span><br><span class="line">        &#125; else &#123;</span><br><span class="line">            _ &#x3D; self.registerFont(bundle: Bundle.init(for: XXXX.self), fontName: fontName, fontExtension: &quot;otf&quot;) &#x2F;&#x2F; 也可以写ttf,看具体格式</span><br><span class="line">            if let newFont &#x3D; UIFont(name: fontName, size: size) &#123;</span><br><span class="line">                return newFont</span><br><span class="line">            &#125;</span><br><span class="line">            return UIFont.customFont(ofSize: size)</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line">    </span><br><span class="line">    static func registerFont(bundle: Bundle, fontName: String, fontExtension: String) -&gt; Bool &#123;</span><br><span class="line">        guard let fontURL &#x3D; bundle.url(forResource: fontName, withExtension: fontExtension) else &#123;</span><br><span class="line">            fatalError(&quot;Couldn&#39;t find font \(fontName)&quot;)</span><br><span class="line">        &#125;</span><br><span class="line">        </span><br><span class="line">        guard let fontDataProvider &#x3D; CGDataProvider(url: fontURL as CFURL) else &#123;</span><br><span class="line">            fatalError(&quot;Couldn&#39;t load data from the font \(fontName)&quot;)</span><br><span class="line">        &#125;</span><br><span class="line">        </span><br><span class="line">        guard let font &#x3D; CGFont(fontDataProvider) else &#123;</span><br><span class="line">            fatalError(&quot;Couldn&#39;t create font from data&quot;)</span><br><span class="line">        &#125;</span><br><span class="line">        </span><br><span class="line">        var error: Unmanaged&lt;CFError&gt;?</span><br><span class="line">        let success &#x3D; CTFontManagerRegisterGraphicsFont(font, &amp;error)</span><br><span class="line">        guard success else &#123;</span><br><span class="line">            print(&quot;Error registering font: maybe it was already registered.&quot;)</span><br><span class="line">            return false</span><br><span class="line">        &#125;</span><br><span class="line">        </span><br><span class="line">        return true</span><br><span class="line">    &#125;</span><br><span class="line"></span><br></pre></td></tr></table></figure></li>
+  <figure class="highlight swift"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br></pre></td><td class="code"><pre><span class="line"><span class="class"><span class="keyword">extension</span> <span class="title">UIFont</span> </span>&#123;</span><br><span class="line"> <span class="keyword">static</span> <span class="function"><span class="keyword">func</span> <span class="title">customFont</span>(<span class="params">fontName</span>:<span class="type">String</span>, <span class="params">size</span>: <span class="type">CGFloat</span>)</span> -&gt; <span class="type">UIFont</span> &#123;</span><br><span class="line">    <span class="keyword">if</span> <span class="keyword">let</span> font <span class="operator">=</span> <span class="type">UIFont</span>(name: fontName, size: size) &#123;</span><br><span class="line">        <span class="keyword">return</span> font</span><br><span class="line">    &#125; <span class="keyword">else</span> &#123;</span><br><span class="line">        <span class="keyword">_</span> <span class="operator">=</span> <span class="keyword">self</span>.registerFont(bundle: <span class="type">Bundle</span>.<span class="keyword">init</span>(for: <span class="type">XXXX</span>.<span class="keyword">self</span>), fontName: fontName, fontExtension: <span class="string">&quot;otf&quot;</span>) <span class="comment">// 也可以写ttf,看具体格式</span></span><br><span class="line">        <span class="keyword">if</span> <span class="keyword">let</span> newFont <span class="operator">=</span> <span class="type">UIFont</span>(name: fontName, size: size) &#123;</span><br><span class="line">            <span class="keyword">return</span> newFont</span><br><span class="line">        &#125;</span><br><span class="line">        <span class="keyword">return</span> <span class="type">UIFont</span>.customFont(ofSize: size)</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="keyword">static</span> <span class="function"><span class="keyword">func</span> <span class="title">registerFont</span>(<span class="params">bundle</span>: <span class="type">Bundle</span>, <span class="params">fontName</span>: <span class="type">String</span>, <span class="params">fontExtension</span>: <span class="type">String</span>)</span> -&gt; <span class="type">Bool</span> &#123;</span><br><span class="line">    <span class="keyword">guard</span> <span class="keyword">let</span> fontURL <span class="operator">=</span> bundle.url(forResource: fontName, withExtension: fontExtension) <span class="keyword">else</span> &#123;</span><br><span class="line">        <span class="built_in">fatalError</span>(<span class="string">&quot;Couldn&#x27;t find font <span class="subst">\(fontName)</span>&quot;</span>)</span><br><span class="line">    &#125;</span><br><span class="line">    </span><br><span class="line">    <span class="keyword">guard</span> <span class="keyword">let</span> fontDataProvider <span class="operator">=</span> <span class="type">CGDataProvider</span>(url: fontURL <span class="keyword">as</span> <span class="type">CFURL</span>) <span class="keyword">else</span> &#123;</span><br><span class="line">        <span class="built_in">fatalError</span>(<span class="string">&quot;Couldn&#x27;t load data from the font <span class="subst">\(fontName)</span>&quot;</span>)</span><br><span class="line">    &#125;</span><br><span class="line">    </span><br><span class="line">    <span class="keyword">guard</span> <span class="keyword">let</span> font <span class="operator">=</span> <span class="type">CGFont</span>(fontDataProvider) <span class="keyword">else</span> &#123;</span><br><span class="line">        <span class="built_in">fatalError</span>(<span class="string">&quot;Couldn&#x27;t create font from data&quot;</span>)</span><br><span class="line">    &#125;</span><br><span class="line">    </span><br><span class="line">    <span class="keyword">var</span> error: <span class="type">Unmanaged</span>&lt;<span class="type">CFError</span>&gt;?</span><br><span class="line">    <span class="keyword">let</span> success <span class="operator">=</span> <span class="type">CTFontManagerRegisterGraphicsFont</span>(font, <span class="operator">&amp;</span>error)</span><br><span class="line">    <span class="keyword">guard</span> success <span class="keyword">else</span> &#123;</span><br><span class="line">        <span class="built_in">print</span>(<span class="string">&quot;Error registering font: maybe it was already registered.&quot;</span>)</span><br><span class="line">        <span class="keyword">return</span> <span class="literal">false</span></span><br><span class="line">    &#125;</span><br><span class="line">    </span><br><span class="line">    <span class="keyword">return</span> <span class="literal">true</span></span><br><span class="line">&#125;</span><br><span class="line"></span><br></pre></td></tr></table></figure></li>
 </ul>
 <p>参考资料：<br>    <a target="_blank" rel="noopener" href="https://stackoverflow.com/questions/12919513/how-do-i-add-a-custom-font-to-a-cocoapod">https://stackoverflow.com/questions/12919513/how-do-i-add-a-custom-font-to-a-cocoapod</a></p>
 
@@ -345,10 +345,10 @@
 
       <ul class="sidebar-nav motion-element">
         <li class="sidebar-nav-toc">
-          Table of Contents
+          文章目录
         </li>
         <li class="sidebar-nav-overview">
-          Overview
+          站点概览
         </li>
       </ul>
 
@@ -369,21 +369,21 @@
       <div class="site-state-item site-state-posts">
           <a href="/archives/">
         
-          <span class="site-state-item-count">89</span>
-          <span class="site-state-item-name">posts</span>
+          <span class="site-state-item-count">91</span>
+          <span class="site-state-item-name">日志</span>
         </a>
       </div>
       <div class="site-state-item site-state-categories">
             <a href="/categories/">
           
         <span class="site-state-item-count">12</span>
-        <span class="site-state-item-name">categories</span></a>
+        <span class="site-state-item-name">分类</span></a>
       </div>
       <div class="site-state-item site-state-tags">
             <a href="/tags/">
           
         <span class="site-state-item-count">37</span>
-        <span class="site-state-item-name">tags</span></a>
+        <span class="site-state-item-name">标签</span></a>
       </div>
   </nav>
 </div>
@@ -423,7 +423,7 @@
   </span>
   <span class="author" itemprop="copyrightHolder">Arclin</span>
 </div>
-  <div class="powered-by">Powered by <a href="https://hexo.io" class="theme-link" rel="noopener" target="_blank">Hexo</a> & <a href="https://muse.theme-next.org" class="theme-link" rel="noopener" target="_blank">NexT.Muse</a>
+  <div class="powered-by">由 <a href="https://hexo.io" class="theme-link" rel="noopener" target="_blank">Hexo</a> & <a href="https://muse.theme-next.org" class="theme-link" rel="noopener" target="_blank">NexT.Muse</a> 强力驱动
   </div>
 
         
@@ -433,7 +433,7 @@
       <span class="post-meta-item-icon">
         <i class="fa fa-user"></i>
       </span>
-      <span class="site-uv" title="Total Visitors">
+      <span class="site-uv" title="总访客量">
         <span id="busuanzi_value_site_uv"></span>
       </span>
     </span>
@@ -442,7 +442,7 @@
       <span class="post-meta-item-icon">
         <i class="fa fa-eye"></i>
       </span>
-      <span class="site-pv" title="Total Views">
+      <span class="site-pv" title="总访问量">
         <span id="busuanzi_value_site_pv"></span>
       </span>
     </span>
