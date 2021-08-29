@@ -47,7 +47,7 @@ CFRunLoopRef runloopRef = CFRunLoopGetCurrent();
 	- 主线程一开始也是没有Runloop的，只是因为在`main.m`中调用了`UIApplicationMain`函数，在这里面回去获取Runloop从而创建了Runloop
     - 对应源码如下
     
-    ```
+    ```objectivec
     CF_EXPORT CFRunLoopRef _CFRunLoopGet0(pthread_t t) {
         ...
          if (!loop) {
@@ -79,7 +79,7 @@ Core Foundation 中关于Runloop的5个类
 - CFRunloopTimerRef
 - CFRunloopObserverRef
 
-```
+```objectivec
 typedef struct __CFRunLoop * CFRunloopRef;
 
 struct __CFRunLoop {
@@ -141,7 +141,7 @@ struct __CFRunLoopMode {
 
 Runloop的几种状态
 
-```
+```objectivec
 /* Run Loop Observer Activities */
 typedef CF_OPTIONS(CFOptionFlags, CFRunLoopActivity) {
     kCFRunLoopEntry = (1UL << 0),         // 即将进入Loop 
@@ -158,7 +158,7 @@ typedef CF_OPTIONS(CFOptionFlags, CFRunLoopActivity) {
 
 1. 定义监听回调
 
-  ```
+  ```objectivec
   void observeRunLoopActivities(CFRunLoopObserverRef observer, CFRunLoopActivity activity, void *info) {
       switch (activity) {
           case kCFRunLoopEntry:
@@ -187,7 +187,7 @@ typedef CF_OPTIONS(CFOptionFlags, CFRunLoopActivity) {
 
 2. 创建监听者
 
-  ```
+  ```objectivec
   /// 创建Observer
   CFRunLoopObserverRef observer = CFRunLoopObserverCreate(kCFAllocatorDefault, kCFRunLoopAllActivities, YES, 0, observeRunLoopActivities, NULL);
   /// 添加Observer
@@ -226,7 +226,7 @@ typedef CF_OPTIONS(CFOptionFlags, CFRunLoopActivity) {
 
 通过在控制台执行命令`bt`我们可以看到开始是调用了`CFRunLoopRunSpecific`函数，核心源码如下
 
-```
+```objectivec
 SInt32 CFRunLoopRunSpecific(CFRunLoopRef rl, CFStringRef modeName, CFTimeInterval seconds, Boolean returnAfterSourceHandled) {     /* DOES CALLOUT */
     
     ...
@@ -247,7 +247,7 @@ SInt32 CFRunLoopRunSpecific(CFRunLoopRef rl, CFStringRef modeName, CFTimeInterva
 
 然后查看一下`__CFRunLoopRun`内的核心处理代码
 
-```
+```objectivec
 static int32_t __CFRunLoopRun(CFRunLoopRef rl, CFRunLoopModeRef rlm, CFTimeInterval seconds, Boolean stopAfterHandle, CFRunLoopModeRef previousMode) {
     ...
     int32_t retVal = 0;
@@ -353,7 +353,7 @@ static int32_t __CFRunLoopRun(CFRunLoopRef rl, CFRunLoopModeRef rlm, CFTimeInter
 
 GCD只有在回调到主线程的时候才会调用到Runloop的函数，比如下面这种情况 
 
-```
+```objectivec
 dispatch_async(dispatch_get_global_queue(0,0), ^{
     dispatch_async(dispatch_get_main_queue(), ^{
     	...
@@ -378,7 +378,7 @@ dispatch_async(dispatch_get_global_queue(0,0), ^{
 
 这时候我们需要把NSTimer设置到`NSRunLoopCommonModes`里，如下
 
-```
+```objectivec
 static int count = 0;
 NSTimer *timer = [NSTimer timerWithTimeInterval:1.0 repeats:YES block:^(NSTimer * _Nonnull timer) {
     NSLog(@"%d",++count);
@@ -392,7 +392,7 @@ NSTimer *timer = [NSTimer timerWithTimeInterval:1.0 repeats:YES block:^(NSTimer 
 
 timer能在`_commonModes`数组中存放的模式下工作
 
-```
+```objectivec
 struct __CFRunLoop {
     ...
     pthread_t _pthread;
@@ -413,7 +413,7 @@ struct __CFRunLoop {
 
 首先我们创建一条线程
 
-```
+```objectivec
 self.thread = [[NSThread alloc] initWithTarget:self selector:@selector(run) object:nil];
 ```
 
@@ -423,7 +423,7 @@ self.thread = [[NSThread alloc] initWithTarget:self selector:@selector(run) obje
 
 这样子线程就会卡在`[[NSRunLoop currentRunLoop] run];`这一行中，不会让方法执行完，线程也就不会销毁
 
-```
+```objectivec
 - (void)run {
     NSLog(@"%@ %s begin",NSThread.currentThread,__func__);
     [[NSRunLoop currentRunLoop] addPort:[[NSPort alloc] init] forMode:NSDefaultRunLoopMode];
@@ -435,7 +435,7 @@ self.thread = [[NSThread alloc] initWithTarget:self selector:@selector(run) obje
 
 然后下一步我们需要调用一个方法去销毁这个线程，比如`CFRunLoopStop(CFRunLoopGetCurrent())`，但是如果我们这么做
 
-```
+```objectivec
 - (void)stop {
     CFRunLoopStop(CFRunLoopGetCurrent());
 }
@@ -446,7 +446,7 @@ self.thread = [[NSThread alloc] initWithTarget:self selector:@selector(run) obje
 
 发现线程不会销毁，原因是`[[NSRunLoop currentRunLoop] run];`执行后，会在一个死循环内执行Runloop的`runMode:beforeDate:`方法，类似于
 
-```
+```objectivec
 while(1) {
     [[NSRunLoop currentRunLoop] runMode: beforeDate:xxx];
 }
@@ -458,7 +458,7 @@ while(1) {
 
 只需要改造一下上面那个while方法就好，给self添加一个bool属性
 
-```
+```objectivec
 
 @property(nonatomic,assign) BOOL isStop;
 
@@ -482,7 +482,7 @@ while(1) {
 
 ### 封装
 
-```
+```objectivec
 @interface MyThread : NSObject
 
 /// 开启线程

@@ -16,7 +16,7 @@ date: 2021-06-29 01:11:00
 
 ### Class对象的结构
 
-```
+```objectivec
 struct objc_class {
     Class isa;
     Class superclass;
@@ -27,7 +27,7 @@ struct objc_class {
 
 其中`bits`成员变量与`FAST_DATA_MASK`进行一次与运算之后，会获得一个其属性可读可写的对象的地址，这个对象长这样
 
-```
+```objectivec
 struct class_rw_t {
     uint32_t flags;
     uint32_t version;
@@ -43,7 +43,7 @@ struct class_rw_t {
 
 其中 `class_ro_t`里面存放的是类的原始信息(不包括分类里面的东西)，是仅可读的，结构如下
 
-```
+```objectivec
 struct class_ro_t {
     uint32_t flags;
     unit32_t instanceStart;
@@ -66,7 +66,7 @@ struct class_ro_t {
 
 `class_rw_t`里面的methods、properties、protocols是二维数组，是可读可写的，比如方法列表随时可以新增`method_list_t`类型的数据进去。`class_rw_t`包含了类的初始内容和分类的内容，其中方法列表类似如下结构
 
-```
+```objectivec
 method_array_t: [
     method_list_t : [
       method_t,
@@ -83,7 +83,7 @@ method_array_t: [
 
 `objc_class`内有一个`data()`函数，其返回值一开始是指向`class_ro_t`类型的对象的。在合并分类内的内容时，才会产生`class_rw_t`类型的对象，并指向这个对象。可以参考runtime源码，`objc-runtime-new.mm`中`realizeClassWithoutSwift`函数的实现，这里贴出关键部分
 
-```
+```objectivec
 static Class realizeClassWithoutSwift(Class cls, Class previously)
 {
     ...
@@ -167,7 +167,7 @@ struct method_t {
 
 - Class内部结构中有个方法缓存（cache_t），用散列表来缓存曾经调用过的方法，可以提高方法的查找速度
 
-```
+```objectivec
 struct cache_t {
     explicit_atomic<uintptr_t> _bucketsAndMaybeMask;
     union {
@@ -186,7 +186,7 @@ struct cache_t {
 
 其中，通过`buckets()`函数我们可以得知`_bucketsAndMaybeMask`是一个存放`bucket_t`数组的指针（即`_bucketsAndMaybeMask`指针指向的是数组的第一个元素），是通过位运算取出来的
 
-```
+```objectivec
 struct bucket_t *cache_t::buckets() const
 {
     uintptr_t addr = _bucketsAndMaybeMask.load(memory_order_relaxed);
@@ -212,7 +212,7 @@ struct bucket_t {
 
 另外`_bucketsAndMaybeMask`之所以叫这个名字是因为它不仅存放着`buckets`还存放着`maybeMask`，在arm64位真机环境下，取高16位，如下:
 
-```
+```objectivec
 mask_t cache_t::mask() const
 {
     uintptr_t maskAndBuckets = _bucketsAndMaybeMask.load(memory_order_relaxed);
@@ -225,7 +225,7 @@ mask_t cache_t::mask() const
 
 先看看runtime源码中，将方法插入缓存的函数（摘抄核心流程）
 
-```
+```objectivec
 void cache_t::insert(SEL sel, IMP imp, id receiver)
 {
     ...
@@ -350,7 +350,7 @@ void cache_t::insert(SEL sel, IMP imp, id receiver)
 
 底层会转换为
 
-```
+```objectivec
 objc_msgSend(person,sel_registerName("personTest"));
 ```
 
@@ -372,7 +372,7 @@ objc_msgSend(person,sel_registerName("personTest"));
 - 如果是还没排序的方法，那么就使用遍历的方法查找
 - 在缓存中查找方法的过程也称作快速查找（使用汇编实现），在`class_rw_t`中查找方法的过程也称作慢速查找(使用汇编和C++实现)，C++部分方法源码在`lookUpImpOrForward`函数中，如下：
 
-```
+```objectivec
 IMP lookUpImpOrForward(id inst, SEL sel, Class cls, int behavior)
 {
     const IMP forward_imp = (IMP)_objc_msgForward_impcache;
@@ -454,13 +454,13 @@ IMP lookUpImpOrForward(id inst, SEL sel, Class cls, int behavior)
 
 假如这里的person没有实现print方法
 
-```
+```objectivec
 Person *person = [Person new];
 [person print];
 ```
 
 那我们可以在`Person.m`添加一个方法实现用来替换丢失的`print`，这里我们用`truePrint`来替代
-```
+```objectivec
 - (void)truePrint {
     NSLog(@"true print");
 }
@@ -504,7 +504,7 @@ struct objc_method {
 
 以下是一些拿到`Method`对象后可以使用的一些函数
 
-```
+```objectivec
 // 函数调用，但是不接收返回值类型为结构体
 method_invoke
 // 函数调用，但是接收返回值类型为结构体
@@ -547,7 +547,7 @@ if (slowpath(behavior & LOOKUP_RESOLVER)) {
 
 当找不到消息的时候就会进入动态方法解析的流程即`resolveMethod_locked`，如下
 
-```
+```objectivec
 static NEVER_INLINE IMP resolveMethod_locked(id inst, SEL sel, Class cls, int behavior) {
     runtimeLock.assertLocked();
     ASSERT(cls->isRealized());
@@ -633,7 +633,7 @@ static void resolveInstanceMethod(id inst, SEL sel, Class cls)
 
 要实现消息转发，我们有两种方式，一种是实现一个方法`-forwardingTargetForSelector`，一种是实现`-methodSignatureForSelector`和`-forwardInvocation`，比如
 
-```
+```objectivec
 - (id)forwardingTargetForSelector:(SEL)aSelector {
     if (aSelector == @selector(print)) {
         return [[Student alloc] init];
@@ -646,7 +646,7 @@ static void resolveInstanceMethod(id inst, SEL sel, Class cls)
 
 如果`forwardingTargetForSelector`没实现或者返回空的话
 
-```
+```objectivec
 - (id)forwardingTargetForSelector:(SEL)aSelector {
     if (aSelector == @selector(print)) {
         return nil;
@@ -657,7 +657,7 @@ static void resolveInstanceMethod(id inst, SEL sel, Class cls)
 
 那么就会寻找`-methodSignatureForSelector`和`-forwardInvocation`
 
-```
+```objectivec
 /// 方法签名： 返回值类型、参数类型
 - (NSMethodSignature *)methodSignatureForSelector:(SEL)aSelector {
     if (aSelector == @selector(print)) {
@@ -687,7 +687,7 @@ static void resolveInstanceMethod(id inst, SEL sel, Class cls)
 
 比如调用方法为`[person print:1]`，进入到`forwardInvocation`后我们可以通过以下方法拿到`1`这个参数
 
-```
+```objectivec
 - (void)forwardInvocation:(NSInvocation *)anInvocation {
     int a;
     [anInvocation getArgument:&a atIndex:2]; // 第一个参数是self，第二个是_cmd，所以从下标2开始取
@@ -696,7 +696,7 @@ static void resolveInstanceMethod(id inst, SEL sel, Class cls)
 
 如果要拿返回值的话，就可以这么做
 
-```
+```objectivec
 - (void)forwardInvocation:(NSInvocation *)anInvocation {
     [anInvocation invokeWithTarget:[[Student alloc] init]]; // 要先调用一下Student的print方法，这里假设返回值是整型
     int result;
@@ -711,7 +711,7 @@ static void resolveInstanceMethod(id inst, SEL sel, Class cls)
 
 我们除了可以通过方法编码拿到`NSMethodSignature`对象之外，还可以这么做
 
-```
+```objectivec
 - (NSMethodSignature *)methodSignatureForSelector:(SEL)aSelector {
     if (aSelector == @selector(print)) {
         return [[Student new] methodSignatureForSelector:@selector(print)];

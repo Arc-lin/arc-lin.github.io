@@ -115,7 +115,7 @@ Contents of (__DATA,TestModes) section
 	
 4. 取出类名， 代码如下
 
-	```
+	```objectivec
 	NSArray<NSString *>* readConfiguration(char *sectionName,const struct mach_header *mhp)
 	{
 		NSMutableArray *configs = [NSMutableArray array];
@@ -181,7 +181,7 @@ Contents of (__DATA,TestModes) section
 
 只需要在实现`UIApplicationDelegate`的方法内部调用super方法即可，如
 
-```
+```objectivec
 - (BOOL)application:(UIApplication *)application didFinishLaunchingWithOptions:(NSDictionary *)launchOptions
 {
     [super application:application didFinishLaunchingWithOptions:launchOptions];
@@ -201,11 +201,11 @@ Contents of (__DATA,TestModes) section
 在AppDelegate的各个方法做分发埋点，触发到埋点后事件会分发到各个组件类里面
 	
 如
-```
+```objectivec
 - (BOOL)application:(UIApplication *)application didFinishLaunchingWithOptions:(NSDictionary *)launchOptions;
 ```
 埋点如下
-```
+```objectivec
 - (BOOL)application:(UIApplication *)application didFinishLaunchingWithOptions:(NSDictionary *)launchOptions
   {
       [[ALComponentManager sharedManager] triggerEvent:ALSetupEvent];
@@ -229,7 +229,7 @@ Contents of (__DATA,TestModes) section
 
 1. 给每个组件创建一个类并写上注解，如`ALComponentA.m`
 
-	```
+	```objectivec
 	@ALMod(ALComponentA);
 	@interface ALComponentA()<ALComponentProtocol>
 
@@ -243,7 +243,7 @@ Contents of (__DATA,TestModes) section
 2. 实现协议`ALComponentProtocol`和需要的协议方法。
 	这个协议里面蕴含了基本所有的`AppDelegate`方法，当然要触发这些方法都是要预先在AppDelegate写上埋点。
 	
-	```
+	```objectivec
 	@implementation ALComponentA
 
 	+ (void)load
