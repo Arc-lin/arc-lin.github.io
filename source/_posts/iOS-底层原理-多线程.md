@@ -517,9 +517,13 @@ static inline void reallySetProperty(id self, SEL _cmd, id newValue, ptrdiff_t o
 
 #### 多读单写
 
+需求
+
 - 同一时间，只能有1条线程进行写的操作
 - 同一时间，允许有多条线程进行读的操作
 - 同一时间，不允许既有写的操作，又有读的操作
+
+解决方案
 
 - pthread_rwlock：读写锁
 - dispatch_barrier_async：异步栅栏调用
@@ -581,9 +585,6 @@ dispatch_barrier_async(queue, ^{
 
 });
 ```
-
-
-
     
 ## 其他
 
