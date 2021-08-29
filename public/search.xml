@@ -6460,4 +6460,90 @@
         <tag>Swift</tag>
       </tags>
   </entry>
+  <entry>
+    <title>最近看了一本书...</title>
+    <url>/post/a4ffdee.html</url>
+    <content><![CDATA[<p>最近看了一本 《代码整洁之道》</p>
+<p>基本跟我们平时的编码代码规范有点类似吧。里面的一些设计思想是挺好的。这里记录一下一些个人感觉好像挺有用的点。</p>
+<blockquote>
+<p>部分内容可能存在争议，请不要在意，以自己团队规范为准。</p>
+</blockquote>
+<span id="more"></span>
+
+<h2 id="常量"><a href="#常量" class="headerlink" title="常量"></a>常量</h2><p>用命名常量替代魔术数（泛指任何不能自我描述的符号）</p>
+<p>命名采用描述性名称，确认名称具有描述性</p>
+<h2 id="语句"><a href="#语句" class="headerlink" title="语句"></a>语句</h2><p>封装条件要抽离解释了条件意图函数，比如 shouldBeDelete(timer) 要优于  (timer.hasExpired &amp;&amp; !timer.isRecurrent())</p>
+<p>避免否定条件  if（shouldDo） 要好于 if (!shouldNotDo)</p>
+<h2 id="函数"><a href="#函数" class="headerlink" title="函数"></a>函数</h2><p>为较大作用范围选用较长名称</p>
+<p>名称应该说明函数、变量或类的一切信息，不要用名称掩蔽副作用。</p>
+<p>每个函数只做一件事情</p>
+<p>函数参数应该越少越好</p>
+<p>不要把输入的参数拿来输出</p>
+<p>布尔值参数宣告函数做了不止一件事情，违反了单一职责原则，应该消灭掉</p>
+<p>用布尔、枚举、整数等参数用于判断流程来决定函数行为是不好的，使用多个函数，通常优于向单个函数传递某些代码来选择函数行为</p>
+<p>使用异常替代返回错误码</p>
+<p>抽离Try/Catch代码块</p>
+<p>把重复代码抽离出来</p>
+<p>通常应该倾向于选用非静态方法。如果的确需要静态函数，确保没机会打算让他有多态行为。</p>
+<p>函数名称应该表达其行为</p>
+<p>如果多个函数的调用有时序性，比如必须先调用A才能调用B，要显式声明时序性，比如调用B函数的时候把A函数作为参数传进去，这样子就保证别人不会误把B函数放在A函数前调用</p>
+<h2 id="格式"><a href="#格式" class="headerlink" title="格式"></a>格式</h2><p>顶部给出高层次概念和算法。细节应该往下渐次展开，直至找到原文件中最底层的函数和细节</p>
+<p>如果某个函数调用了另外一个，就应该把它们放在一起，而且调用者应该尽可能放在被调用者上面，</p>
+<p>概念相关的代码应该放到一起，相关性越强，彼此之间的距离就该越短</p>
+<h2 id="对象"><a href="#对象" class="headerlink" title="对象"></a>对象</h2><p>过程式代码（使用数据结构的代码）便于在不改动既有数据结构的前提下添加新函数<br>面向对象代码便于在不改动既有函数的前提下添加新类</p>
+<p>过程式代码难以添加新数据结构，因为必须修改所有函数。<br>面向对象代码难以添加新函数，因为必须修改所有类。</p>
+<p>迪米特法则：模块不应了解它所操作对象的内部情形。<br>隐藏结构：<code>let a = b.c().e().f()</code><br>拆分成</p>
+<figure class="highlight nix"><table><tr><td class="code"><pre><span class="line"><span class="keyword">let</span> <span class="attr">c</span> = b.c()</span><br><span class="line"><span class="keyword">let</span> <span class="attr">e</span> = c.e()</span><br><span class="line"><span class="keyword">let</span> <span class="attr">a</span> = e.f()</span><br></pre></td></tr></table></figure>
+
+<p>应该改成<br><code>let a = b.func()</code></p>
+<p>在方法中，不应该调用其他对象的方法</p>
+<figure class="highlight swift"><table><tr><td class="code"><pre><span class="line"><span class="function"><span class="keyword">func</span> <span class="title">test</span>(<span class="keyword">let</span> obj)</span> &#123;</span><br><span class="line">    <span class="keyword">let</span> item <span class="operator">=</span> obj.func()</span><br><span class="line">    item.func() <span class="comment">// 不可以</span></span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>类C的方法f只能调用以下对象的方法</p>
+<ul>
+<li>C</li>
+<li>由f创建的对象</li>
+<li>作为参数传递给f的对象</li>
+<li>由C的实体变量持有的对象</li>
+</ul>
+<p>用多态替代if/else 或 switch/case</p>
+<h2 id="错误处理"><a href="#错误处理" class="headerlink" title="错误处理"></a>错误处理</h2><p>不要使用错误码，用try-catch代替</p>
+<p>不要返回null值，用空对象替代，或者抛出异常</p>
+<p>不要传入null值作为参数，除非API要求你这么做</p>
+<h2 id="边界"><a href="#边界" class="headerlink" title="边界"></a>边界</h2><p>使用泛型限制输入</p>
+<p>单元测试</p>
+<p>单元测试应当简单、精悍、足具表达力。</p>
+<p>测试代码和生产代码一样重要</p>
+<p>TDD三定律：</p>
+<ol>
+<li>在编写不能通过的单元测试前，不可编写生产代码</li>
+<li>只可编写刚好无法通过的单元测试，不能编译也不算通过</li>
+<li>只可编写刚好足以通过当前失败测试的生产代码</li>
+</ol>
+<p>每一个测试一个断言</p>
+<ul>
+<li>每一个测试一个概念</li>
+<li>一个概念可以多个断言</li>
+</ul>
+<p>简洁的测试应该遵循5条规则<br>（FIRST: FAST、Independent、Repeatable、Self-Validating、Timely）</p>
+<ol>
+<li>快速：测试应该够快</li>
+<li>独立：测试应该互相独立，某个测试不应为下一个测试设定条件</li>
+<li>可重复：测试应当可在任何环境中重复通过</li>
+<li>自足验证：测试应该有布尔值输出</li>
+<li>及时：测试应及时编写</li>
+</ol>
+<h2 id="类"><a href="#类" class="headerlink" title="类"></a>类</h2><p>类应该短小，遵循单一职责原则（类或模块应有且只有一条加以修改的理由）</p>
+<p>类应该只有少量实体变量</p>
+<p>当类丧失了内聚性，就拆分它</p>
+<p>类的方法只应对其所属类中的变量和函数感兴趣，不应该垂青其他类中的变量和函数</p>
+]]></content>
+      <categories>
+        <category>杂谈</category>
+      </categories>
+      <tags>
+        <tag>架构</tag>
+        <tag>技巧</tag>
+      </tags>
+  </entry>
 </search>
