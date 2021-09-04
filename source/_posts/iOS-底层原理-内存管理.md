@@ -6,7 +6,7 @@ tags:
 categories:
   - iOS
 abbrlink: 56d1bd42
-date: 2021-09-01 17:26:00
+date: 2021-09-03 17:26:00
 ---
 本文主要介绍iOS中内存管理的一些事情
 
@@ -234,6 +234,82 @@ void timerFire(void *param) {
 
 	这种对象被直接存储在指针的内容中，可以当作一种伪对象。
     
+    当字符串的长度为10个以内时，字符串的类型都是`NSTaggedPointerString`类型，当超过10个时，字符串的类型才是`__NSCFString`
+    
+- 从`NSTaggedPointerString`中读取出字符串的值
+
+```c
+#   define _OBJC_TAG_MASK (1UL<<63)
+#   define _OBJC_TAG_INDEX_SHIFT 0
+#   define _OBJC_TAG_SLOT_SHIFT 0
+#   define _OBJC_TAG_PAYLOAD_LSHIFT 1
+#   define _OBJC_TAG_PAYLOAD_RSHIFT 4
+#   define _OBJC_TAG_EXT_INDEX_SHIFT 55
+#   define _OBJC_TAG_EXT_SLOT_SHIFT 55
+#   define _OBJC_TAG_EXT_PAYLOAD_LSHIFT 9
+#   define _OBJC_TAG_EXT_PAYLOAD_RSHIFT 12
+
+static inline bool _objc_isTaggedPointer(const void * _Nullable ptr)
+{
+    return ((uintptr_t)ptr & _OBJC_TAG_MASK) == _OBJC_TAG_MASK;
+}
+
+static inline uintptr_t _objc_decodeTaggedPointer(const void * _Nullable ptr)
+{
+    return (uintptr_t)ptr ^ objc_debug_taggedpointer_obfuscator;
+}
+
+static inline uintptr_t _objc_getTaggedPointerValue(const void * _Nullable ptr) 
+{
+    // assert(_objc_isTaggedPointer(ptr));
+    uintptr_t value = _objc_decodeTaggedPointer(ptr);
+    uintptr_t basicTag = (value >> _OBJC_TAG_INDEX_SHIFT) & _OBJC_TAG_INDEX_MASK;
+    if (basicTag == _OBJC_TAG_INDEX_MASK) {
+        return (value << _OBJC_TAG_EXT_PAYLOAD_LSHIFT) >> _OBJC_TAG_EXT_PAYLOAD_RSHIFT;
+    } else {
+        return (value << _OBJC_TAG_PAYLOAD_LSHIFT) >> _OBJC_TAG_PAYLOAD_RSHIFT;
+    }
+}
+
+static inline intptr_t _objc_getTaggedPointerSignedValue(const void * _Nullable ptr) 
+{
+    // assert(_objc_isTaggedPointer(ptr));
+    uintptr_t value = _objc_decodeTaggedPointer(ptr);
+    uintptr_t basicTag = (value >> _OBJC_TAG_INDEX_SHIFT) & _OBJC_TAG_INDEX_MASK;
+    if (basicTag == _OBJC_TAG_INDEX_MASK) {
+        return ((intptr_t)value << _OBJC_TAG_EXT_PAYLOAD_LSHIFT) >> _OBJC_TAG_EXT_PAYLOAD_RSHIFT;
+    } else {
+        return ((intptr_t)value << _OBJC_TAG_PAYLOAD_LSHIFT) >> _OBJC_TAG_PAYLOAD_RSHIFT;
+    }
+}
+```
+
+### NSNumber
+
+```objectivec
+NSNumber *number1 = @(0x1);
+NSNumber *number2 = @(0x20);
+NSNumber *number3 = @(0x3F);
+NSNumber *numberFFFF = @(0xFFFFFFFFFFEFE);
+NSNumber *maxNum = @(MAXFLOAT);
+NSLog(@"number1 pointer is %p class is %@", number1, number1.class);
+NSLog(@"number2 pointer is %p class is %@", number2, number2.class);
+NSLog(@"number3 pointer is %p class is %@", number3, number3.class);
+NSLog(@"numberffff pointer is %p class is %@", numberFFFF, numberFFFF.class);
+NSLog(@"maxNum pointer is %p class is %@", maxNum, maxNum.class);
+
+```
+
+```objectivec
+TaggedPointerDemo[59218:2167895] number1 pointer is 0xf7cb914ffb51479a class is __NSCFNumber
+TaggedPointerDemo[59218:2167895] number2 pointer is 0xf7cb914ffb51458a class is __NSCFNumber
+TaggedPointerDemo[59218:2167895] number3 pointer is 0xf7cb914ffb51447a class is __NSCFNumber
+TaggedPointerDemo[59218:2167895] numberffff pointer is 0xf7346eb004aea86b class is __NSCFNumber
+TaggedPointerDemo[59218:2167895] maxNum pointer is 0x28172a0c0 class is __NSCFNumber
+```
+
+我们发现对于`NSNumber`，我们打印出来的数据类型均为`__NSCFNumber`,但是我们发现对于MAXFLOAT打印出的地址显然与其他几项不符，上面几个`NSNumber`的地址以0xf开头，根据字符串地址的经验我们可以看出`f = 1111`,首位标记位为1，表示这个数据类型属于`TaggedPointer`。而`MAXFLOAT`不是。
+
     
 ## MRC
 
@@ -251,15 +327,15 @@ void timerFire(void *param) {
 
 在ARC中声明`@property(nonatomic,assign) int age;` 其set方法相当于MRC中的
 
-```
+```objectivec
 - (void)setAge:(int)age {
-	_age = age;
+    _age = age;
 }
 ```
 
 在ARC中声明`@property(nonatomic,strong) NSObject *age;` 其set方法相当于MRC中的
 
-```
+```objectivec
 - (void)setAge:(NSObject *)age {
     if (_age != age) { // 防止同个对象释放后引用计数变成0，就不能再retain了
         [_age release]; // 防止新对象进来之后，旧对象的引用计数多出了1导致释放不掉
@@ -270,7 +346,7 @@ void timerFire(void *param) {
 
 - 关于Autorelease
 
-  ```
+  ```	
   self.data = [NSMutableArray array]; // 自动进行了autorelease
   ```
   等同于
@@ -321,7 +397,7 @@ size_t objc_object::sidetable_getExtraRC_nolock()
  weak指针能够在对象释放的时候把指针清空，具体是怎么做到的。我们需要看一下对象`dealloc`的过程
  
  ```c
- inline void objc_object::rootDealloc()
+inline void objc_object::rootDealloc()
 {
     if (isTaggedPointer()) return;  // fixme necessary?
 
@@ -341,7 +417,7 @@ size_t objc_object::sidetable_getExtraRC_nolock()
  ```
  
  ```c
- id  object_dispose(id obj) {
+id  object_dispose(id obj) {
     if (!obj) return nil;
 
     objc_destructInstance(obj); // 释放前做一些事情
@@ -352,7 +428,7 @@ size_t objc_object::sidetable_getExtraRC_nolock()
  ```
  
  ```c
- void *objc_destructInstance(id obj) 
+void *objc_destructInstance(id obj) 
 {
     if (obj) {
         // Read all of the flags at once for performance.
@@ -370,7 +446,7 @@ size_t objc_object::sidetable_getExtraRC_nolock()
  ```
  
  ```c
- inline void objc_object::clearDeallocating()
+inline void objc_object::clearDeallocating()
 {
     if (slowpath(!isa.nonpointer)) {
         // Slow path for raw pointer isa.
@@ -450,7 +526,6 @@ void  weak_clear_no_lock(weak_table_t *weak_table, id referent_id)
 ```
 
 ```c
-
 static inline uintptr_t hash_pointer(objc_object *key) {
     return ptr_hash((uintptr_t)key);
 }
@@ -490,3 +565,166 @@ Weak指针指向的对象释放流程如下
 4. 置空取出的所有的弱引用指针
 5. 清除引用计数表
 6. 释放对象
+
+## Copy和MutableCopy
+
+拷贝的目的：产生一个副本对象，跟源对象互不影响
+修改了源对象，不会影响副本对象
+修改了副本对象，不会影响源对象
+
+iOS提供了2个拷贝方法
+1. copy ，不可变拷贝，产生不可变副本。
+2. mutableCopy，可变拷贝，产生可变副本。
+3. 浅拷贝：指针拷贝，没有产生新的对象。（不可变对象copy）
+4. 深拷贝：内容拷贝，产生新的对象。(可变、不可变对象调用mutableCopy或者可变对象调用copy)
+
+```objectivec
+NSString *str1 = [NSString stringWithFormat:@"test"];
+NSString *str2 = [str1 copy]; // 返回的是NSString
+NSMutableString *str3 = [str1 mutableCopy]; // 返回的是NSMutableString
+```
+
+当`copy`方法被不可变对象调用的话，不会发生什么变化，直接还是返回原来的对象，但是这时候引用计数会加1，相当于`retain`了一下，所以上面的代码要释放对象的时候，除了调用`[str1 release];`，那么还得调用`[str2 release]；`
+
+在ARC中声明`@property(nonatomic,copy) NSString *age;` 其set方法相当于MRC中的
+
+```objectivec
+- (void)setAge:(NSString *)age {
+    if (_age != age) {
+        [_age release];
+        _age = [age copy];
+    }
+}
+```
+
+## AutoRelease
+
+```objectivec
+@autoreleasepool {
+    Student *student = [[[Student alloc] init] autorelease];
+}
+```
+
+```c
+struct __AtAutoreleasePool {
+  __AtAutoreleasePool() { // 构造函数
+      atautoreleasepoolobj = objc_autoreleasePoolPush();
+  }
+  ~__AtAutoreleasePool() { // 析构函数
+      objc_autoreleasePoolPop(atautoreleasepoolobj);
+  }
+  void * atautoreleasepoolobj;
+};
+```
+
+```c
+{ 
+    __AtAutoreleasePool __autoreleasepool; // 创建一个结构体变量
+    Student *student = objc_msgSend(objc_msgSend(objc_msgSend(objc_getClass("Student"), sel_registerName("alloc")), sel_registerName("init")), sel_registerName("autorelease"));
+}
+```
+
+相当于
+
+
+```objectivec
+{ 
+    atautoreleasepoolobj = objc_autoreleasePoolPush();
+    Student *student = objc_msgSend(objc_msgSend(objc_msgSend(objc_getClass("Student"), sel_registerName("alloc")), sel_registerName("init")), sel_registerName("autorelease"));
+    objc_autoreleasePoolPop(atautoreleasepoolobj);
+}
+```
+
+自动释放池的主要底层数据结构是: `__AtAutoreleasePool`、`AutoreleasePoolPage`
+
+调用了`autorelease`的对象最终都是通过`AutoreleasePoolPage`对象来管的
+
+
+源码分析
+	- clang重写@autoreleasepool
+    - objc4源码：NSobject.mm
+
+## AutoreleasePoolPage的结构
+
+```c
+class AutoreleasePage
+{
+    magic_t const magic;
+    id *next;
+    pthread_t const thread;
+    AutoreleasePoolPage *const parent;
+    AutoreleasePoolPage *const child;
+    uint32_t depth;
+    uint32_t hiwat;
+}
+```
+
+- 每个AutoreleasePoolPage对象占用4096字节内存，除了用来存放它内部的成员变量，剩下的空间用来存放`autorelease`对象的地址
+- 所有的`AutoreleasePoolPage`对象通过双向链表的形式连接在一起
+
+- 调用push方法会将一个POOL_BOUNDARY入栈，并且返回其存放的内存地址
+- 调用pop方法时传入一个POOL_BOUNDARY的内存地址，会从最后一个入栈的对象开始发送release对象，直到遇到这个POOL_BOUNDARY
+
+- `id *next`指向了下一个能存放`autorelease`对象地址的区域
+
+```c
+static inline void *push()  {
+    id *dest;
+    if (slowpath(DebugPoolAllocation)) {
+        // Each autorelease pool starts on a new pool page.
+        dest = autoreleaseNewPage(POOL_BOUNDARY);
+    } else {
+        dest = autoreleaseFast(POOL_BOUNDARY);
+    }
+    ASSERT(dest == EMPTY_POOL_PLACEHOLDER || *dest == POOL_BOUNDARY);
+    return dest;
+}
+```
+
+```c
+static inline void pop(void *token) {
+    AutoreleasePoolPage *page;
+    id *stop;
+    if (token == (void*)EMPTY_POOL_PLACEHOLDER) {
+        // Popping the top-level placeholder pool.
+        page = hotPage();
+        if (!page) {
+            // Pool was never used. Clear the placeholder.
+            return setHotPage(nil);
+        }
+        // Pool was used. Pop its contents normally.
+        // Pool pages remain allocated for re-use as usual.
+        page = coldPage();
+        token = page->begin();
+    } else {
+        page = pageForPointer(token);
+    }
+
+    stop = (id *)token;
+    if (*stop != POOL_BOUNDARY) {
+        if (stop == page->begin()  &&  !page->parent) {
+            // Start of coldest page may correctly not be POOL_BOUNDARY:
+            // 1. top-level pool is popped, leaving the cold page in place
+            // 2. an object is autoreleased with no pool
+        } else {
+            // Error. For bincompat purposes this is not 
+            // fatal in executables built with old SDKs.
+            return badPop(token);
+        }
+    }
+
+    if (slowpath(PrintPoolHiwat || DebugPoolAllocation || DebugMissingPools)) {
+        return popPageDebug(token, page, stop);
+    }
+
+    return popPage<false>(token, page, stop);
+}
+```
+
+### Runloop和Autorelease
+
+- iOS在主线程的Runloop中注册了两个Observer
+- 第1个Observer监听了`kCFRunLoopEntry`事件，会调用`objc_autoreleasePoolPush()`
+- 第2个Observer
+	- 监听了`kCFRunLoopBeforeWaiting`会调用`objc_autoreleasePoolPop()`、`objc_autoreleasePoolPush()`
+	- 监听了`kCFRunloopBeforeExit`事件，会调用`objc_autoreleasePoolPop()`

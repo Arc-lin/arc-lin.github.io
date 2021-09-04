@@ -6546,4 +6546,251 @@
         <tag>技巧</tag>
       </tags>
   </entry>
+  <entry>
+    <title>iOS --- 性能优化</title>
+    <url>/post/a2ff8280.html</url>
+    <content><![CDATA[<p>本文主要介绍iOS内常用的性能优化方案</p>
+<span id="more"></span>
+
+<h2 id="CPU和GPU"><a href="#CPU和GPU" class="headerlink" title="CPU和GPU"></a>CPU和GPU</h2><ul>
+<li><p>在屏幕成像的过程中，CPU和GPU起着至关重要的作用</p>
+<ul>
+<li>CPU <ul>
+<li>对象的创建和销毁，对象属性的调整、布局计算、文本的计算和排版、图片格式转换和解码、图像的绘制 </li>
+</ul>
+</li>
+<li>GPU<ul>
+<li>纹理的渲染</li>
+</ul>
+</li>
+</ul>
+</li>
+<li><p>在iOS中是双缓冲机制，有前帧缓存、后帧缓存（）</p>
+</li>
+</ul>
+<figure class="highlight clean"><table><tr><td class="code"><pre><span class="line">CPU-&gt;计算-&gt;GPU-&gt;渲染-&gt;帧缓存-&gt;读取-&gt;视频控制器-&gt;显示-&gt;屏幕   </span><br></pre></td></tr></table></figure>
+
+<h2 id="屏幕成像原理"><a href="#屏幕成像原理" class="headerlink" title="屏幕成像原理"></a>屏幕成像原理</h2><p>首先先发出一个垂直同步信号（VSync），然后再一行行发出水平同步信号（HSync），直到最后一行HSync发出之后，一帧就渲染完成，然后再次发出一个VSync，渲染下一帧。</p>
+<img src="https://i.loli.net/2021/08/31/hWqVypmfbtga4eK.png" >
+
+<h2 id="卡顿"><a href="#卡顿" class="headerlink" title="卡顿"></a>卡顿</h2><h3 id="卡顿产生的原因"><a href="#卡顿产生的原因" class="headerlink" title="卡顿产生的原因"></a>卡顿产生的原因</h3><p><img src="https://i.loli.net/2021/08/31/ZTNhbeyRiq8UgmV.png" alt="1682758-5be402cc0ab5dc56.png"></p>
+<ol>
+<li>首先第一个VSync进入，CPU开始计算处理，然后交给GPU渲染，然后显示到屏幕上</li>
+<li>然后第二个VSync进入，这时候CPU处理的时间比较长，交给GPU后， GPU还没处理完，第三个VSync就进来了，但是因为GPU没处理完。第二帧还不能显示，所以这时候直接取上一帧数据显示，造成第一帧长时间停留</li>
+<li>然后过了一段时间GPU终于处理完了，但是第四个VSync还没来，所以就等，等到第四个VSync进来了，就开始拿刚才生成好的那一帧去显示，然后开始继续第三帧的计算</li>
+</ol>
+<ul>
+<li>解决卡顿的主要思路<ul>
+<li>尽可能减少CPU、GPU资源损耗</li>
+</ul>
+</li>
+<li>按照60fps的刷新率，每个16ms就会有一次VSync信号 </li>
+</ul>
+<h3 id="卡顿检测"><a href="#卡顿检测" class="headerlink" title="卡顿检测"></a>卡顿检测</h3><ul>
+<li>平时所说的__卡顿__主要是因为在主线程执行了比较耗时的操作</li>
+<li>可以添加<code>Observer</code>到主线程<code>Runloop</code>中，通过监听<code>Runloop</code>状态切换的耗时，以达到监控卡顿的目的</li>
+</ul>
+<blockquote>
+<p>参考：<a href="https://github.com/UIControl/LXDAppFluecyMonitor/blob/master/LXDAppFluecyMonitor/LXDAppFluecyMonitor/LXDAppFluecyMonitor.m">LXDAppFluecyMonitor</a></p>
+</blockquote>
+<figure class="highlight objectivec"><table><tr><td class="code"><pre><span class="line"><span class="keyword">static</span> <span class="keyword">void</span> lxdRunLoopObserverCallback(<span class="built_in">CFRunLoopObserverRef</span> observer, <span class="built_in">CFRunLoopActivity</span> activity, <span class="keyword">void</span> * info) &#123;</span><br><span class="line">     <span class="comment">/// 更新当前Runloop状态</span></span><br><span class="line">    SHAREDMONITOR.currentActivity = activity;</span><br><span class="line">    dispatch_semaphore_signal(SHAREDMONITOR.semphore);</span><br><span class="line">&#125;;</span><br><span class="line"></span><br><span class="line">- (<span class="keyword">void</span>)startMonitoring &#123;</span><br><span class="line">    <span class="keyword">if</span> (_isMonitoring) &#123; <span class="keyword">return</span>; &#125;</span><br><span class="line">    _isMonitoring = <span class="literal">YES</span>;</span><br><span class="line">    <span class="built_in">CFRunLoopObserverContext</span> context = &#123;</span><br><span class="line">        <span class="number">0</span>,</span><br><span class="line">        (__bridge <span class="keyword">void</span> *)<span class="keyword">self</span>,</span><br><span class="line">        <span class="literal">NULL</span>,</span><br><span class="line">        <span class="literal">NULL</span></span><br><span class="line">    &#125;;</span><br><span class="line">    <span class="comment">/// 创建监听对象</span></span><br><span class="line">    _observer = <span class="built_in">CFRunLoopObserverCreate</span>(kCFAllocatorDefault, kCFRunLoopAllActivities, <span class="literal">YES</span>, <span class="number">0</span>, &amp;lxdRunLoopObserverCallback, &amp;context);</span><br><span class="line">    <span class="comment">/// 在CommonModes添加监听者</span></span><br><span class="line">    <span class="built_in">CFRunLoopAddObserver</span>(<span class="built_in">CFRunLoopGetMain</span>(), _observer, kCFRunLoopCommonModes);</span><br><span class="line">    </span><br><span class="line">    <span class="comment">/// 子线程异步串行队列中添加死循环</span></span><br><span class="line">    <span class="built_in">dispatch_async</span>(lxd_event_monitor_queue(), ^&#123;</span><br><span class="line">        <span class="keyword">while</span> (SHAREDMONITOR.isMonitoring) &#123;</span><br><span class="line">        	<span class="comment">/// 如果当前状态是BeforeWaiting（即将进入休眠）的话</span></span><br><span class="line">            <span class="keyword">if</span> (SHAREDMONITOR.currentActivity == kCFRunLoopBeforeWaiting) &#123;</span><br><span class="line">                __block <span class="built_in">BOOL</span> timeOut = <span class="literal">YES</span>;</span><br><span class="line">                <span class="built_in">dispatch_async</span>(dispatch_get_main_queue(), ^&#123;</span><br><span class="line">                    timeOut = <span class="literal">NO</span>; <span class="comment">// 即将休眠的时候回到主线程超时状态改为NO</span></span><br><span class="line">                    dispatch_semaphore_signal(SHAREDMONITOR.eventSemphore); <span class="comment">//解锁</span></span><br><span class="line">                &#125;);</span><br><span class="line">                [<span class="built_in">NSThread</span> sleepForTimeInterval: lxd_time_out_interval]; <span class="comment">// 子线程休眠一秒</span></span><br><span class="line">                <span class="keyword">if</span> (timeOut) &#123;</span><br><span class="line">                    [LXDBacktraceLogger lxd_logMain]; <span class="comment">// 打印堆栈</span></span><br><span class="line">                &#125;</span><br><span class="line">                dispatch_wait(SHAREDMONITOR.eventSemphore, DISPATCH_TIME_FOREVER); <span class="comment">// 加锁</span></span><br><span class="line">            &#125;</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;);</span><br><span class="line">    </span><br><span class="line">    <span class="built_in">dispatch_async</span>(lxd_fluecy_monitor_queue(), ^&#123;</span><br><span class="line">        <span class="keyword">while</span> (SHAREDMONITOR.isMonitoring) &#123;</span><br><span class="line">            <span class="keyword">long</span> waitTime = dispatch_semaphore_wait(<span class="keyword">self</span>.semphore, dispatch_time(DISPATCH_TIME_NOW, lxd_wait_interval)); <span class="comment">// 等待200纳秒，看是否能拿到锁</span></span><br><span class="line">            <span class="keyword">if</span> (waitTime != LXD_SEMPHORE_SUCCESS) &#123; <span class="comment">// 拿不到锁</span></span><br><span class="line">                <span class="keyword">if</span> (!SHAREDMONITOR.observer) &#123;</span><br><span class="line">                    SHAREDMONITOR.timeOut = <span class="number">0</span>;</span><br><span class="line">                    [SHAREDMONITOR stopMonitoring];</span><br><span class="line">                    <span class="keyword">continue</span>;</span><br><span class="line">                &#125;</span><br><span class="line">                <span class="comment">/// Runloop 即将处理Source或者刚从休眠中唤醒</span></span><br><span class="line">                <span class="keyword">if</span> (SHAREDMONITOR.currentActivity == kCFRunLoopBeforeSources || SHAREDMONITOR.currentActivity == kCFRunLoopAfterWaiting) &#123;</span><br><span class="line">                    <span class="keyword">if</span> (++SHAREDMONITOR.timeOut &lt; <span class="number">5</span>) &#123; <span class="comment">// 超时次数+1，然后如果超时次数大于5次就打印堆栈</span></span><br><span class="line">                        <span class="keyword">continue</span>;</span><br><span class="line">                    &#125;</span><br><span class="line">                    [LXDBacktraceLogger lxd_logMain];</span><br><span class="line">                    [<span class="built_in">NSThread</span> sleepForTimeInterval: lxd_restore_interval];</span><br><span class="line">                &#125;</span><br><span class="line">            &#125;</span><br><span class="line">            SHAREDMONITOR.timeOut = <span class="number">0</span>;</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;);</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<h3 id="卡顿优化-CPU"><a href="#卡顿优化-CPU" class="headerlink" title="卡顿优化 - CPU"></a>卡顿优化 - CPU</h3><ul>
+<li>尽量使用轻量级的对象，比如用不到事件处理的地方，可以考虑使用<code>CALayer</code>（只是拿来渲染）取代<code>UIView</code>（渲染+处理点击事件等）</li>
+<li>不要频繁地调用<code>UIView</code>的相关属性，比如<code>frame</code>、<code>bounds</code>、<code>transform</code>等属性，尽量减少不必要的修改</li>
+<li>尽量提前计算好布局，在有需要时一次性调整对应的属性，不要多次修改属性</li>
+<li>Autolayout会比直接设置frame消耗更多的CPU资源</li>
+<li>图片的Size最好跟UIImageView的size保持一致</li>
+<li>控制一下线程的最大并发数量</li>
+<li>尽量把耗时操作放到子线程<ul>
+<li>文本处理（尺寸计算、绘制）</li>
+<li>图片处理（解码、绘制）</li>
+</ul>
+</li>
+</ul>
+<p>图片子线程解码举例</p>
+<figure class="highlight objectivec"><table><tr><td class="code"><pre><span class="line">- (<span class="keyword">void</span>)renderImage &#123;</span><br><span class="line">    </span><br><span class="line">    <span class="built_in">dispatch_async</span>(dispatch_get_global_queue(<span class="number">0</span>, <span class="number">0</span>), ^&#123;</span><br><span class="line">        <span class="comment">/// get CGImage</span></span><br><span class="line">        <span class="built_in">CGImageRef</span> cgImage = [<span class="built_in">UIImage</span> imageWithData:[<span class="built_in">NSData</span> dataWithContentsOfURL:xxx]].CGImage;</span><br><span class="line">        </span><br><span class="line">        size_t width = <span class="built_in">CGImageGetWidth</span>(cgImage);</span><br><span class="line">        size_t height = <span class="built_in">CGImageGetHeight</span>(cgImage);</span><br><span class="line">        <span class="keyword">if</span> (width == <span class="number">0</span> || height == <span class="number">0</span>) <span class="keyword">return</span>;</span><br><span class="line">        </span><br><span class="line">        <span class="built_in">CGImageAlphaInfo</span> alphaInfo = <span class="built_in">CGImageGetAlphaInfo</span>(cgImage);</span><br><span class="line">        <span class="built_in">BOOL</span> hasAlpha = !(alphaInfo == kCGImageAlphaNone ||</span><br><span class="line">                          alphaInfo == kCGImageAlphaNoneSkipFirst ||</span><br><span class="line">                          alphaInfo == kCGImageAlphaNoneSkipLast);</span><br><span class="line"></span><br><span class="line">        </span><br><span class="line">        <span class="built_in">CGBitmapInfo</span> bitmapInfo = kCGBitmapByteOrder32Host;</span><br><span class="line">        bitmapInfo |= hasAlpha ? kCGImageAlphaPremultipliedFirst : kCGImageAlphaNoneSkipFirst;</span><br><span class="line">        <span class="built_in">CGContextRef</span> context = <span class="built_in">CGBitmapContextCreate</span>(<span class="literal">NULL</span>, width, height, <span class="number">8</span>, <span class="number">0</span>, <span class="built_in">CGColorSpaceCreateDeviceRGB</span>(), bitmapInfo);</span><br><span class="line">        <span class="keyword">if</span> (!context) &#123;</span><br><span class="line">            <span class="keyword">return</span>;</span><br><span class="line">        &#125;</span><br><span class="line">        </span><br><span class="line">        <span class="comment">// Apply transform</span></span><br><span class="line">        <span class="built_in">CGAffineTransform</span> transform = <span class="built_in">CGAffineTransformIdentity</span>;</span><br><span class="line">        <span class="built_in">CGContextConcatCTM</span>(context, transform);</span><br><span class="line">        <span class="built_in">CGContextDrawImage</span>(context, <span class="built_in">CGRectMake</span>(<span class="number">0</span>, <span class="number">0</span>, width, height), cgImage); <span class="comment">// The rect is bounding box of CGImage, don&#x27;t swap width &amp; height</span></span><br><span class="line">        <span class="built_in">CGImageRef</span> newImageRef = <span class="built_in">CGBitmapContextCreateImage</span>(context);</span><br><span class="line">        <span class="built_in">CGContextRelease</span>(context);</span><br><span class="line">        </span><br><span class="line">        <span class="comment">// back to the main thread</span></span><br><span class="line">        <span class="built_in">dispatch_async</span>(dispatch_get_main_queue(), ^&#123;</span><br><span class="line">            <span class="keyword">self</span>.imageView.image = [[<span class="built_in">UIImage</span> alloc] initWithCGImage:newImageRef];</span><br><span class="line">            <span class="built_in">CGImageRelease</span>(newImageRef);</span><br><span class="line">        &#125;);</span><br><span class="line">    &#125;);</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<h3 id="卡顿优化-GPU"><a href="#卡顿优化-GPU" class="headerlink" title="卡顿优化 - GPU"></a>卡顿优化 - GPU</h3><ul>
+<li>尽量避免短时间内大量图片的显示，尽可能将多张图片合成一张进行显示</li>
+<li>GPU能处理的最大纹理尺寸是<strong>4096*4096</strong>，一旦超过这个尺寸，就会占用CPU资源进行处理，所以纹理尽量不要超过这个尺寸</li>
+<li>尽量减少视图数量和层次</li>
+<li>减少透明的视图（alpha &lt; 1），不透明的就设置<code>opaque</code>为<code>YES</code></li>
+<li>尽量避免出现离屏渲染</li>
+</ul>
+<h4 id="离屏渲染"><a href="#离屏渲染" class="headerlink" title="离屏渲染"></a>离屏渲染</h4><ul>
+<li><p>在OpenGL中，GPU有2种渲染方式</p>
+<ul>
+<li>On-Screen Rendering：当前离屏渲染，在当前用于显示屏幕缓冲区进行渲染操作</li>
+<li>Off-Screen Rendering: 离屏渲染，在当前屏幕缓冲区以外开辟一个缓冲区进行渲染操作 </li>
+</ul>
+</li>
+<li><p>离屏渲染消耗性能的原因</p>
+<ul>
+<li>需要创建新的缓冲区</li>
+<li>离屏渲染的整个过程，需要多次切换上下文环境，先是从当前屏幕（On-Screen）切换到离屏（Off-Screen）;等到离屏渲染结束以后，将离屏缓冲区的渲染结果显示到屏幕上，又需要将上下文环境从离屏切换到当前屏幕上。</li>
+</ul>
+</li>
+<li><p>哪些操作会触发离屏渲染</p>
+<ul>
+<li>光栅化，<code>layer.shouldRasterize = YES</code></li>
+<li>遮罩 <code>layer.mask</code></li>
+<li>圆角，同时设置 <code>layouer.maskToBounds = YES</code>, <code>layer.cornerRadius</code>大于0<ul>
+<li>考虑通过<code>CoreGraphics</code>绘制裁剪圆角，或者叫美工提供圆角图片</li>
+</ul>
+</li>
+<li>阴影，<code>layer.shadowXXX</code><ul>
+<li>如果设置了<code>layer.shadowPath</code>就不会产生离屏渲染</li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+<h2 id="耗电优化"><a href="#耗电优化" class="headerlink" title="耗电优化"></a>耗电优化</h2><h3 id="主要来源"><a href="#主要来源" class="headerlink" title="主要来源"></a>主要来源</h3><ul>
+<li>CPU处理，Processing</li>
+<li>网络，Networking</li>
+<li>定位，Location</li>
+<li>图像，Graphics</li>
+</ul>
+<h3 id="优化"><a href="#优化" class="headerlink" title="优化"></a>优化</h3><ul>
+<li><p>尽可能降低CPU、GPU功耗</p>
+</li>
+<li><p>少用定时器</p>
+</li>
+<li><p>优化I/O操作</p>
+<ul>
+<li>尽量不要频繁写入小数据，最好批量一次性写入 </li>
+<li>读写大量重要数据时，考虑使用<code>dispatch_io</code>，其提供了基于GCD的异步操作文件的I/O的API.用<code>dispatch_io</code>系统会优化磁盘访问</li>
+<li>数据量比较大的，建议使用数据库(SQLite、CoreData)</li>
+</ul>
+</li>
+<li><p>网络优化</p>
+<ul>
+<li>减少、压缩网络数据</li>
+<li>如果多次请求结果是相同的，尽量使用缓存</li>
+<li>使用断点续传，否则网络不稳定时可能多次传输相同的内容</li>
+<li>网络不可用时，不要尝试执行网络请求</li>
+<li>让用户可以取消长时间运行或者速度很慢的网络操作，设置合适的超时时间</li>
+<li>批量传输，比如，下载视频流时，不要传输很小的数据包，直接下载整个文件或者一大块一大块地下载，如果下载广告，一次性多下载一些，然后再慢慢展示，如果下载电子邮件，一次下载多封，不要一封一封地下载</li>
+</ul>
+</li>
+<li><p>定位优化</p>
+<ul>
+<li>如果只是需要快速确定用户当前位置，最好用<code>CLLocationManager</code>的<code>requestLocation</code>方法，定位完成后，会自动让定位硬件断电</li>
+<li>如果不是导航应用， 尽量不要实时更新位置，定位关闭就关掉定位服务</li>
+<li>尽量降低定位精度，比如尽量不要使用精度最高的<code>kCLLocationAccuracyBest</code></li>
+<li>需要后台定位时，尽量设置<code>pausesLocationUpdatesAutomatically</code>为YES，如果用户不太可能移动的时候，系统会自动暂停位置更新</li>
+<li>尽量不要使用<code>startMonitoringSignificantLocationChanges</code>，优先考虑<code>startMonitoringForRegion:</code></li>
+</ul>
+</li>
+<li><p>硬件检测优化</p>
+<ul>
+<li>用户移动、摇晃、倾斜设备时，会产生动作(motion)事件，这些事件由加速度计、陀螺仪、磁力计等硬件检测。在不需要检测的场合，应该及时关闭这些硬件。</li>
+</ul>
+</li>
+</ul>
+<h2 id="App启动优化"><a href="#App启动优化" class="headerlink" title="App启动优化"></a>App启动优化</h2><ul>
+<li><p>App的启动可以分为2种</p>
+<ul>
+<li>冷启动（Code Launch）：从零开始启动App</li>
+<li>热启动（Warm Launch）：App已经在内存中，在后台存活着，再次点击图标</li>
+</ul>
+</li>
+<li><p>App启动时间的优化，主要是针对冷启动进行优化</p>
+</li>
+<li><p>通过添加环境变量可以打印出App的启动时间分析（Edit Scheme -&gt; Run -&gt; Arguments）</p>
+<ul>
+<li><code>DYLD_PRINT_STATISTICS</code>设置为1 或者 <code>DYLD_PRINT_STATISTICS_DETAILS</code> （更加详细 ）</li>
+</ul>
+</li>
+<li><p>App的冷启动可以概括为3大阶段</p>
+<ul>
+<li><p>dyld</p>
+</li>
+<li><p>runtime</p>
+</li>
+<li><p>main</p>
+<img src="https://i.loli.net/2021/08/31/ldg1cjZCUPe5Gk6.png" ></li>
+<li><p>dyld（dynamic link editor），Apple的动态链接器，可以用来装在Mach-O文件（可执行文件、动态库等 ）</p>
+</li>
+<li><p>启动App时，dyld所做的事情有</p>
+<ul>
+<li>装载App的可执行文件，同时会递归加载所有依赖的动态库</li>
+<li>当dyld把可执行文件、动态库都装载到内存完毕后，会通知Runtime进行下一步的处理</li>
+</ul>
+</li>
+<li><p>启动App时，runtime所做的事情有</p>
+<ul>
+<li>调用<code>map_images</code>进行可执行文件内容的解析和处理</li>
+<li>在<code>load_images</code>中调用<code>call_load_methods</code>,调用所有<code>Class</code>和<code>Category</code>的<code>+load</code>方法</li>
+<li>进行各种objc结构的初始化（注册Objc类，初始化类对象等等）</li>
+<li>调用C++静态初始化器和<code>__attribute((constructor))</code>修饰的函数</li>
+</ul>
+</li>
+<li><p>到此为止，可执行文件和动态库中所有的符号（Class、Protocol、Selector、IMP、…）都已经按格式成功加载到内存中，被<code>runtime</code>所管理</p>
+</li>
+<li><p>总结</p>
+<ul>
+<li>App的启动由dyld主导，将可执行文件加载到内存，顺便加载所有依赖的动态库</li>
+<li>并由runtime负责加载成objc定义的结构</li>
+<li>所有初始化工作结束后，dyld就会调用main函数</li>
+<li>接下来就是<code>UIApplicationMain</code>函数，AppDelegate的<code>application:didFinishLaunchingWithOptions:</code>方法</li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+<h3 id="优化方案"><a href="#优化方案" class="headerlink" title="优化方案"></a>优化方案</h3><ul>
+<li>按照不同的阶段<ul>
+<li>dyld <ul>
+<li>减少动态库，合并一些动态库（定期清理不必要的动态库）</li>
+<li>减少Objc类，分类的数量，减少selector的数量（定期清理不必要的类，分类）</li>
+<li>减少C++虚函数数量</li>
+<li>Swift尽量使用struct</li>
+</ul>
+</li>
+<li>runtime<ul>
+<li>用<code>+initialize</code>和<code>dispatch_once</code>取代所有的<code>__attribute((constructor))</code>、C++静态构造器 、ObjC的<code>+load</code></li>
+</ul>
+</li>
+<li>main<ul>
+<li>在不影响用户体验的前提下，尽可能将一些操作延迟，不要全部都放在<code>finishLaunch</code>方法中</li>
+<li>按需加载 </li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+<h2 id="安装包瘦身"><a href="#安装包瘦身" class="headerlink" title="安装包瘦身"></a>安装包瘦身</h2><ul>
+<li><p>安装包（IPA）主要由可执行文件、资源组成</p>
+</li>
+<li><p>资源（图片、视频、音频等）</p>
+<ul>
+<li>采取无损压缩</li>
+<li>去除没有用到的资源(github :LSUnusedResources）</li>
+</ul>
+</li>
+<li><p>可执行文件瘦身</p>
+<ul>
+<li>编译器优化 <ul>
+<li>Strip Linked Product 、 Make Strings Read-Only、 Symbols Hidden By Defaults设置为YES</li>
+<li>去掉异常支持，Enable C++ Exceptions、Enable Objective-C Exceptions 设置为NO，Other C Flags  添加 -fno-exceptions</li>
+</ul>
+</li>
+<li>利用AppCode(<a href="https://www.jetbrains.com/objc">https://www.jetbrains.com/objc</a>)检测未使用的代码：菜单栏 -&gt; Code -&gt; Inspect Code</li>
+<li>编写LLVM插件检测出重复代码，未被调用的代码</li>
+<li>生成Link Map文件，可以查看可执行文件的具体组成（在Build Setting-&gt;Write Link Map File 改为true，就可以在Path to link map file 看到这个文件）</li>
+<li>可以借助第三方工具解析LinkMap文件：<a href="https://github.com/huanxsd/LinkMap">https://github.com/huanxsd/LinkMap</a></li>
+</ul>
+</li>
+</ul>
+]]></content>
+      <categories>
+        <category>iOS</category>
+      </categories>
+      <tags>
+        <tag>iOS</tag>
+        <tag>底层原理</tag>
+      </tags>
+  </entry>
 </search>
