@@ -1,8 +1,12 @@
 title: 函数式Swift --- 透镜
 author: Arclin
 abbrlink: c5814bfc
-date: 2021-09-25 23:29:29
 tags:
+  - iOS
+  - Swift
+categories:
+  - iOS
+date: 2021-09-25 23:29:00
 ---
 Swift是实现函数式思想的一门好语言，这里简要讲述一下函数式中透镜的Swift实现
 
