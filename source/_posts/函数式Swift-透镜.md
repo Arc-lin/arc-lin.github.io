@@ -432,3 +432,54 @@ square = square
 
 print("修改后\(square)")
 ```
+
+## 拓展
+
+在这种思想的基础上，我们就可以使用keyPath特性来对我们的编码进行一些改进
+
+首先我们对keyPath进行拓展，也就是`\.xxx`这种写法
+
+```swift
+extension WritableKeyPath {
+    var toLens : Lens<Value,Root> {
+        return lens(view: { $0[keyPath : self] }, set: {
+            var copy = $1
+            copy[keyPath: self] = $0
+            return copy
+        })
+    }
+}
+```
+
+修改一下我们先前定义的两个运算符的实现，设置左运算符为keyPath的键，右运算符为新值或者生成新值的闭包表达式
+
+```swift
+infix operator %~ : LensPrecedence
+infix operator .~ : LensPrecedence
+
+func %~ <Value, Root>(lhs: WritableKeyPath<Root, Value>, rhs: @escaping (Value) -> Value) -> (Root) -> Root {
+    return over(mapper: rhs, lens: lhs.toLens)
+}
+
+func .~ <Value, Root>(lhs: WritableKeyPath<Root, Value>, rhs: Value) -> (Root) -> Root {
+    return set(value: rhs, lens: lhs.toLens)
+}
+```
+
+最终效果如下
+
+```swift
+let formatter = DateFormatter()
+    |> \.dateFormat .~ "yyyy-MM-dd"
+    |> \.timeZone .~ TimeZone(secondsFromGMT: 0)
+
+let date = formatter.date(from: "2020-01-01")
+
+print(date)
+
+let view = UIView()
+    |> \.backgroundColor .~ UIColor.white
+    |> \.alpha %~ { $0 - 0.1 }
+
+print(view)
+```
