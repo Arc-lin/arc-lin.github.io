@@ -451,7 +451,7 @@ extension WritableKeyPath {
 }
 ```
 
-修改一下我们先前定义的两个运算符的实现，设置左运算符为keyPath的键，右运算符为新值或者生成新值的闭包表达式
+修改一下我们先前定义的两个运算符的实现，设置左值为keyPath的键，右值为新值或者生成新值的闭包表达式
 
 ```swift
 infix operator %~ : LensPrecedence
