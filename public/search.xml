@@ -7419,5 +7419,99 @@
 <li><code>inout</code>参数只能传入可以被多次赋值的（var变量，可变数组的元素等）</li>
 </ul>
 ]]></content>
+      <categories>
+        <category>iOS</category>
+      </categories>
+      <tags>
+        <tag>底层原理</tag>
+        <tag>Swift</tag>
+        <tag>汇编</tag>
+      </tags>
+  </entry>
+  <entry>
+    <title>What&#39;s new in Swift 5.7</title>
+    <url>/post/89a7f98f.html</url>
+    <content><![CDATA[<p>本文总结自WWDC 2022 <a href="https://developer.apple.com/videos/play/wwdc2022/110354/">《What’s new in Swift》</a></p>
+<span id="more"></span>
+
+<h2 id="Optional-unwrapping"><a href="#Optional-unwrapping" class="headerlink" title="Optional unwrapping"></a>Optional unwrapping</h2><p>在对可选值进行解包的时候，可以用一种更简便的方式</p>
+<p>Swift 5.5</p>
+<figure class="highlight swift"><table><tr><td class="code"><pre><span class="line"><span class="keyword">var</span> name : <span class="type">String</span>? <span class="operator">=</span> <span class="string">&quot;Linda&quot;</span></span><br></pre></td></tr></table></figure>
+
+<figure class="highlight swift"><table><tr><td class="code"><pre><span class="line"><span class="keyword">if</span> <span class="keyword">let</span> name <span class="operator">=</span> name &#123;</span><br><span class="line">   <span class="built_in">print</span>(<span class="string">&quot;Hello, <span class="subst">\(name)</span>!&quot;</span>)</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>Swift 5.7</p>
+<figure class="highlight swift"><table><tr><td class="code"><pre><span class="line"><span class="keyword">if</span> <span class="keyword">let</span> name &#123;</span><br><span class="line">   <span class="built_in">print</span>(<span class="string">&quot;Hello, <span class="subst">\(name)</span>!&quot;</span>)</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<h2 id="Multi-statement-closure-type-inference"><a href="#Multi-statement-closure-type-inference" class="headerlink" title="Multi-statement closure type inference"></a>Multi-statement closure type inference</h2><p>当闭包表达式内有多行语句的时候，可以不用显式声明返回值类型</p>
+<figure class="highlight swift"><table><tr><td class="code"><pre><span class="line"><span class="keyword">let</span> scores <span class="operator">=</span> [<span class="number">100</span>,<span class="number">80</span>, <span class="number">85</span>]</span><br></pre></td></tr></table></figure>
+
+<p>Swift 5.5 </p>
+<figure class="highlight swift"><table><tr><td class="code"><pre><span class="line"><span class="keyword">let</span> oldResults <span class="operator">=</span> scores.map &#123; score -&gt; <span class="type">String</span> <span class="keyword">in</span></span><br><span class="line">   <span class="keyword">if</span> score <span class="operator">&gt;</span> <span class="number">85</span> &#123;</span><br><span class="line">      <span class="keyword">return</span>  <span class="string">&quot;<span class="subst">\(score)</span>%: Pass&quot;</span></span><br><span class="line">   &#125; <span class="keyword">else</span> &#123;</span><br><span class="line">      <span class="keyword">return</span>  <span class="string">&quot;<span class="subst">\(score)</span>%: Fail&quot;</span></span><br><span class="line">   &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>Swift 5.7</p>
+<figure class="highlight swift"><table><tr><td class="code"><pre><span class="line"><span class="keyword">let</span> results <span class="operator">=</span> scores.map &#123; score <span class="keyword">in</span></span><br><span class="line">   <span class="keyword">if</span> score <span class="operator">&gt;=</span> <span class="number">85</span> &#123;</span><br><span class="line">      <span class="keyword">return</span>  <span class="string">&quot;<span class="subst">\(score)</span>%: Pass&quot;</span></span><br><span class="line">   &#125; <span class="keyword">else</span> &#123;</span><br><span class="line">      <span class="keyword">return</span>  <span class="string">&quot;<span class="subst">\(score)</span>%: Fail&quot;</span></span><br><span class="line">   &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<h2 id="Regular-expressions"><a href="#Regular-expressions" class="headerlink" title="Regular expressions"></a>Regular expressions</h2><p>新增正则表达式工具 <code>Regex</code>，支持正则语法检查</p>
+<p>举例：取出句子中的”at”的range</p>
+<figure class="highlight swift"><table><tr><td class="code"><pre><span class="line"><span class="keyword">let</span> message <span class="operator">=</span> <span class="string">&quot;the cat sat on the mat&quot;</span></span><br><span class="line"><span class="built_in">print</span>(message.range(of:<span class="string">&quot;at&quot;</span>))</span><br></pre></td></tr></table></figure>
+
+<p>Swift 5.7 使用字符串初始化Regex，若传入不符合语法规则的正则表达式，则会throw error</p>
+<figure class="highlight swift"><table><tr><td class="code"><pre><span class="line"><span class="keyword">do</span> &#123;</span><br><span class="line">   <span class="keyword">let</span> atSearch <span class="operator">=</span> <span class="keyword">try</span> <span class="type">Regex</span>(<span class="string">&quot;[a-z]at&quot;</span>)</span><br><span class="line">   <span class="built_in">print</span>(message.range(of:atSearch))</span><br><span class="line">&#125; <span class="keyword">catch</span> &#123;</span><br><span class="line">   <span class="built_in">print</span>(<span class="string">&quot;Failed to create regex&quot;</span>)</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>另外可以使用<code>/ /</code>包裹正则表达式（字面量语法），当传入不符合语法规则的正则表达式的时候，编译器将会报错</p>
+<figure class="highlight swift"><table><tr><td class="code"><pre><span class="line"><span class="built_in">print</span>(message.ranges(of: <span class="operator">/</span>[a<span class="operator">-</span>z]at<span class="operator">/</span>))</span><br></pre></td></tr></table></figure>
+
+<p>此外，Swift  5.7还新增了一种DSL的语法去做类似正则表达式的事情，如下:</p>
+<figure class="highlight swift"><table><tr><td class="code"><pre><span class="line"><span class="keyword">let</span> search <span class="operator">=</span> <span class="operator">/</span><span class="type">My</span> name <span class="keyword">is</span> (<span class="operator">.+?</span>) and <span class="type">I</span>&#x27;m (\d<span class="operator">+</span>) years old<span class="operator">./</span></span><br><span class="line"><span class="keyword">let</span> greeting <span class="operator">=</span> <span class="string">&quot;My name is Taylor and I&#x27;m 26 years old&quot;</span></span><br></pre></td></tr></table></figure>
+
+<p>等价于</p>
+<figure class="highlight swift"><table><tr><td class="code"><pre><span class="line"><span class="keyword">let</span> search <span class="operator">=</span> <span class="type">Regex</span> &#123;</span><br><span class="line">   <span class="string">&quot;My name is&quot;</span></span><br><span class="line">   </span><br><span class="line">   <span class="type">Capture</span> &#123;</span><br><span class="line">      <span class="type">OneOrMore</span>(.word)</span><br><span class="line">   &#125;</span><br><span class="line">   </span><br><span class="line">   <span class="string">&quot;and I&#x27;m&quot;</span></span><br><span class="line">   </span><br><span class="line">   <span class="type">Capture</span> &#123;</span><br><span class="line">      <span class="type">OneOrMore</span>(.digit)</span><br><span class="line">   &#125;</span><br><span class="line">   </span><br><span class="line">   <span class="string">&quot; years old.&quot;</span></span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<h2 id="Protocol-and-generics"><a href="#Protocol-and-generics" class="headerlink" title="Protocol and generics"></a>Protocol and generics</h2><p>针对泛型协议，可以使用<code>any</code>和<code>some</code>关键字来简洁编码</p>
+<figure class="highlight swift"><table><tr><td class="code"><pre><span class="line"><span class="class"><span class="keyword">protocol</span> <span class="title">Pizza</span> </span>&#123;</span><br><span class="line">   <span class="keyword">var</span> size : <span class="type">Int</span> &#123; <span class="keyword">get</span> &#125;</span><br><span class="line">   <span class="keyword">var</span> name : <span class="type">String</span> &#123; <span class="keyword">get</span> &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>Swift 5.5 </p>
+<p>这里传入的参数可以是任意遵循了<code>Pizza</code>的类或者结构体的实例</p>
+<figure class="highlight swift"><table><tr><td class="code"><pre><span class="line"><span class="function"><span class="keyword">func</span> <span class="title">receivePizza</span>(<span class="keyword">_</span> <span class="params">pizza</span>: <span class="type">Pizza</span>)</span> &#123;</span><br><span class="line">   <span class="built_in">print</span>(<span class="string">&quot;Nice <span class="subst">\(pizza.name)</span>&quot;</span>)</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>Swift 5.7</p>
+<figure class="highlight swift"><table><tr><td class="code"><pre><span class="line"><span class="function"><span class="keyword">func</span> <span class="title">receivePizza</span>(<span class="keyword">_</span> <span class="params">pizza</span>: any <span class="type">Pizza</span>)</span> &#123;</span><br><span class="line">   <span class="built_in">print</span>(<span class="string">&quot;Nice <span class="subst">\(pizza.name)</span>&quot;</span>)</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>Swift 5.5 </p>
+<p>这里传入的参数可以是某一个遵循了<code>Pizza</code>的类或者结构体的任意实例，类型T需要确定</p>
+<figure class="highlight swift"><table><tr><td class="code"><pre><span class="line"><span class="function"><span class="keyword">func</span> <span class="title">receivePizza</span>&lt;<span class="type">T</span> : <span class="type">Pizza</span>&gt;(<span class="keyword">_</span> <span class="params">pizza</span>: <span class="type">Pizza</span>)</span> &#123;</span><br><span class="line">   <span class="built_in">print</span>(<span class="string">&quot;Nice <span class="subst">\(pizza.name)</span>&quot;</span>)</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>Swift 5.7</p>
+<figure class="highlight swift"><table><tr><td class="code"><pre><span class="line"><span class="function"><span class="keyword">func</span> <span class="title">receivePizza</span>(<span class="keyword">_</span> <span class="params">pizza</span>: <span class="keyword">some</span> <span class="type">Pizza</span>)</span> &#123;</span><br><span class="line">   <span class="built_in">print</span>(<span class="string">&quot;Nice <span class="subst">\(pizza.name)</span>&quot;</span>)</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<h3 id="Some-和-Any"><a href="#Some-和-Any" class="headerlink" title="Some 和 Any"></a>Some 和 Any</h3><p><code>some</code>和<code>any</code>其实是以前就有的关键字</p>
+<p>some : 指定某种遵循了协议A的类型</p>
+<p>any : 任意遵循了协议A的类型</p>
+<p>举例：</p>
+<p>下面代码会报错，提示Cat不能复制给animal，因为animal已经被指定为Dog类型了</p>
+<figure class="highlight swift"><table><tr><td class="code"><pre><span class="line"><span class="keyword">var</span> animal : <span class="keyword">some</span> <span class="type">Animal</span> <span class="operator">=</span> <span class="type">Dog</span>()</span><br><span class="line">animal <span class="operator">=</span> <span class="type">Cat</span>()</span><br></pre></td></tr></table></figure>
+
+<p>下面代码不会报错，因为animal可以是任意遵循了Animal协议的类的实例</p>
+<figure class="highlight swift"><table><tr><td class="code"><pre><span class="line"><span class="keyword">var</span> animal : any <span class="type">Animal</span> <span class="operator">=</span> <span class="type">Dog</span>()</span><br><span class="line">animal <span class="operator">=</span> <span class="type">Cat</span>()</span><br></pre></td></tr></table></figure>
+
+<p>同理，会报错，因为some只能指定一种类型</p>
+<figure class="highlight swift"><table><tr><td class="code"><pre><span class="line"><span class="keyword">let</span> animals : [<span class="keyword">some</span> <span class="type">Animal</span>] <span class="operator">=</span> [<span class="type">Dog</span>(),<span class="type">Cat</span>()]</span><br></pre></td></tr></table></figure>
+
+<p>不会报错，因为any能指定任意遵循了Animal协议的类型</p>
+<figure class="highlight swift"><table><tr><td class="code"><pre><span class="line"><span class="keyword">let</span> animals : [<span class="keyword">some</span> <span class="type">Animal</span>] <span class="operator">=</span> [<span class="type">Dog</span>(),<span class="type">Cat</span>()]</span><br></pre></td></tr></table></figure>
+
+<p>那到底什么时候用<code>some</code>，什么时候用<code>any</code>呢？</p>
+<p>答：当你在设计接口的时候就已经默认是某个类型的时候，就用<code>some</code>，当不符合上述要求的时候就用<code>any</code></p>
+<h2 id="Swift-Package-Plugins"><a href="#Swift-Package-Plugins" class="headerlink" title="Swift Package Plugins"></a>Swift Package Plugins</h2><p>Swift新增的插件，就是可以用swift写脚本，然后可以在Xcode构建的时候运行。比如代码格式化，产出代码统计报告等</p>
+<h2 id="Swift-Concurrency-Instrument"><a href="#Swift-Concurrency-Instrument" class="headerlink" title="Swift Concurrency Instrument"></a>Swift Concurrency Instrument</h2><p>在Instrument里面新增了针对<code>awiat</code>相关代码的性能检测</p>
+]]></content>
+      <categories>
+        <category>iOS</category>
+      </categories>
+      <tags>
+        <tag>iOS</tag>
+        <tag>Swift</tag>
+      </tags>
   </entry>
 </search>
