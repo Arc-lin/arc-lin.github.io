@@ -1,0 +1,594 @@
+<!DOCTYPE html>
+<html lang="zh-Hans">
+<head>
+  <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=2">
+<meta name="theme-color" content="#222">
+<meta name="generator" content="Hexo 5.4.0">
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png">
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32-next.png">
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next.png">
+  <link rel="mask-icon" href="/images/logo.svg" color="#222">
+
+<link rel="stylesheet" href="/css/main.css">
+
+
+<link rel="stylesheet" href="/lib/font-awesome/css/all.min.css">
+  <link rel="stylesheet" href="//cdn.jsdelivr.net/gh/fancyapps/fancybox@3/dist/jquery.fancybox.min.css">
+
+<script id="hexo-configurations">
+    var NexT = window.NexT || {};
+    var CONFIG = {"hostname":"www.arclin.cn","root":"/","scheme":"Muse","version":"7.8.0","exturl":false,"sidebar":{"position":"left","display":"post","padding":18,"offset":12,"onmobile":false},"copycode":{"enable":false,"show_result":false,"style":null},"back2top":{"enable":true,"sidebar":false,"scrollpercent":false},"bookmark":{"enable":false,"color":"#222","save":"auto"},"fancybox":true,"mediumzoom":false,"lazyload":false,"pangu":false,"comments":{"style":"tabs","active":null,"storage":true,"lazyload":false,"nav":null},"algolia":{"appID":"VOFC7668C9","apiKey":"24c644edc8e7353bf2e8d8e31f03a940","indexName":"hexo","hits":{"per_page":10},"labels":{"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}},"localsearch":{"enable":true,"trigger":"auto","top_n_per_article":1,"unescape":false,"preload":false},"motion":{"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},"path":"search.xml"};
+  </script>
+
+  <meta name="description" content="可能会用到的iOS13新Api">
+<meta property="og:type" content="article">
+<meta property="og:title" content="iOS 13新API">
+<meta property="og:url" content="https://www.arclin.cn/post/f356f3c1.html">
+<meta property="og:site_name" content="Arclin">
+<meta property="og:description" content="可能会用到的iOS13新Api">
+<meta property="og:locale">
+<meta property="og:image" content="https://i.loli.net/2019/10/24/iHxWAqL63E2ZfMY.jpg">
+<meta property="og:image" content="https://i.loli.net/2019/10/24/FbSEV8WCXcQRrf9.gif">
+<meta property="og:image" content="https://docs-assets.developer.apple.com/published/8ce996907a/fc0975ae-c186-438c-abdd-5280f650c377.png">
+<meta property="article:published_time" content="2019-10-24T05:18:00.000Z">
+<meta property="article:modified_time" content="2021-06-06T18:52:24.964Z">
+<meta property="article:author" content="Arclin">
+<meta property="article:tag" content="iOS">
+<meta property="article:tag" content="feature">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="https://i.loli.net/2019/10/24/iHxWAqL63E2ZfMY.jpg">
+
+<link rel="canonical" href="https://www.arclin.cn/post/f356f3c1.html">
+
+
+<script id="page-configurations">
+  // https://hexo.io/docs/variables.html
+  CONFIG.page = {
+    sidebar: "",
+    isHome : false,
+    isPost : true,
+    lang   : 'zh-Hans'
+  };
+</script>
+
+  <title>iOS 13新API | Arclin</title>
+  
+
+
+
+
+
+
+  <noscript>
+  <style>
+  .use-motion .brand,
+  .use-motion .menu-item,
+  .sidebar-inner,
+  .use-motion .post-block,
+  .use-motion .pagination,
+  .use-motion .comments,
+  .use-motion .post-header,
+  .use-motion .post-body,
+  .use-motion .collection-header { opacity: initial; }
+
+  .use-motion .site-title,
+  .use-motion .site-subtitle {
+    opacity: initial;
+    top: initial;
+  }
+
+  .use-motion .logo-line-before i { left: initial; }
+  .use-motion .logo-line-after i { right: initial; }
+  </style>
+</noscript>
+
+<link rel="alternate" href="/atom.xml" title="Arclin" type="application/atom+xml">
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage">
+  <div class="container use-motion">
+    <div class="headband"></div>
+
+    <header class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-container">
+  <div class="site-nav-toggle">
+    <div class="toggle" aria-label="切换导航栏">
+      <span class="toggle-line toggle-line-first"></span>
+      <span class="toggle-line toggle-line-middle"></span>
+      <span class="toggle-line toggle-line-last"></span>
+    </div>
+  </div>
+
+  <div class="site-meta">
+
+    <a href="/" class="brand" rel="start">
+      <span class="logo-line-before"><i></i></span>
+      <h1 class="site-title">Arclin</h1>
+      <span class="logo-line-after"><i></i></span>
+    </a>
+      <p class="site-subtitle" itemprop="description">Advocate Technology. Enjoy Technology.</p>
+  </div>
+
+  <div class="site-nav-right">
+    <div class="toggle popup-trigger">
+        <i class="fa fa-search fa-fw fa-lg"></i>
+    </div>
+  </div>
+</div>
+
+
+
+
+<nav class="site-nav">
+  <ul id="menu" class="main-menu menu">
+        <li class="menu-item menu-item-home">
+
+    <a href="/" rel="section"><i class="fa fa-home fa-fw"></i>首页</a>
+
+  </li>
+        <li class="menu-item menu-item-tags">
+
+    <a href="/tags/" rel="section"><i class="fa fa-tags fa-fw"></i>标签</a>
+
+  </li>
+        <li class="menu-item menu-item-categories">
+
+    <a href="/categories/" rel="section"><i class="fa fa-th fa-fw"></i>分类</a>
+
+  </li>
+        <li class="menu-item menu-item-archives">
+
+    <a href="/archives/" rel="section"><i class="fa fa-archive fa-fw"></i>归档</a>
+
+  </li>
+        <li class="menu-item menu-item-about">
+
+    <a href="/about/" rel="section"><i class="fa fa-user fa-fw"></i>关于</a>
+
+  </li>
+      <li class="menu-item menu-item-search">
+        <a role="button" class="popup-trigger"><i class="fa fa-search fa-fw"></i>搜索
+        </a>
+      </li>
+  </ul>
+</nav>
+
+
+
+  <div class="search-pop-overlay">
+    <div class="popup search-popup">
+        <div class="search-header">
+  <span class="search-icon">
+    <i class="fa fa-search"></i>
+  </span>
+  <div class="search-input-container">
+    <input autocomplete="off" autocapitalize="off"
+           placeholder="搜索..." spellcheck="false"
+           type="search" class="search-input">
+  </div>
+  <span class="popup-btn-close">
+    <i class="fa fa-times-circle"></i>
+  </span>
+</div>
+<div id="search-result">
+  <div id="no-result">
+    <i class="fa fa-spinner fa-pulse fa-5x fa-fw"></i>
+  </div>
+</div>
+
+    </div>
+  </div>
+
+</div>
+    </header>
+
+    
+  <div class="back-to-top">
+    <i class="fa fa-arrow-up"></i>
+    <span>0%</span>
+  </div>
+
+
+    <main class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          
+
+          <div class="content post posts-expand">
+            
+
+    
+  
+  
+  <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="zh-Hans">
+    <link itemprop="mainEntityOfPage" href="https://www.arclin.cn/post/f356f3c1.html">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="https://avatars.githubusercontent.com/u/12107804?v=4">
+      <meta itemprop="name" content="Arclin">
+      <meta itemprop="description" content="Stay hungry,stay foolish">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="Arclin">
+    </span>
+      <header class="post-header">
+        <h1 class="post-title" itemprop="name headline">
+          iOS 13新API
+        </h1>
+
+        <div class="post-meta">
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-calendar"></i>
+              </span>
+              <span class="post-meta-item-text">发表于</span>
+
+              <time title="创建时间：2019-10-24 13:18:00" itemprop="dateCreated datePublished" datetime="2019-10-24T13:18:00+08:00">2019-10-24</time>
+            </span>
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-folder"></i>
+              </span>
+              <span class="post-meta-item-text">分类于</span>
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/iOS/" itemprop="url" rel="index"><span itemprop="name">iOS</span></a>
+                </span>
+            </span>
+
+          
+            <span class="post-meta-item" title="阅读次数" id="busuanzi_container_page_pv" style="display: none;">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-eye"></i>
+              </span>
+              <span class="post-meta-item-text">阅读次数：</span>
+              <span id="busuanzi_value_page_pv"></span>
+            </span>
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+        <p>可能会用到的iOS13新Api</p>
+<span id="more"></span>
+
+<h2 id="接口类"><a href="#接口类" class="headerlink" title="接口类"></a>接口类</h2><h3 id="截图转PDF"><a href="#截图转PDF" class="headerlink" title="截图转PDF"></a>截图转PDF</h3><p>safari可以长截图了<br><img width=20% src="https://i.loli.net/2019/10/24/iHxWAqL63E2ZfMY.jpg"></p>
+<p>然后我们可以把<code>UIScrollView</code>的截图转成PDF</p>
+<p><a target="_blank" rel="noopener" href="https://developer.apple.com/documentation/uikit/uiscreenshotservicedelegate">文档</a></p>
+<h3 id="双指滑动手势"><a href="#双指滑动手势" class="headerlink" title="双指滑动手势"></a>双指滑动手势</h3><p><img src="https://i.loli.net/2019/10/24/FbSEV8WCXcQRrf9.gif"></p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">&#x2F;&#x2F;&#x2F; 是否允许多指选中</span><br><span class="line">optional func tableView(_ tableView: UITableView, shouldBeginMultipleSelectionInteractionAtIndexPath indexPath: IndexPath) -&gt; Bool</span><br><span class="line"></span><br><span class="line">&#x2F;&#x2F;&#x2F;多指选中开始，这里可以做一些UI修改，比如修改导航栏上按钮的文本</span><br><span class="line">optional func tableView(_ tableView: UITableView, didBeginMultipleSelectionInteractionAtIndexPath indexPath: IndexPath) </span><br></pre></td></tr></table></figure>
+
+<h3 id="深色模式"><a href="#深色模式" class="headerlink" title="深色模式"></a>深色模式</h3><p>见<a target="_blank" rel="noopener" href="https://www.jianshu.com/p/176537b0d9dd">文章</a></p>
+<h2 id="Framework类"><a href="#Framework类" class="headerlink" title="Framework类"></a>Framework类</h2><h3 id="Multiple-UI-Instances"><a href="#Multiple-UI-Instances" class="headerlink" title="Multiple UI Instances"></a>Multiple UI Instances</h3><p>可以支持一个界面同时展示多个控制器（不是父子控制器那种）<br>在iPad上可以使用</p>
+<p><img src="https://docs-assets.developer.apple.com/published/8ce996907a/fc0975ae-c186-438c-abdd-5280f650c377.png"></p>
+<p>主要类<code>UIScene</code></p>
+<p><a target="_blank" rel="noopener" href="https://developer.apple.com/documentation/uikit/app_and_environment">文档</a></p>
+<h3 id="BackgroundTasks"><a href="#BackgroundTasks" class="headerlink" title="BackgroundTasks"></a>BackgroundTasks</h3><p>好消息~ 现在维持后台不被杀可以直接用这个API了，以前的会用后台获取定位和播放静音音乐的方式，但是现在只要注册后台就可以了，但是还是只有短期，长时间的话可能会要求充电状态或者持续的网络状态。</p>
+<p><a target="_blank" rel="noopener" href="https://developer.apple.com/documentation/backgroundtasks/">文档</a></p>
+<h3 id="Camera-Capture"><a href="#Camera-Capture" class="headerlink" title="Camera Capture"></a>Camera Capture</h3><p>现在可以同时使用前后摄像头，可以进行分割遮罩，可以识别出头发，皮肤，牙齿</p>
+<p><a target="_blank" rel="noopener" href="https://developer.apple.com/documentation/avfoundation/avcapturemulticamsession/">文档1</a></p>
+<p><a target="_blank" rel="noopener" href="https://developer.apple.com/documentation/avfoundation/avsemanticsegmentationmatte/">文档2</a></p>
+<h3 id="Combine"><a href="#Combine" class="headerlink" title="Combine"></a>Combine</h3><p>官方版RxSwift，主要是配合SwiftUI使用</p>
+<p><a target="_blank" rel="noopener" href="https://developer.apple.com/documentation/combine/">文档</a></p>
+<h3 id="Core-Haptics"><a href="#Core-Haptics" class="headerlink" title="Core Haptics"></a>Core Haptics</h3><p>可以在UI交互的时候给点小触觉反馈，比如打开关闭UISwitch的时候小震动一下，或者播放点声音之类的</p>
+<p><a target="_blank" rel="noopener" href="https://developer.apple.com/documentation/corehaptics/">文档</a></p>
+<h3 id="Apple-CryptoKit"><a href="#Apple-CryptoKit" class="headerlink" title="Apple CryptoKit"></a>Apple CryptoKit</h3><p>好消息，苹果自带HMAC、SHA、AES、NIST加密算法啦</p>
+<p><a target="_blank" rel="noopener" href="https://developer.apple.com/documentation/cryptokit/">文档</a></p>
+<h3 id="VisionKit"><a href="#VisionKit" class="headerlink" title="VisionKit"></a>VisionKit</h3><p>好消息，苹果自带图片转文字功能啦</p>
+<p><a target="_blank" rel="noopener" href="https://developer.apple.com/documentation/visionkit/">文档</a></p>
+<h3 id="MetricKit"><a href="#MetricKit" class="headerlink" title="MetricKit"></a>MetricKit</h3><p>用来收集用户设备信息的，主要是使用App的过程中的耗电，CPU等等性能指标，可以依据这些优化你的App</p>
+<p><a target="_blank" rel="noopener" href="https://developer.apple.com/documentation/metrickit/">文档</a></p>
+<h3 id="PencilKit"><a href="#PencilKit" class="headerlink" title="PencilKit"></a>PencilKit</h3><p>iPad上跟Apple Pencil交互的API</p>
+<p><a target="_blank" rel="noopener" href="https://developer.apple.com/documentation/pencilkit/">文档</a></p>
+<h3 id="Vision"><a href="#Vision" class="headerlink" title="Vision"></a>Vision</h3><p>图像识别相关framework<br>iOS11的功能：面部和面部界标检测，条形码识别，图像配准以及一般特征跟踪。</p>
+<p>iOS13的新功能：</p>
+<ol>
+<li>对图像进行显著性分析。</li>
+<li>在图像中检测人类和动物。</li>
+<li>对图像进行分类和搜索。</li>
+<li>分析图像与特征打印的相似性。</li>
+<li>对文档执行文本识别。</li>
+</ol>
+<p><a target="_blank" rel="noopener" href="https://developer.apple.com/documentation/vision/">文档</a></p>
+<h3 id="Sign-in-with-Apple"><a href="#Sign-in-with-Apple" class="headerlink" title="Sign in with Apple"></a>Sign in with Apple</h3><p>苹果登录</p>
+<p><a target="_blank" rel="noopener" href="https://developer.apple.com/sign-in-with-apple/get-started/">文档</a></p>
+<h3 id="SF-Symbols"><a href="#SF-Symbols" class="headerlink" title="SF Symbols"></a>SF Symbols</h3><p>可以用来显示矢量图</p>
+<p><a target="_blank" rel="noopener" href="https://developer.apple.com/documentation/uikit/uiimage/configuring_and_displaying_symbol_images_in_your_ui/">文档</a></p>
+<h3 id="Bring-Your-iPad-App-to-Mac"><a href="#Bring-Your-iPad-App-to-Mac" class="headerlink" title="Bring Your iPad App to Mac"></a>Bring Your iPad App to Mac</h3><p>直接把iPad App 迁移到 Mac，不过还是要做适配的，下面文档会有一些适配规则，以兼容两个端</p>
+<p><a target="_blank" rel="noopener" href="https://developer.apple.com/design/human-interface-guidelines/ios/overview/mac-catalyst/">参考</a></p>
+<p><a target="_blank" rel="noopener" href="https://developer.apple.com/documentation/xcode/creating_a_mac_version_of_your_ipad_app">文档1</a></p>
+<p><a target="_blank" rel="noopener" href="https://developer.apple.com/documentation/uikit/mac_catalyst/optimizing_your_ipad_app_for_mac">文档2</a></p>
+<h3 id="ARKit-3"><a href="#ARKit-3" class="headerlink" title="ARKit 3"></a>ARKit 3</h3><p>应该大家都知道ARKit，这次主要是多了些新特性，包括动态捕捉动作，同时捕捉多个面部，同时开启前后摄像头等。</p>
+<p><a target="_blank" rel="noopener" href="https://developer.apple.com/documentation/arkit/">文档</a></p>
+<h3 id="RealityKit"><a href="#RealityKit" class="headerlink" title="RealityKit"></a>RealityKit</h3><p>3D模型搭建、展示用</p>
+<p><a target="_blank" rel="noopener" href="https://developer.apple.com/documentation/realitykit/">文档</a></p>
+<h3 id="Core-ML-3"><a href="#Core-ML-3" class="headerlink" title="Core ML 3"></a>Core ML 3</h3><p>升级版机器学习套件</p>
+<p><a target="_blank" rel="noopener" href="https://developer.apple.com/documentation/coreml/">文档</a></p>
+
+    </div>
+
+    
+    
+    
+
+      <footer class="post-footer">
+          <div class="post-tags">
+              <a href="/tags/iOS/" rel="tag"># iOS</a>
+              <a href="/tags/feature/" rel="tag"># feature</a>
+          </div>
+
+        
+
+
+        
+    <div class="post-nav">
+      <div class="post-nav-item">
+    <a href="/post/3c7b026b.html" rel="prev" title="如何开发/管理一个项目">
+      <i class="fa fa-chevron-left"></i> 如何开发/管理一个项目
+    </a></div>
+      <div class="post-nav-item">
+    <a href="/post/ac0a85bd.html" rel="next" title="Sign in with Apple接入指南">
+      Sign in with Apple接入指南 <i class="fa fa-chevron-right"></i>
+    </a></div>
+    </div>
+      </footer>
+    
+  </article>
+  
+  
+  
+
+
+
+          </div>
+          
+    <div class="comments" id="gitalk-container"></div>
+
+<script>
+  window.addEventListener('tabs:register', () => {
+    let { activeClass } = CONFIG.comments;
+    if (CONFIG.comments.storage) {
+      activeClass = localStorage.getItem('comments_active') || activeClass;
+    }
+    if (activeClass) {
+      let activeTab = document.querySelector(`a[href="#comment-${activeClass}"]`);
+      if (activeTab) {
+        activeTab.click();
+      }
+    }
+  });
+  if (CONFIG.comments.storage) {
+    window.addEventListener('tabs:click', event => {
+      if (!event.target.matches('.tabs-comment .tab-content .tab-pane')) return;
+      let commentClass = event.target.classList[1];
+      localStorage.setItem('comments_active', commentClass);
+    });
+  }
+</script>
+
+        </div>
+          
+  
+  <div class="toggle sidebar-toggle">
+    <span class="toggle-line toggle-line-first"></span>
+    <span class="toggle-line toggle-line-middle"></span>
+    <span class="toggle-line toggle-line-last"></span>
+  </div>
+
+  <aside class="sidebar">
+    <div class="sidebar-inner">
+
+      <ul class="sidebar-nav motion-element">
+        <li class="sidebar-nav-toc">
+          文章目录
+        </li>
+        <li class="sidebar-nav-overview">
+          站点概览
+        </li>
+      </ul>
+
+      <!--noindex-->
+      <div class="post-toc-wrap sidebar-panel">
+          <div class="post-toc motion-element"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#%E6%8E%A5%E5%8F%A3%E7%B1%BB"><span class="nav-number">1.</span> <span class="nav-text">接口类</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#%E6%88%AA%E5%9B%BE%E8%BD%ACPDF"><span class="nav-number">1.1.</span> <span class="nav-text">截图转PDF</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E5%8F%8C%E6%8C%87%E6%BB%91%E5%8A%A8%E6%89%8B%E5%8A%BF"><span class="nav-number">1.2.</span> <span class="nav-text">双指滑动手势</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E6%B7%B1%E8%89%B2%E6%A8%A1%E5%BC%8F"><span class="nav-number">1.3.</span> <span class="nav-text">深色模式</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#Framework%E7%B1%BB"><span class="nav-number">2.</span> <span class="nav-text">Framework类</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#Multiple-UI-Instances"><span class="nav-number">2.1.</span> <span class="nav-text">Multiple UI Instances</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#BackgroundTasks"><span class="nav-number">2.2.</span> <span class="nav-text">BackgroundTasks</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#Camera-Capture"><span class="nav-number">2.3.</span> <span class="nav-text">Camera Capture</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#Combine"><span class="nav-number">2.4.</span> <span class="nav-text">Combine</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#Core-Haptics"><span class="nav-number">2.5.</span> <span class="nav-text">Core Haptics</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#Apple-CryptoKit"><span class="nav-number">2.6.</span> <span class="nav-text">Apple CryptoKit</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#VisionKit"><span class="nav-number">2.7.</span> <span class="nav-text">VisionKit</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#MetricKit"><span class="nav-number">2.8.</span> <span class="nav-text">MetricKit</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#PencilKit"><span class="nav-number">2.9.</span> <span class="nav-text">PencilKit</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#Vision"><span class="nav-number">2.10.</span> <span class="nav-text">Vision</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#Sign-in-with-Apple"><span class="nav-number">2.11.</span> <span class="nav-text">Sign in with Apple</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#SF-Symbols"><span class="nav-number">2.12.</span> <span class="nav-text">SF Symbols</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#Bring-Your-iPad-App-to-Mac"><span class="nav-number">2.13.</span> <span class="nav-text">Bring Your iPad App to Mac</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#ARKit-3"><span class="nav-number">2.14.</span> <span class="nav-text">ARKit 3</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#RealityKit"><span class="nav-number">2.15.</span> <span class="nav-text">RealityKit</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#Core-ML-3"><span class="nav-number">2.16.</span> <span class="nav-text">Core ML 3</span></a></li></ol></li></ol></div>
+      </div>
+      <!--/noindex-->
+
+      <div class="site-overview-wrap sidebar-panel">
+        <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+    <img class="site-author-image" itemprop="image" alt="Arclin"
+      src="https://avatars.githubusercontent.com/u/12107804?v=4">
+  <p class="site-author-name" itemprop="name">Arclin</p>
+  <div class="site-description" itemprop="description">Stay hungry,stay foolish</div>
+</div>
+<div class="site-state-wrap motion-element">
+  <nav class="site-state">
+      <div class="site-state-item site-state-posts">
+          <a href="/archives/">
+        
+          <span class="site-state-item-count">100</span>
+          <span class="site-state-item-name">日志</span>
+        </a>
+      </div>
+      <div class="site-state-item site-state-categories">
+            <a href="/categories/">
+          
+        <span class="site-state-item-count">12</span>
+        <span class="site-state-item-name">分类</span></a>
+      </div>
+      <div class="site-state-item site-state-tags">
+            <a href="/tags/">
+          
+        <span class="site-state-item-count">38</span>
+        <span class="site-state-item-name">标签</span></a>
+      </div>
+  </nav>
+</div>
+  <div class="links-of-author motion-element">
+      <span class="links-of-author-item">
+        <a href="https://github.com/Arc-lin" title="GitHub → https://github.com/Arc-lin" rel="noopener" target="_blank"><i class="fab fa-github fa-fw"></i>GitHub</a>
+      </span>
+      <span class="links-of-author-item">
+        <a href="mailto:arclin325@gmail.com" title="E-Mail → mailto:arclin325@gmail.com" rel="noopener" target="_blank"><i class="fa fa-envelope fa-fw"></i>E-Mail</a>
+      </span>
+  </div>
+
+
+
+      </div>
+
+    </div>
+  </aside>
+  <div id="sidebar-dimmer"></div>
+
+
+      </div>
+    </main>
+
+    <footer class="footer">
+      <div class="footer-inner">
+        
+
+        
+
+<div class="copyright">
+  
+  &copy; 
+  <span itemprop="copyrightYear">2022</span>
+  <span class="with-love">
+    <i class="fa fa-heart"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">Arclin</span>
+</div>
+  <div class="powered-by">由 <a href="https://hexo.io" class="theme-link" rel="noopener" target="_blank">Hexo</a> & <a href="https://muse.theme-next.org" class="theme-link" rel="noopener" target="_blank">NexT.Muse</a> 强力驱动
+  </div>
+
+        
+<div class="busuanzi-count">
+  <script async src="https://busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js"></script>
+    <span class="post-meta-item" id="busuanzi_container_site_uv" style="display: none;">
+      <span class="post-meta-item-icon">
+        <i class="fa fa-user"></i>
+      </span>
+      <span class="site-uv" title="总访客量">
+        <span id="busuanzi_value_site_uv"></span>
+      </span>
+    </span>
+    <span class="post-meta-divider">|</span>
+    <span class="post-meta-item" id="busuanzi_container_site_pv" style="display: none;">
+      <span class="post-meta-item-icon">
+        <i class="fa fa-eye"></i>
+      </span>
+      <span class="site-pv" title="总访问量">
+        <span id="busuanzi_value_site_pv"></span>
+      </span>
+    </span>
+</div>
+
+
+
+
+
+
+
+
+      </div>
+    </footer>
+  </div>
+
+  
+  <script src="/lib/anime.min.js"></script>
+  <script src="//cdn.jsdelivr.net/npm/jquery@3/dist/jquery.min.js"></script>
+  <script src="//cdn.jsdelivr.net/gh/fancyapps/fancybox@3/dist/jquery.fancybox.min.js"></script>
+  <script src="/lib/velocity/velocity.min.js"></script>
+  <script src="/lib/velocity/velocity.ui.min.js"></script>
+
+<script src="/js/utils.js"></script>
+
+<script src="/js/motion.js"></script>
+
+
+<script src="/js/schemes/muse.js"></script>
+
+
+<script src="/js/next-boot.js"></script>
+
+
+
+
+  
+  <script>
+    (function(){
+      var canonicalURL, curProtocol;
+      //Get the <link> tag
+      var x=document.getElementsByTagName("link");
+		//Find the last canonical URL
+		if(x.length > 0){
+			for (i=0;i<x.length;i++){
+				if(x[i].rel.toLowerCase() == 'canonical' && x[i].href){
+					canonicalURL=x[i].href;
+				}
+			}
+		}
+    //Get protocol
+	    if (!canonicalURL){
+	    	curProtocol = window.location.protocol.split(':')[0];
+	    }
+	    else{
+	    	curProtocol = canonicalURL.split(':')[0];
+	    }
+      //Get current URL if the canonical URL does not exist
+	    if (!canonicalURL) canonicalURL = window.location.href;
+	    //Assign script content. Replace current URL with the canonical URL
+      !function(){var e=/([http|https]:\/\/[a-zA-Z0-9\_\.]+\.baidu\.com)/gi,r=canonicalURL,t=document.referrer;if(!e.test(r)){var n=(String(curProtocol).toLowerCase() === 'https')?"https://sp0.baidu.com/9_Q4simg2RQJ8t7jm9iCKT-xh_/s.gif":"//api.share.baidu.com/s.gif";t?(n+="?r="+encodeURIComponent(document.referrer),r&&(n+="&l="+r)):r&&(n+="?l="+r);var i=new Image;i.src=n}}(window);})();
+  </script>
+
+
+
+
+  
+<script src="/js/local-search.js"></script>
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+  
+
+<link rel="stylesheet" href="//cdn.jsdelivr.net/npm/gitalk@1/dist/gitalk.min.css">
+
+<script>
+NexT.utils.loadComments(document.querySelector('#gitalk-container'), () => {
+  NexT.utils.getScript('//cdn.jsdelivr.net/npm/gitalk@1/dist/gitalk.min.js', () => {
+    var gitalk = new Gitalk({
+      clientID    : 'df6d1f33bb4a66f5fa60',
+      clientSecret: '5fcc9fb756ac9d4b16381288da7b29f691b45e0a',
+      repo        : 'arc-lin.github.io',
+      owner       : 'Arc-lin',
+      admin       : ['Arc-lin'],
+      id          : 'c1936829ab98b8aafcdf5308bd3ab971',
+        language: 'zh-CN',
+      distractionFreeMode: false
+    });
+    gitalk.render('gitalk-container');
+  }, window.Gitalk);
+});
+</script>
+
+</body>
+</html>

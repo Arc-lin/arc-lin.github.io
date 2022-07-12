@@ -1,0 +1,722 @@
+<!DOCTYPE html>
+<html lang="zh-Hans">
+<head>
+  <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=2">
+<meta name="theme-color" content="#222">
+<meta name="generator" content="Hexo 5.4.0">
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png">
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32-next.png">
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next.png">
+  <link rel="mask-icon" href="/images/logo.svg" color="#222">
+
+<link rel="stylesheet" href="/css/main.css">
+
+
+<link rel="stylesheet" href="/lib/font-awesome/css/all.min.css">
+  <link rel="stylesheet" href="//cdn.jsdelivr.net/gh/fancyapps/fancybox@3/dist/jquery.fancybox.min.css">
+
+<script id="hexo-configurations">
+    var NexT = window.NexT || {};
+    var CONFIG = {"hostname":"www.arclin.cn","root":"/","scheme":"Muse","version":"7.8.0","exturl":false,"sidebar":{"position":"left","display":"post","padding":18,"offset":12,"onmobile":false},"copycode":{"enable":false,"show_result":false,"style":null},"back2top":{"enable":true,"sidebar":false,"scrollpercent":false},"bookmark":{"enable":false,"color":"#222","save":"auto"},"fancybox":true,"mediumzoom":false,"lazyload":false,"pangu":false,"comments":{"style":"tabs","active":null,"storage":true,"lazyload":false,"nav":null},"algolia":{"appID":"VOFC7668C9","apiKey":"24c644edc8e7353bf2e8d8e31f03a940","indexName":"hexo","hits":{"per_page":10},"labels":{"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}},"localsearch":{"enable":true,"trigger":"auto","top_n_per_article":1,"unescape":false,"preload":false},"motion":{"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},"path":"search.xml"};
+  </script>
+
+  <meta name="description" content="本文主要简述LLVM的概念与Clang插件开发">
+<meta property="og:type" content="article">
+<meta property="og:title" content="LLVM">
+<meta property="og:url" content="https://www.arclin.cn/post/6d8a8bc2.html">
+<meta property="og:site_name" content="Arclin">
+<meta property="og:description" content="本文主要简述LLVM的概念与Clang插件开发">
+<meta property="og:locale">
+<meta property="og:image" content="https://z3.ax1x.com/2021/09/12/4ppCOx.png">
+<meta property="og:image" content="https://z3.ax1x.com/2021/09/12/4pEhkt.png">
+<meta property="og:image" content="https://i.loli.net/2021/09/12/P7Z2sTB6ifOt4XM.png">
+<meta property="og:image" content="https://i.loli.net/2021/09/12/EZ9hnywmdQAX3LK.png">
+<meta property="og:image" content="https://z3.ax1x.com/2021/09/19/483bNR.png">
+<meta property="og:image" content="https://z3.ax1x.com/2021/09/19/483d9P.png">
+<meta property="og:image" content="https://z3.ax1x.com/2021/09/19/48lKER.png">
+<meta property="og:image" content="https://z3.ax1x.com/2021/09/19/430RxA.png">
+<meta property="og:image" content="https://z3.ax1x.com/2021/09/19/43022d.png">
+<meta property="og:image" content="https://z3.ax1x.com/2021/09/19/4369gg.png">
+<meta property="og:image" content="https://z3.ax1x.com/2021/09/19/481kdA.png">
+<meta property="og:image" content="https://z3.ax1x.com/2021/09/19/481eRf.png">
+<meta property="og:image" content="https://z3.ax1x.com/2021/09/19/43XojJ.png">
+<meta property="og:image" content="https://z3.ax1x.com/2021/09/19/48lXI1.png">
+<meta property="og:image" content="https://z3.ax1x.com/2021/09/19/48lsxS.png">
+<meta property="article:published_time" content="2021-09-12T03:11:00.000Z">
+<meta property="article:modified_time" content="2021-09-19T13:16:22.789Z">
+<meta property="article:author" content="Arclin">
+<meta property="article:tag" content="iOS">
+<meta property="article:tag" content="底层原理">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="https://z3.ax1x.com/2021/09/12/4ppCOx.png">
+
+<link rel="canonical" href="https://www.arclin.cn/post/6d8a8bc2.html">
+
+
+<script id="page-configurations">
+  // https://hexo.io/docs/variables.html
+  CONFIG.page = {
+    sidebar: "",
+    isHome : false,
+    isPost : true,
+    lang   : 'zh-Hans'
+  };
+</script>
+
+  <title>LLVM | Arclin</title>
+  
+
+
+
+
+
+
+  <noscript>
+  <style>
+  .use-motion .brand,
+  .use-motion .menu-item,
+  .sidebar-inner,
+  .use-motion .post-block,
+  .use-motion .pagination,
+  .use-motion .comments,
+  .use-motion .post-header,
+  .use-motion .post-body,
+  .use-motion .collection-header { opacity: initial; }
+
+  .use-motion .site-title,
+  .use-motion .site-subtitle {
+    opacity: initial;
+    top: initial;
+  }
+
+  .use-motion .logo-line-before i { left: initial; }
+  .use-motion .logo-line-after i { right: initial; }
+  </style>
+</noscript>
+
+<link rel="alternate" href="/atom.xml" title="Arclin" type="application/atom+xml">
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage">
+  <div class="container use-motion">
+    <div class="headband"></div>
+
+    <header class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-container">
+  <div class="site-nav-toggle">
+    <div class="toggle" aria-label="切换导航栏">
+      <span class="toggle-line toggle-line-first"></span>
+      <span class="toggle-line toggle-line-middle"></span>
+      <span class="toggle-line toggle-line-last"></span>
+    </div>
+  </div>
+
+  <div class="site-meta">
+
+    <a href="/" class="brand" rel="start">
+      <span class="logo-line-before"><i></i></span>
+      <h1 class="site-title">Arclin</h1>
+      <span class="logo-line-after"><i></i></span>
+    </a>
+      <p class="site-subtitle" itemprop="description">Advocate Technology. Enjoy Technology.</p>
+  </div>
+
+  <div class="site-nav-right">
+    <div class="toggle popup-trigger">
+        <i class="fa fa-search fa-fw fa-lg"></i>
+    </div>
+  </div>
+</div>
+
+
+
+
+<nav class="site-nav">
+  <ul id="menu" class="main-menu menu">
+        <li class="menu-item menu-item-home">
+
+    <a href="/" rel="section"><i class="fa fa-home fa-fw"></i>首页</a>
+
+  </li>
+        <li class="menu-item menu-item-tags">
+
+    <a href="/tags/" rel="section"><i class="fa fa-tags fa-fw"></i>标签</a>
+
+  </li>
+        <li class="menu-item menu-item-categories">
+
+    <a href="/categories/" rel="section"><i class="fa fa-th fa-fw"></i>分类</a>
+
+  </li>
+        <li class="menu-item menu-item-archives">
+
+    <a href="/archives/" rel="section"><i class="fa fa-archive fa-fw"></i>归档</a>
+
+  </li>
+        <li class="menu-item menu-item-about">
+
+    <a href="/about/" rel="section"><i class="fa fa-user fa-fw"></i>关于</a>
+
+  </li>
+      <li class="menu-item menu-item-search">
+        <a role="button" class="popup-trigger"><i class="fa fa-search fa-fw"></i>搜索
+        </a>
+      </li>
+  </ul>
+</nav>
+
+
+
+  <div class="search-pop-overlay">
+    <div class="popup search-popup">
+        <div class="search-header">
+  <span class="search-icon">
+    <i class="fa fa-search"></i>
+  </span>
+  <div class="search-input-container">
+    <input autocomplete="off" autocapitalize="off"
+           placeholder="搜索..." spellcheck="false"
+           type="search" class="search-input">
+  </div>
+  <span class="popup-btn-close">
+    <i class="fa fa-times-circle"></i>
+  </span>
+</div>
+<div id="search-result">
+  <div id="no-result">
+    <i class="fa fa-spinner fa-pulse fa-5x fa-fw"></i>
+  </div>
+</div>
+
+    </div>
+  </div>
+
+</div>
+    </header>
+
+    
+  <div class="back-to-top">
+    <i class="fa fa-arrow-up"></i>
+    <span>0%</span>
+  </div>
+
+
+    <main class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          
+
+          <div class="content post posts-expand">
+            
+
+    
+  
+  
+  <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="zh-Hans">
+    <link itemprop="mainEntityOfPage" href="https://www.arclin.cn/post/6d8a8bc2.html">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="https://avatars.githubusercontent.com/u/12107804?v=4">
+      <meta itemprop="name" content="Arclin">
+      <meta itemprop="description" content="Stay hungry,stay foolish">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="Arclin">
+    </span>
+      <header class="post-header">
+        <h1 class="post-title" itemprop="name headline">
+          LLVM
+        </h1>
+
+        <div class="post-meta">
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-calendar"></i>
+              </span>
+              <span class="post-meta-item-text">发表于</span>
+
+              <time title="创建时间：2021-09-12 11:11:00" itemprop="dateCreated datePublished" datetime="2021-09-12T11:11:00+08:00">2021-09-12</time>
+            </span>
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-folder"></i>
+              </span>
+              <span class="post-meta-item-text">分类于</span>
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/iOS/" itemprop="url" rel="index"><span itemprop="name">iOS</span></a>
+                </span>
+            </span>
+
+          
+            <span class="post-meta-item" title="阅读次数" id="busuanzi_container_page_pv" style="display: none;">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-eye"></i>
+              </span>
+              <span class="post-meta-item-text">阅读次数：</span>
+              <span id="busuanzi_value_page_pv"></span>
+            </span>
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+        <p>本文主要简述LLVM的概念与Clang插件开发</p>
+<span id="more"></span>
+
+<h2 id="LLVM"><a href="#LLVM" class="headerlink" title="LLVM"></a>LLVM</h2><ul>
+<li>官网：<a target="_blank" rel="noopener" href="https://llvm.org/">https://llvm.org</a></li>
+<li>LLVM项目是模块化、可重用的<code>编译器</code>以及<code>工具链</code>技术的集合</li>
+<li>”LLVM“这个名称不是缩写，是项目全称</li>
+</ul>
+<h2 id="传统的编译器架构"><a href="#传统的编译器架构" class="headerlink" title="传统的编译器架构"></a>传统的编译器架构</h2><p><img src="https://z3.ax1x.com/2021/09/12/4ppCOx.png" alt="4ppCOx.png"></p>
+<ul>
+<li>Frontend：前端<ul>
+<li>词法分析、语法分析、语义分析、生成中间代码</li>
+</ul>
+</li>
+<li>Optimizer：优化器<ul>
+<li>中间代码优化</li>
+</ul>
+</li>
+<li>Backend：后端<ul>
+<li>生成机器码</li>
+</ul>
+</li>
+</ul>
+<h2 id="LLVM架构"><a href="#LLVM架构" class="headerlink" title="LLVM架构"></a>LLVM架构</h2><p><img src="https://z3.ax1x.com/2021/09/12/4pEhkt.png" alt="4pEhkt.png"></p>
+<ul>
+<li>不同的前端后端使用统一的中间代码<code>LLVM Intermediate Representation(LLVM IR)</code></li>
+<li>如果需要支持一种新的编程语言，那么只需要实现一个新的前端</li>
+<li>如果需要支持一种新的硬件设备，那么只需要实现一个新的后端</li>
+<li>优化阶段是一个通用的阶段，他针对的是统一的<code>LLVM IR</code>，不论是支持新的编程语言，还是支持新的硬件设备，都不需要对优化阶段做需修改</li>
+<li>相比之下，GCC的前端和后端没分得太开，前端后端耦合在了一起。所以GCC为了支持一门新的语言，或者为了支持一个新的目标平台，就变得相当困难</li>
+<li>LLVM现在被作为实现各种静态和运行时编译语言的通用基础结构（GCC家族，Java,.Net,Python,Ruby,Scheme,Haskell,D等）</li>
+</ul>
+<h3 id="Clang"><a href="#Clang" class="headerlink" title="Clang"></a>Clang</h3><ul>
+<li><p>Clang是LLVM的一个子项目</p>
+</li>
+<li><p>基于LLVM架构的C/C++/Objective-C编译器前端</p>
+</li>
+<li><p>官网：<a target="_blank" rel="noopener" href="http://clang.llvm.org/">http://clang.llvm.org/</a></p>
+</li>
+<li><p>相比于GCC，Clang具有如下优点</p>
+<ul>
+<li>编译速度快：在某些平台上，Clang的编译速度显著地快过GCC(Debug模式下编译OC速度比GCC快3倍)</li>
+<li>占用内存小：Clang生成的AST所占用的内存是GCC的五分之一左右</li>
+<li>模块化设计：Clang采用基于库的模块化设计，易于IDE集成及其他用途的重用</li>
+<li>诊断信息可读性强：在编译过程中，Clang创建并保留了大量详细的元数据（metadata），有利于调试和错误报告</li>
+<li>设计清晰简单，容易理解，易于扩展增强 </li>
+</ul>
+</li>
+</ul>
+<h3 id="Clang与LLVM"><a href="#Clang与LLVM" class="headerlink" title="Clang与LLVM"></a>Clang与LLVM</h3><p> <img src="https://i.loli.net/2021/09/12/P7Z2sTB6ifOt4XM.png" alt="WX20210912-142017.png"></p>
+<p> <img src="https://i.loli.net/2021/09/12/EZ9hnywmdQAX3LK.png" alt="WX20210912-142026.png"></p>
+<p> IR：中间代码</p>
+<h2 id="OC源文件的编译过程"><a href="#OC源文件的编译过程" class="headerlink" title="OC源文件的编译过程"></a>OC源文件的编译过程</h2><ul>
+<li>命令行查看编译的过程：<code>$ clang -ccc-print-phases main.m</code></li>
+</ul>
+ <figure class="highlight css"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line">arclin<span class="keyword">@ArcdeMacBook-Pro</span> TestObjC % clang -ccc-print-phases main.m </span><br><span class="line">               +- <span class="number">0</span>: input, <span class="string">&quot;main.m&quot;</span>, objective-c</span><br><span class="line">            +- <span class="number">1</span>: preprocessor, &#123;<span class="number">0</span>&#125;, objective-c-cpp-output</span><br><span class="line">         +- <span class="number">2</span>: compiler, &#123;<span class="number">1</span>&#125;, ir</span><br><span class="line">      +- <span class="number">3</span>: backend, &#123;<span class="number">2</span>&#125;, assembler</span><br><span class="line">   +- <span class="number">4</span>: assembler, &#123;<span class="number">3</span>&#125;, <span class="selector-tag">object</span></span><br><span class="line">+- <span class="number">5</span>: linker, &#123;<span class="number">4</span>&#125;, image</span><br><span class="line"><span class="number">6</span>: bind-arch, <span class="string">&quot;x86_64&quot;</span>, &#123;<span class="number">5</span>&#125;, image</span><br></pre></td></tr></table></figure>
+<p>  preprocessor: 预处理器，处理宏定义，展开引入的头文件内容等</p>
+<p>  complier: 编译，编译成ir中间代码</p>
+<p>  backend: 后端，转成汇编代码</p>
+<p>  assemler: 汇编，转成目标代码</p>
+<p>  linker: 链接，链接动态库、静态库等</p>
+<p>  bind-arch: 绑定当前处理器架构</p>
+<ul>
+<li><p>查看preprocesser(预处理)的结果：<code>$ clang -E main.m</code></p>
+</li>
+<li><p>词法分析，生成Token：<code>$ clang -fmodules -E -Xlang -dump-tokens main.m</code></p>
+</li>
+<li><p>语法分析，生成语法树（AST，Abstract Syntax Tree）：<code>$ clang -fmodules -fsyntax-only -Xclang -ast-dump main.m</code></p>
+</li>
+</ul>
+<h2 id="词法分析、语法树"><a href="#词法分析、语法树" class="headerlink" title="词法分析、语法树"></a>词法分析、语法树</h2><p>词法分析，生成Token： <code>$ clang -fmodules -E -Xclang -dump-tokens main.m</code></p>
+<p><a target="_blank" rel="noopener" href="https://imgtu.com/i/483bNR"><img src="https://z3.ax1x.com/2021/09/19/483bNR.png" alt="483bNR.png"></a></p>
+<p>语法分析，生成语法树（AST，Abstract Syntax Tree）： <code>$ clang -fmodules -fsyntax-only -Xclang -ast-dump main.m</code></p>
+<p><a target="_blank" rel="noopener" href="https://imgtu.com/i/483d9P"><img src="https://z3.ax1x.com/2021/09/19/483d9P.png" alt="483d9P.png"></a></p>
+<h2 id="LLVM-IR"><a href="#LLVM-IR" class="headerlink" title="LLVM IR"></a>LLVM IR</h2><p>LLVM IR 有三种表现形式</p>
+<ul>
+<li><p>text：便于阅读的文本格式，类似于汇编语言，拓展名<code>.ll</code>，<code>$ clang -S -emit-llvm main.m</code></p>
+</li>
+<li><p>memory：内存格式</p>
+</li>
+<li><p>bitcode：二进制格式，拓展名<code>.bc</code>，<code>$ clang -c -emit-llvm main.m</code></p>
+</li>
+</ul>
+<p>IR基本语法</p>
+<ul>
+<li>注释以分号开头</li>
+<li>全局标识以@开头，局部标识符以%开头</li>
+<li>alloca, 在当前函数栈帧中分配内存</li>
+<li>i32，32bit，4个字节的意思</li>
+<li>align，内存对齐</li>
+<li>store，写入数据</li>
+<li>load，读取数据</li>
+</ul>
+<p>官方语法参考</p>
+<p><a target="_blank" rel="noopener" href="https://llvm.org/docs/LangRef.html">https://llvm.org/docs/LangRef.html</a></p>
+<h2 id="Clang插件开发"><a href="#Clang插件开发" class="headerlink" title="Clang插件开发"></a>Clang插件开发</h2><p>我们可以通过开发Clang插件来对我们的代码进行静态分析，大概步骤是我们先把LLVM源码和clang源码下载到本地，然后进行编译，编译完之后我们就可以得到我们自己的编译器，然后把我们的clang插件放入指定目录，然后在Xcode里面把Xcode原来的编译器配置为我们自己的编译器，然后就可以使用我们的Clang插件了。</p>
+<p>举个例子，通过Clang我们可以对类名命名进行一些约束，比如NSString不用copy修饰的时候就警告一下。</p>
+<p><a target="_blank" rel="noopener" href="https://imgtu.com/i/48lKER"><img src="https://z3.ax1x.com/2021/09/19/48lKER.png" alt="48lKER.png"></a></p>
+<p>接下来我们讲解一下配置和开发步骤</p>
+<h3 id="下载LLVM源码"><a href="#下载LLVM源码" class="headerlink" title="下载LLVM源码"></a>下载LLVM源码</h3><p>可以直接在github上面下载到源码，目前最新版本号为12.0.1，直接点击页面的<code>Source Code</code>下载，<a target="_blank" rel="noopener" href="https://github.com/llvm/llvm-project/releases/tag/llvmorg-12.0.1">github地址</a></p>
+<h3 id="下载Clang源码"><a href="#下载Clang源码" class="headerlink" title="下载Clang源码"></a>下载Clang源码</h3><p>同样也是<a target="_blank" rel="noopener" href="https://github.com/llvm/llvm-project/releases/tag/llvmorg-12.0.1">这个地址</a>，目前的最新版本是12.0.1，点击<code>clang-12.0.1.src.tar.xz</code>下载</p>
+<p>下载后解压，文件夹命名为clang，把文件夹置入LLVM源码目录<code>llvm</code>文件夹的<code>tools</code>文件夹中</p>
+<h3 id="安装cmake和ninja（先安装brew，https-brew-sh）"><a href="#安装cmake和ninja（先安装brew，https-brew-sh）" class="headerlink" title="安装cmake和ninja（先安装brew，https://brew.sh）"></a>安装cmake和ninja（先安装brew，<a target="_blank" rel="noopener" href="https://brew.sh)/">https://brew.sh）</a></h3><p>使用cmake和ninja工具是为了让编译速度更快</p>
+<p><code>$ brew install cmake</code><br><code>$ brew install ninja</code></p>
+<p>ninja如果安装失败，可以直接从<a target="_blank" rel="noopener" href="https://github.com/ninja-build/ninja/releases">github</a>获取release版（ninja-mac.zip）放入<code>/usr/local/bin</code>中</p>
+<h3 id="编译"><a href="#编译" class="headerlink" title="编译"></a>编译</h3><h4 id="使用ninja模板进行编译"><a href="#使用ninja模板进行编译" class="headerlink" title="使用ninja模板进行编译"></a>使用ninja模板进行编译</h4><p>在llvm源码目录内新建一个文件夹命名为<code>llvm_build</code>目录备用，用来放置ninja模板，然后在新建一个<code>llvm_release</code>文件夹，用来放置编译后的成品</p>
+<figure class="highlight jboss-cli"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">$ <span class="keyword">cd</span> llvm_build</span><br><span class="line">$ cmake -G Ninja <span class="string">../llvm</span> -DCMAKE_INSTALL_PREFIX=<span class="string">../llvm_release</span></span><br></pre></td></tr></table></figure>
+
+<p>命令执行完成后就<code>cd llvm_build</code>进入模板文件夹，然后依次执行以下命令</p>
+<figure class="highlight elixir"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"><span class="variable">$ </span>ninja</span><br><span class="line"><span class="variable">$ </span>ninja release</span><br></pre></td></tr></table></figure>
+
+<p>之后就可以在<code>llvm_release</code>内看到编译成品了</p>
+<h4 id="使用Xcode进行编译"><a href="#使用Xcode进行编译" class="headerlink" title="使用Xcode进行编译"></a>使用Xcode进行编译</h4><p>也可以生成Xcode项目再进行编译，但是速度很慢（可能需要1个多小时）</p>
+<p>在llvm源码目录内新建一个文件夹命名为<code>llvm_xcode</code>目录备用</p>
+<figure class="highlight powershell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"><span class="variable">$</span> <span class="built_in">cd</span> llvm_xcode</span><br><span class="line"><span class="variable">$</span> cmake <span class="literal">-G</span> Xcode ../llvm</span><br></pre></td></tr></table></figure>
+
+<p>生成完之后打开<code>llvm_xcode</code>内的<code>LLVM.xcodeproj</code></p>
+<p>选择自动生成Scheme</p>
+<p><a target="_blank" rel="noopener" href="https://imgtu.com/i/430RxA"><img src="https://z3.ax1x.com/2021/09/19/430RxA.png" alt="430RxA.png"></a></p>
+<p>选择<code>ALL_BUILD</code> Scheme 然后就可以Cmd+R开始编译了</p>
+<p><a target="_blank" rel="noopener" href="https://imgtu.com/i/43022d"><img src="https://z3.ax1x.com/2021/09/19/43022d.png" alt="43022d.png"></a></p>
+<p>编译后的成品在<code>llvm_xcode/Debug/bin</code>中</p>
+<h3 id="创建Clang插件"><a href="#创建Clang插件" class="headerlink" title="创建Clang插件"></a>创建Clang插件</h3><p>在llvm源码的<code>/llvm/tools/clang/tools</code>文件夹内，新建一个文件夹，命名为<code>my-plugin</code>(举例名字)</p>
+<p>在同目录下打开文件<code>CMakeLists.txt</code>，在最后一行写入<code>add_clang_subdirectory(my-plugin)</code>后保存</p>
+<p>在<code>my-plugin</code>文件夹内新建一个文件命名为<code>MyPlugin.cpp</code>，再新建一个<code>CMakeLists.txt</code>文件到该文件夹内</p>
+<p>编辑<code>CMakeLists.txt</code>文件，写入</p>
+<figure class="highlight stylus"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="title">add_llvm_library</span><span class="params">(MyPlugin MODULE BUILDTREE_ONLY MyPlugin.cpp)</span></span></span><br></pre></td></tr></table></figure>
+
+<p>表示可加载模块</p>
+<p>如果有很多cpp文件的话，那么也可以这么写</p>
+<figure class="highlight stylus"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line">add_llvm_library( MyPlugin MODULE BUILDTREE_ONLY </span><br><span class="line">MyPlugin.cpp</span><br><span class="line">MyPlugin2.cpp</span><br><span class="line">MyPlugin3.cpp</span><br><span class="line">MyPlugin4.cpp</span><br><span class="line">)</span><br></pre></td></tr></table></figure>
+
+<h3 id="编写Clang插件"><a href="#编写Clang插件" class="headerlink" title="编写Clang插件"></a>编写Clang插件</h3><p>因为在文本编辑器中编辑c++代码很麻烦，所以我们一般会生成一个Xcode模板（也就是上面提到那个<code>使用Xcode进行编译</code>的Xcode模板）帮我们辅助编写C++代码</p>
+<p>所以我们在llvm源码目录的<code>llvm_xcode</code>文件夹内执行一下<code>cmake -G Xcode ../llvm</code>命令，就可以得到一个Xcode模板，打开工程之后，就可以看到我们的插件目录</p>
+<p><a target="_blank" rel="noopener" href="https://imgtu.com/i/4369gg"><img src="https://z3.ax1x.com/2021/09/19/4369gg.png" alt="4369gg.png"></a></p>
+<h4 id="基本结构"><a href="#基本结构" class="headerlink" title="基本结构"></a>基本结构</h4><figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">/// 必要的头文件，主要用来解析语法树</span></span><br><span class="line"><span class="meta">#<span class="meta-keyword">include</span> <span class="meta-string">&lt;iostream&gt;</span></span></span><br><span class="line"><span class="meta">#<span class="meta-keyword">include</span> <span class="meta-string">&quot;clang/AST/AST.h&quot;</span></span></span><br><span class="line"><span class="meta">#<span class="meta-keyword">include</span> <span class="meta-string">&quot;clang/AST/ASTConsumer.h&quot;</span></span></span><br><span class="line"><span class="meta">#<span class="meta-keyword">include</span> <span class="meta-string">&quot;clang/ASTMatchers/ASTMatchers.h&quot;</span></span></span><br><span class="line"><span class="meta">#<span class="meta-keyword">include</span> <span class="meta-string">&quot;clang/ASTMatchers/ASTMatchFinder.h&quot;</span></span></span><br><span class="line"><span class="meta">#<span class="meta-keyword">include</span> <span class="meta-string">&quot;clang/Frontend/CompilerInstance.h&quot;</span></span></span><br><span class="line"><span class="meta">#<span class="meta-keyword">include</span> <span class="meta-string">&quot;clang/Frontend/FrontendPluginRegistry.h&quot;</span></span></span><br><span class="line"></span><br><span class="line"><span class="keyword">using</span> <span class="keyword">namespace</span> clang;</span><br><span class="line"><span class="keyword">using</span> <span class="keyword">namespace</span> std;</span><br><span class="line"><span class="keyword">using</span> <span class="keyword">namespace</span> llvm;</span><br><span class="line"><span class="keyword">using</span> <span class="keyword">namespace</span> clang::ast_matchers;</span><br><span class="line"></span><br><span class="line"><span class="keyword">namespace</span> MyPlugin &#123;</span><br><span class="line"></span><br><span class="line">    <span class="class"><span class="keyword">class</span> <span class="title">MyASTConsumer</span> :</span> <span class="keyword">public</span> ASTConsumer &#123;</span><br><span class="line">    <span class="keyword">public</span>:</span><br><span class="line">        <span class="comment">/// 每当生成一棵语法树就会调用这个方法</span></span><br><span class="line">        <span class="function"><span class="keyword">void</span> <span class="title">HandleTranslationUnit</span><span class="params">(ASTContext &amp;Ctx)</span> </span>&#123;</span><br><span class="line">            cout &lt;&lt; <span class="string">&quot;MyPlugin-HandleTranslationUnit&quot;</span> &lt;&lt; endl;</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;;</span><br><span class="line"></span><br><span class="line">    <span class="class"><span class="keyword">class</span> <span class="title">MyAction</span> :</span> <span class="keyword">public</span> PluginASTAction &#123;</span><br><span class="line">    <span class="keyword">public</span>:</span><br><span class="line">        <span class="comment">/// 一定要重写的两个父类方法，指定Consumer</span></span><br><span class="line">        <span class="function">unique_ptr&lt;ASTConsumer&gt; <span class="title">CreateASTConsumer</span><span class="params">(CompilerInstance &amp;ci, StringRef InFile)</span> </span>&#123;</span><br><span class="line">            <span class="keyword">return</span> unique_ptr&lt;MyASTConsumer&gt; (<span class="keyword">new</span> MyASTConsumer);</span><br><span class="line">        &#125;</span><br><span class="line">        </span><br><span class="line">        <span class="function"><span class="keyword">bool</span> <span class="title">ParseArgs</span><span class="params">(<span class="keyword">const</span> CompilerInstance &amp;CI, <span class="keyword">const</span> std::vector&lt;std::string&gt; &amp;arg)</span> </span>&#123;</span><br><span class="line">            <span class="keyword">return</span> <span class="literal">true</span>;</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="comment">/// 注册插件</span></span><br><span class="line"><span class="keyword">static</span> FrontendPluginRegistry::Add&lt;MyPlugin::MyAction&gt;</span><br><span class="line"><span class="built_in">X</span>(<span class="string">&quot;MyPlugin&quot;</span>, <span class="string">&quot;The MyPlugin is my first clang-plugin.&quot;</span>);</span><br></pre></td></tr></table></figure>
+
+<p>编译<code>MyPlugin</code> Scheme</p>
+<p><a target="_blank" rel="noopener" href="https://imgtu.com/i/481kdA"><img src="https://z3.ax1x.com/2021/09/19/481kdA.png" alt="481kdA.png"></a></p>
+<p>最后得到成品<code>MyPlugin.dylib</code></p>
+<p><a target="_blank" rel="noopener" href="https://imgtu.com/i/481eRf"><img src="https://z3.ax1x.com/2021/09/19/481eRf.png" alt="481eRf.png"></a></p>
+<h3 id="使用Clang插件"><a href="#使用Clang插件" class="headerlink" title="使用Clang插件"></a>使用Clang插件</h3><p><code>Show in finder</code>取出<code>MyPlugin.dylib</code>之后，我们新建一个测试工程</p>
+<p>在新建的Xcode项目中指定加载插件：<code>Build Settings &gt; OTHER_CFLAGS</code>，双击输入框后输入</p>
+<p><code>-Xclang -load -Xclang 动态库路径 -Xclang -add-plugin -Xclang 插件名称</code>，回车</p>
+<p><a target="_blank" rel="noopener" href="https://imgtu.com/i/43XojJ"><img src="https://z3.ax1x.com/2021/09/19/43XojJ.png" alt="43XojJ.png"></a></p>
+<p>因为Xcode自带的编译器不允许加载插件，所以我们使用刚才自己编译好的编译器</p>
+<p>首先下载<a target="_blank" rel="noopener" href="https://github.com/weizhangCoder/XcodeHacking">Xcode破解插件</a></p>
+<p>进入目录<code>XcodeHacking/HackedClang.xcplugin/Contents/Resources</code></p>
+<p>修改<code>HackedClang.xcspec</code></p>
+<figure class="highlight ini"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="attr">ExecPath</span> = <span class="string">&quot;/opt/llvm/llvm_build/bin/clang&quot;</span><span class="comment">;</span></span><br></pre></td></tr></table></figure>
+
+<p>改为我们刚才编译好的clang的全路径</p>
+<figure class="highlight ini"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="attr">ExecPath</span> = <span class="string">&quot;/Users/arclin/Downloads/llvm-project-llvmorg-12.0.1/llvm-release/bin/clang&quot;</span><span class="comment">;</span></span><br></pre></td></tr></table></figure>
+
+<p>然后在XcodeHacking目录下进行命令行，</p>
+<p>将XcodeHacking的内容剪切到Xcode内部</p>
+<figure class="highlight awk"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">$ sudo mv HackedClang.xcplugin `xcode-select -p`<span class="regexp">/../</span>PlugIns<span class="regexp">/Xcode3Core.ideplugin/</span>Contents<span class="regexp">/SharedSupport/</span>Developer<span class="regexp">/Library/</span>Xcode/Plug-ins</span><br><span class="line">$ sudo mv HackedBuildSystem.xcspec `xcode-select -p`<span class="regexp">/Platforms/i</span>PhoneSimulator.platform<span class="regexp">/Developer/</span>Library<span class="regexp">/Xcode/</span>Specifications</span><br></pre></td></tr></table></figure>
+
+<p>这时候Xcode就应该有多一个编译器可选项，我们选择<code>Clang LLVM Trunk</code></p>
+<p><a target="_blank" rel="noopener" href="https://imgtu.com/i/48lXI1"><img src="https://z3.ax1x.com/2021/09/19/48lXI1.png" alt="48lXI1.png"></a></p>
+<p>然后就可以Clean一下后编译进行测试。</p>
+<p>自己在测试的时候发生了一些报错的问题（可能我是用的M1笔记本的原因），可以修改<code>Build System</code>的值为<code>Legacy Build System</code>解决</p>
+<p><a target="_blank" rel="noopener" href="https://imgtu.com/i/48lsxS"><img src="https://z3.ax1x.com/2021/09/19/48lsxS.png" alt="48lsxS.png"></a></p>
+<p>如果发生了<code>CADisplayLink&#39; is unavailable: not available on macOS</code>的问题，那尝试新建一个Mac项目</p>
+<p>最后贴出完整的插件代码仅供参考</p>
+<figure class="highlight arduino"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br><span class="line">62</span><br><span class="line">63</span><br><span class="line">64</span><br><span class="line">65</span><br><span class="line">66</span><br><span class="line">67</span><br><span class="line">68</span><br><span class="line">69</span><br><span class="line">70</span><br><span class="line">71</span><br><span class="line">72</span><br><span class="line">73</span><br><span class="line">74</span><br><span class="line">75</span><br><span class="line">76</span><br><span class="line">77</span><br><span class="line">78</span><br><span class="line">79</span><br><span class="line">80</span><br><span class="line">81</span><br><span class="line">82</span><br><span class="line">83</span><br><span class="line">84</span><br><span class="line">85</span><br><span class="line">86</span><br><span class="line">87</span><br><span class="line">88</span><br><span class="line">89</span><br><span class="line">90</span><br><span class="line">91</span><br><span class="line">92</span><br><span class="line">93</span><br><span class="line">94</span><br><span class="line">95</span><br><span class="line">96</span><br><span class="line">97</span><br><span class="line">98</span><br><span class="line">99</span><br><span class="line">100</span><br><span class="line">101</span><br><span class="line">102</span><br><span class="line">103</span><br><span class="line">104</span><br><span class="line">105</span><br><span class="line">106</span><br><span class="line">107</span><br><span class="line">108</span><br><span class="line">109</span><br><span class="line">110</span><br><span class="line">111</span><br><span class="line">112</span><br><span class="line">113</span><br><span class="line">114</span><br><span class="line">115</span><br><span class="line">116</span><br><span class="line">117</span><br><span class="line">118</span><br><span class="line">119</span><br><span class="line">120</span><br><span class="line">121</span><br><span class="line">122</span><br><span class="line">123</span><br><span class="line">124</span><br><span class="line">125</span><br><span class="line">126</span><br><span class="line">127</span><br><span class="line">128</span><br><span class="line">129</span><br><span class="line">130</span><br><span class="line">131</span><br><span class="line">132</span><br><span class="line">133</span><br><span class="line">134</span><br><span class="line">135</span><br><span class="line">136</span><br><span class="line">137</span><br><span class="line">138</span><br><span class="line">139</span><br><span class="line">140</span><br><span class="line">141</span><br><span class="line">142</span><br><span class="line">143</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">#<span class="meta-keyword">include</span> <span class="meta-string">&lt;iostream&gt;</span></span></span><br><span class="line"><span class="meta">#<span class="meta-keyword">include</span> <span class="meta-string">&quot;clang/AST/AST.h&quot;</span></span></span><br><span class="line"><span class="meta">#<span class="meta-keyword">include</span> <span class="meta-string">&quot;clang/AST/DeclObjC.h&quot;</span></span></span><br><span class="line"><span class="meta">#<span class="meta-keyword">include</span> <span class="meta-string">&quot;clang/AST/ASTConsumer.h&quot;</span></span></span><br><span class="line"><span class="meta">#<span class="meta-keyword">include</span> <span class="meta-string">&quot;clang/ASTMatchers/ASTMatchers.h&quot;</span></span></span><br><span class="line"><span class="meta">#<span class="meta-keyword">include</span> <span class="meta-string">&quot;clang/Frontend/CompilerInstance.h&quot;</span></span></span><br><span class="line"><span class="meta">#<span class="meta-keyword">include</span> <span class="meta-string">&quot;clang/ASTMatchers/ASTMatchFinder.h&quot;</span></span></span><br><span class="line"><span class="meta">#<span class="meta-keyword">include</span> <span class="meta-string">&quot;clang/Frontend/FrontendPluginRegistry.h&quot;</span></span></span><br><span class="line"></span><br><span class="line"><span class="comment">// 声明使用命名空间</span></span><br><span class="line"><span class="keyword">using</span> <span class="keyword">namespace</span> clang;</span><br><span class="line"><span class="keyword">using</span> <span class="keyword">namespace</span> std;</span><br><span class="line"><span class="keyword">using</span> <span class="keyword">namespace</span> llvm;</span><br><span class="line"><span class="keyword">using</span> <span class="keyword">namespace</span> clang::ast_matchers;</span><br><span class="line"></span><br><span class="line"><span class="comment">// 插件命名空间</span></span><br><span class="line"><span class="keyword">namespace</span> MyPlugin &#123;</span><br><span class="line"></span><br><span class="line">    <span class="comment">// 第三步：扫描完毕回调</span></span><br><span class="line">    <span class="comment">// 4、自定义回调类，继承自MatchCallback</span></span><br><span class="line">    <span class="class"><span class="keyword">class</span> <span class="title">MyMatchCallback</span> :</span> <span class="keyword">public</span> MatchFinder::MatchCallback &#123;</span><br><span class="line"></span><br><span class="line">    <span class="keyword">private</span>:</span><br><span class="line">        <span class="comment">// CI传递路径：MyASTAction类中的CreateASTConsumer方法参数 -&gt; MyASTConsumer的构造函数 -&gt; MyMatchCallback的私有属性，通过构造函数从MyASTConsumer构造函数中获取</span></span><br><span class="line">        CompilerInstance &amp;CI;</span><br><span class="line"></span><br><span class="line">        <span class="comment">// 判断是否是自己的文件</span></span><br><span class="line">        <span class="function"><span class="keyword">bool</span> <span class="title">isUserSourceCode</span><span class="params">(<span class="keyword">const</span> string fileName)</span> </span>&#123;</span><br><span class="line">            <span class="comment">// 文件名不为空</span></span><br><span class="line">            <span class="keyword">if</span> (fileName.<span class="built_in">empty</span>()) <span class="keyword">return</span> <span class="literal">false</span>;</span><br><span class="line">            <span class="comment">// 非Xcode中的代码都认为是用户的</span></span><br><span class="line">            <span class="keyword">if</span> (<span class="number">0</span> == fileName.<span class="built_in">find</span>(<span class="string">&quot;/Applications/Xcode.app/&quot;</span>)) <span class="keyword">return</span> <span class="literal">false</span>;</span><br><span class="line">            <span class="keyword">return</span> <span class="literal">true</span>;</span><br><span class="line">        &#125;</span><br><span class="line"></span><br><span class="line">        <span class="comment">// 判断是否应该用copy修饰</span></span><br><span class="line">        <span class="function"><span class="keyword">bool</span> <span class="title">isShouldUseCopy</span><span class="params">(<span class="keyword">const</span> string typeStr)</span> </span>&#123;</span><br><span class="line">            <span class="comment">// 判断类型是否是 NSString / NSArray / NSDictionary</span></span><br><span class="line">            <span class="keyword">if</span> (typeStr.<span class="built_in">find</span>(<span class="string">&quot;NSString&quot;</span>) != string::npos ||</span><br><span class="line">                typeStr.<span class="built_in">find</span>(<span class="string">&quot;NSArray&quot;</span>) != string::npos ||</span><br><span class="line">                typeStr.<span class="built_in">find</span>(<span class="string">&quot;NSDictionary&quot;</span>) != string::npos) &#123;</span><br><span class="line">                <span class="keyword">return</span> <span class="literal">true</span>;</span><br><span class="line">            &#125;</span><br><span class="line">            <span class="keyword">return</span> <span class="literal">false</span>;</span><br><span class="line">        &#125;</span><br><span class="line"></span><br><span class="line">    <span class="keyword">public</span>:</span><br><span class="line">        <span class="comment">// 构造方法</span></span><br><span class="line">        <span class="built_in">MyMatchCallback</span>(CompilerInstance &amp;CI):<span class="built_in">CI</span>(CI) &#123;&#125;</span><br><span class="line"></span><br><span class="line">        <span class="comment">// 重载run方法</span></span><br><span class="line">        <span class="function"><span class="keyword">void</span> <span class="title">run</span><span class="params">(<span class="keyword">const</span> MatchFinder::MatchResult &amp;Result)</span> </span>&#123;</span><br><span class="line">            <span class="comment">// 通过Result获取节点对象，根据节点id(&quot;objcPropertyDecl&quot;)获取(此id需要与MyASTConsumer构造方法中bind的id一致)</span></span><br><span class="line">            <span class="keyword">const</span> ObjCPropertyDecl *propertyDecl = Result.Nodes.getNodeAs&lt;ObjCPropertyDecl&gt;(<span class="string">&quot;objcPropertyDecl&quot;</span>);</span><br><span class="line">            <span class="comment">// 获取文件名称（包含路径）</span></span><br><span class="line">            string fileName = CI.<span class="built_in">getSourceManager</span>().<span class="built_in">getFilename</span>(propertyDecl-&gt;<span class="built_in">getSourceRange</span>().<span class="built_in">getBegin</span>()).<span class="built_in">str</span>();</span><br><span class="line">            <span class="comment">// 如果节点有值 &amp;&amp; 是用户文件</span></span><br><span class="line">            <span class="keyword">if</span> (propertyDecl &amp;&amp; <span class="built_in">isUserSourceCode</span>(fileName)) &#123;</span><br><span class="line">                <span class="comment">// 获取节点的类型，并转成字符串</span></span><br><span class="line">                string typeStr = propertyDecl-&gt;<span class="built_in">getType</span>().<span class="built_in">getAsString</span>();</span><br><span class="line">                <span class="comment">// 节点的描述信息</span></span><br><span class="line">                ObjCPropertyAttribute::Kind attrKind = propertyDecl-&gt;<span class="built_in">getPropertyAttributes</span>();</span><br><span class="line">                <span class="comment">// 应该使用copy，但是没有使用copy</span></span><br><span class="line">                <span class="keyword">if</span> (<span class="built_in">isShouldUseCopy</span>(typeStr) &amp;&amp; !(attrKind &amp; ObjCPropertyAttribute::kind_copy)) &#123;</span><br><span class="line">                    <span class="comment">// 通过CI获取诊断引擎</span></span><br><span class="line">                    DiagnosticsEngine &amp;diag = CI.<span class="built_in">getDiagnostics</span>();</span><br><span class="line">                    <span class="comment">// Report 报告</span></span><br><span class="line">                    <span class="comment">/**</span></span><br><span class="line"><span class="comment">                     错误位置：getLocation 节点位置</span></span><br><span class="line"><span class="comment">                     错误：getCustomDiagID（等级，提示）</span></span><br><span class="line"><span class="comment">                     DiagnosticsEngine::Warning 警告</span></span><br><span class="line"><span class="comment">                     DiagnosticsEngine::Error 错误</span></span><br><span class="line"><span class="comment">                     */</span></span><br><span class="line">                    diag.<span class="built_in">Report</span>(propertyDecl-&gt;<span class="built_in">getLocation</span>(), diag.<span class="built_in">getCustomDiagID</span>(DiagnosticsEngine::Warning, <span class="string">&quot;%0 - 推荐使用copy修饰该属性&quot;</span>))&lt;&lt; typeStr;</span><br><span class="line">                &#125;</span><br><span class="line">            &#125;</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;;</span><br><span class="line"></span><br><span class="line">    <span class="comment">// 第二步：扫描配置完毕</span></span><br><span class="line">    <span class="comment">// 3、自定义MyASTConsumer，继承自抽象类 ASTConsumer，用于监听AST节点的信息 -- 过滤器</span></span><br><span class="line">    <span class="class"><span class="keyword">class</span> <span class="title">MyASTConsumer</span> :</span> <span class="keyword">public</span> ASTConsumer &#123;</span><br><span class="line">    <span class="keyword">private</span>:</span><br><span class="line">        <span class="comment">// AST 节点查找器（过滤器）</span></span><br><span class="line">        MatchFinder matcher;</span><br><span class="line">        <span class="comment">// 回调对象</span></span><br><span class="line">        MyMatchCallback callback;</span><br><span class="line"></span><br><span class="line">    <span class="keyword">public</span>:</span><br><span class="line">        <span class="comment">// 构造方法中创建MatchFinder对象</span></span><br><span class="line">        <span class="built_in">MyASTConsumer</span>(CompilerInstance &amp;CI):<span class="built_in">callback</span>(CI) &#123; <span class="comment">// 构造即将CI传递给callback</span></span><br><span class="line">            <span class="comment">// 添加一个MatchFinder，每个objcPropertyDecl节点绑定一个objcPropertyDecl标识（去匹配objcPropertyDecl节点）</span></span><br><span class="line">            <span class="comment">// 回调callback，其实是在CJLMatchCallback里面重写run方法（真正回调的是回调run方法）</span></span><br><span class="line">matcher.<span class="built_in">addMatcher</span>(<span class="built_in">objcPropertyDecl</span>().<span class="built_in">bind</span>(<span class="string">&quot;objcPropertyDecl&quot;</span>), &amp;callback);</span><br><span class="line">        &#125;</span><br><span class="line"></span><br><span class="line">        <span class="comment">// 重载两个方法 HandleTopLevelDecl 和 HandleTranslationUnit</span></span><br><span class="line"></span><br><span class="line">        <span class="comment">// 解析完毕一个顶级的声明就回调一次（顶级节点，即全局变量，属性，函数等）</span></span><br><span class="line">        <span class="function"><span class="keyword">bool</span> <span class="title">HandleTopLevelDecl</span><span class="params">(DeclGroupRef D)</span> </span>&#123;</span><br><span class="line"><span class="comment">//            cout&lt;&lt;&quot;正在解析...&quot;&lt;&lt;endl;</span></span><br><span class="line">            <span class="keyword">return</span> <span class="literal">true</span>;</span><br><span class="line">        &#125;</span><br><span class="line"></span><br><span class="line">        <span class="comment">// 当整个文件都解析完毕后回调</span></span><br><span class="line">        <span class="function"><span class="keyword">void</span> <span class="title">HandleTranslationUnit</span><span class="params">(ASTContext &amp;Ctx)</span> </span>&#123;</span><br><span class="line"><span class="comment">//            cout&lt;&lt;&quot;文件解析完毕！！！&quot;&lt;&lt;endl;</span></span><br><span class="line">            <span class="comment">// 将文件解析完毕后的上下文context（即AST语法树） 给 matcher</span></span><br><span class="line">            matcher.<span class="built_in">matchAST</span>(Ctx);</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;;</span><br><span class="line"></span><br><span class="line">    <span class="comment">//2、继承PluginASTAction，实现我们自定义的MyASTAction，即自定义AST语法树行为</span></span><br><span class="line">    <span class="class"><span class="keyword">class</span> <span class="title">MyASTAction</span> :</span> <span class="keyword">public</span> PluginASTAction &#123;</span><br><span class="line">    <span class="keyword">public</span>:</span><br><span class="line"></span><br><span class="line">        <span class="comment">// 重载ParseArgs 和 CreateASTConsumer方法</span></span><br><span class="line"></span><br><span class="line">        <span class="comment">/*</span></span><br><span class="line"><span class="comment">         解析给定的插件命令行参数</span></span><br><span class="line"><span class="comment">         - param CI 编译器实例，用于报告诊断。</span></span><br><span class="line"><span class="comment">         - return 如果解析成功，则为true；否则，插件将被销毁，并且不执行任何操作。该插件负责使用CompilerInstance的Diagnostic对象报告错误。</span></span><br><span class="line"><span class="comment">         */</span></span><br><span class="line">        <span class="function"><span class="keyword">bool</span> <span class="title">ParseArgs</span><span class="params">(<span class="keyword">const</span> CompilerInstance &amp;CI, <span class="keyword">const</span> std::vector&lt;std::string&gt; &amp;arg)</span> </span>&#123;</span><br><span class="line">            <span class="keyword">return</span> <span class="literal">true</span>;</span><br><span class="line">        &#125;</span><br><span class="line"></span><br><span class="line">        <span class="comment">// 返回自定义的MyASTConsumer对象，抽象类ASTConsumer的子类</span></span><br><span class="line">        <span class="function">unique_ptr&lt;ASTConsumer&gt; <span class="title">CreateASTConsumer</span><span class="params">(CompilerInstance &amp;CI, StringRef InFile)</span> </span>&#123;</span><br><span class="line">            <span class="comment">/**</span></span><br><span class="line"><span class="comment">             传递CI</span></span><br><span class="line"><span class="comment">             CI用于：</span></span><br><span class="line"><span class="comment">             - 判断文件是否是用户的</span></span><br><span class="line"><span class="comment">             - 抛出警告</span></span><br><span class="line"><span class="comment">             */</span></span><br><span class="line">            <span class="keyword">return</span> unique_ptr&lt;MyASTConsumer&gt;(<span class="keyword">new</span> <span class="built_in">MyASTConsumer</span>(CI));</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="comment">// 第一步：注册插件，并自定义MyASTAction类</span></span><br><span class="line"><span class="comment">// 1、注册插件</span></span><br><span class="line"><span class="function"><span class="keyword">static</span> FrontendPluginRegistry::Add&lt;MyPlugin::MyASTAction&gt; <span class="title">X</span><span class="params">(<span class="string">&quot;MyPlugin&quot;</span>, <span class="string">&quot;this is MyPlugin&quot;</span>)</span></span>;</span><br></pre></td></tr></table></figure>
+
+
+<blockquote>
+<p>参考：<a target="_blank" rel="noopener" href="https://juejin.cn/post/7004633055012864031">https://juejin.cn/post/7004633055012864031</a></p>
+</blockquote>
+
+    </div>
+
+    
+    
+    
+
+      <footer class="post-footer">
+          <div class="post-tags">
+              <a href="/tags/iOS/" rel="tag"># iOS</a>
+              <a href="/tags/%E5%BA%95%E5%B1%82%E5%8E%9F%E7%90%86/" rel="tag"># 底层原理</a>
+          </div>
+
+        
+
+
+        
+    <div class="post-nav">
+      <div class="post-nav-item">
+    <a href="/post/56d1bd42.html" rel="prev" title="iOS 底层原理 --- 内存管理">
+      <i class="fa fa-chevron-left"></i> iOS 底层原理 --- 内存管理
+    </a></div>
+      <div class="post-nav-item">
+    <a href="/post/c5814bfc.html" rel="next" title="函数式Swift --- 透镜">
+      函数式Swift --- 透镜 <i class="fa fa-chevron-right"></i>
+    </a></div>
+    </div>
+      </footer>
+    
+  </article>
+  
+  
+  
+
+
+
+          </div>
+          
+    <div class="comments" id="gitalk-container"></div>
+
+<script>
+  window.addEventListener('tabs:register', () => {
+    let { activeClass } = CONFIG.comments;
+    if (CONFIG.comments.storage) {
+      activeClass = localStorage.getItem('comments_active') || activeClass;
+    }
+    if (activeClass) {
+      let activeTab = document.querySelector(`a[href="#comment-${activeClass}"]`);
+      if (activeTab) {
+        activeTab.click();
+      }
+    }
+  });
+  if (CONFIG.comments.storage) {
+    window.addEventListener('tabs:click', event => {
+      if (!event.target.matches('.tabs-comment .tab-content .tab-pane')) return;
+      let commentClass = event.target.classList[1];
+      localStorage.setItem('comments_active', commentClass);
+    });
+  }
+</script>
+
+        </div>
+          
+  
+  <div class="toggle sidebar-toggle">
+    <span class="toggle-line toggle-line-first"></span>
+    <span class="toggle-line toggle-line-middle"></span>
+    <span class="toggle-line toggle-line-last"></span>
+  </div>
+
+  <aside class="sidebar">
+    <div class="sidebar-inner">
+
+      <ul class="sidebar-nav motion-element">
+        <li class="sidebar-nav-toc">
+          文章目录
+        </li>
+        <li class="sidebar-nav-overview">
+          站点概览
+        </li>
+      </ul>
+
+      <!--noindex-->
+      <div class="post-toc-wrap sidebar-panel">
+          <div class="post-toc motion-element"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#LLVM"><span class="nav-number">1.</span> <span class="nav-text">LLVM</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E4%BC%A0%E7%BB%9F%E7%9A%84%E7%BC%96%E8%AF%91%E5%99%A8%E6%9E%B6%E6%9E%84"><span class="nav-number">2.</span> <span class="nav-text">传统的编译器架构</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#LLVM%E6%9E%B6%E6%9E%84"><span class="nav-number">3.</span> <span class="nav-text">LLVM架构</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#Clang"><span class="nav-number">3.1.</span> <span class="nav-text">Clang</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#Clang%E4%B8%8ELLVM"><span class="nav-number">3.2.</span> <span class="nav-text">Clang与LLVM</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#OC%E6%BA%90%E6%96%87%E4%BB%B6%E7%9A%84%E7%BC%96%E8%AF%91%E8%BF%87%E7%A8%8B"><span class="nav-number">4.</span> <span class="nav-text">OC源文件的编译过程</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E8%AF%8D%E6%B3%95%E5%88%86%E6%9E%90%E3%80%81%E8%AF%AD%E6%B3%95%E6%A0%91"><span class="nav-number">5.</span> <span class="nav-text">词法分析、语法树</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#LLVM-IR"><span class="nav-number">6.</span> <span class="nav-text">LLVM IR</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#Clang%E6%8F%92%E4%BB%B6%E5%BC%80%E5%8F%91"><span class="nav-number">7.</span> <span class="nav-text">Clang插件开发</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#%E4%B8%8B%E8%BD%BDLLVM%E6%BA%90%E7%A0%81"><span class="nav-number">7.1.</span> <span class="nav-text">下载LLVM源码</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E4%B8%8B%E8%BD%BDClang%E6%BA%90%E7%A0%81"><span class="nav-number">7.2.</span> <span class="nav-text">下载Clang源码</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E5%AE%89%E8%A3%85cmake%E5%92%8Cninja%EF%BC%88%E5%85%88%E5%AE%89%E8%A3%85brew%EF%BC%8Chttps-brew-sh%EF%BC%89"><span class="nav-number">7.3.</span> <span class="nav-text">安装cmake和ninja（先安装brew，https:&#x2F;&#x2F;brew.sh）</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E7%BC%96%E8%AF%91"><span class="nav-number">7.4.</span> <span class="nav-text">编译</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#%E4%BD%BF%E7%94%A8ninja%E6%A8%A1%E6%9D%BF%E8%BF%9B%E8%A1%8C%E7%BC%96%E8%AF%91"><span class="nav-number">7.4.1.</span> <span class="nav-text">使用ninja模板进行编译</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#%E4%BD%BF%E7%94%A8Xcode%E8%BF%9B%E8%A1%8C%E7%BC%96%E8%AF%91"><span class="nav-number">7.4.2.</span> <span class="nav-text">使用Xcode进行编译</span></a></li></ol></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E5%88%9B%E5%BB%BAClang%E6%8F%92%E4%BB%B6"><span class="nav-number">7.5.</span> <span class="nav-text">创建Clang插件</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E7%BC%96%E5%86%99Clang%E6%8F%92%E4%BB%B6"><span class="nav-number">7.6.</span> <span class="nav-text">编写Clang插件</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#%E5%9F%BA%E6%9C%AC%E7%BB%93%E6%9E%84"><span class="nav-number">7.6.1.</span> <span class="nav-text">基本结构</span></a></li></ol></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E4%BD%BF%E7%94%A8Clang%E6%8F%92%E4%BB%B6"><span class="nav-number">7.7.</span> <span class="nav-text">使用Clang插件</span></a></li></ol></li></ol></div>
+      </div>
+      <!--/noindex-->
+
+      <div class="site-overview-wrap sidebar-panel">
+        <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+    <img class="site-author-image" itemprop="image" alt="Arclin"
+      src="https://avatars.githubusercontent.com/u/12107804?v=4">
+  <p class="site-author-name" itemprop="name">Arclin</p>
+  <div class="site-description" itemprop="description">Stay hungry,stay foolish</div>
+</div>
+<div class="site-state-wrap motion-element">
+  <nav class="site-state">
+      <div class="site-state-item site-state-posts">
+          <a href="/archives/">
+        
+          <span class="site-state-item-count">100</span>
+          <span class="site-state-item-name">日志</span>
+        </a>
+      </div>
+      <div class="site-state-item site-state-categories">
+            <a href="/categories/">
+          
+        <span class="site-state-item-count">12</span>
+        <span class="site-state-item-name">分类</span></a>
+      </div>
+      <div class="site-state-item site-state-tags">
+            <a href="/tags/">
+          
+        <span class="site-state-item-count">38</span>
+        <span class="site-state-item-name">标签</span></a>
+      </div>
+  </nav>
+</div>
+  <div class="links-of-author motion-element">
+      <span class="links-of-author-item">
+        <a href="https://github.com/Arc-lin" title="GitHub → https://github.com/Arc-lin" rel="noopener" target="_blank"><i class="fab fa-github fa-fw"></i>GitHub</a>
+      </span>
+      <span class="links-of-author-item">
+        <a href="mailto:arclin325@gmail.com" title="E-Mail → mailto:arclin325@gmail.com" rel="noopener" target="_blank"><i class="fa fa-envelope fa-fw"></i>E-Mail</a>
+      </span>
+  </div>
+
+
+
+      </div>
+
+    </div>
+  </aside>
+  <div id="sidebar-dimmer"></div>
+
+
+      </div>
+    </main>
+
+    <footer class="footer">
+      <div class="footer-inner">
+        
+
+        
+
+<div class="copyright">
+  
+  &copy; 
+  <span itemprop="copyrightYear">2022</span>
+  <span class="with-love">
+    <i class="fa fa-heart"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">Arclin</span>
+</div>
+  <div class="powered-by">由 <a href="https://hexo.io" class="theme-link" rel="noopener" target="_blank">Hexo</a> & <a href="https://muse.theme-next.org" class="theme-link" rel="noopener" target="_blank">NexT.Muse</a> 强力驱动
+  </div>
+
+        
+<div class="busuanzi-count">
+  <script async src="https://busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js"></script>
+    <span class="post-meta-item" id="busuanzi_container_site_uv" style="display: none;">
+      <span class="post-meta-item-icon">
+        <i class="fa fa-user"></i>
+      </span>
+      <span class="site-uv" title="总访客量">
+        <span id="busuanzi_value_site_uv"></span>
+      </span>
+    </span>
+    <span class="post-meta-divider">|</span>
+    <span class="post-meta-item" id="busuanzi_container_site_pv" style="display: none;">
+      <span class="post-meta-item-icon">
+        <i class="fa fa-eye"></i>
+      </span>
+      <span class="site-pv" title="总访问量">
+        <span id="busuanzi_value_site_pv"></span>
+      </span>
+    </span>
+</div>
+
+
+
+
+
+
+
+
+      </div>
+    </footer>
+  </div>
+
+  
+  <script src="/lib/anime.min.js"></script>
+  <script src="//cdn.jsdelivr.net/npm/jquery@3/dist/jquery.min.js"></script>
+  <script src="//cdn.jsdelivr.net/gh/fancyapps/fancybox@3/dist/jquery.fancybox.min.js"></script>
+  <script src="/lib/velocity/velocity.min.js"></script>
+  <script src="/lib/velocity/velocity.ui.min.js"></script>
+
+<script src="/js/utils.js"></script>
+
+<script src="/js/motion.js"></script>
+
+
+<script src="/js/schemes/muse.js"></script>
+
+
+<script src="/js/next-boot.js"></script>
+
+
+
+
+  
+  <script>
+    (function(){
+      var canonicalURL, curProtocol;
+      //Get the <link> tag
+      var x=document.getElementsByTagName("link");
+		//Find the last canonical URL
+		if(x.length > 0){
+			for (i=0;i<x.length;i++){
+				if(x[i].rel.toLowerCase() == 'canonical' && x[i].href){
+					canonicalURL=x[i].href;
+				}
+			}
+		}
+    //Get protocol
+	    if (!canonicalURL){
+	    	curProtocol = window.location.protocol.split(':')[0];
+	    }
+	    else{
+	    	curProtocol = canonicalURL.split(':')[0];
+	    }
+      //Get current URL if the canonical URL does not exist
+	    if (!canonicalURL) canonicalURL = window.location.href;
+	    //Assign script content. Replace current URL with the canonical URL
+      !function(){var e=/([http|https]:\/\/[a-zA-Z0-9\_\.]+\.baidu\.com)/gi,r=canonicalURL,t=document.referrer;if(!e.test(r)){var n=(String(curProtocol).toLowerCase() === 'https')?"https://sp0.baidu.com/9_Q4simg2RQJ8t7jm9iCKT-xh_/s.gif":"//api.share.baidu.com/s.gif";t?(n+="?r="+encodeURIComponent(document.referrer),r&&(n+="&l="+r)):r&&(n+="?l="+r);var i=new Image;i.src=n}}(window);})();
+  </script>
+
+
+
+
+  
+<script src="/js/local-search.js"></script>
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+  
+
+<link rel="stylesheet" href="//cdn.jsdelivr.net/npm/gitalk@1/dist/gitalk.min.css">
+
+<script>
+NexT.utils.loadComments(document.querySelector('#gitalk-container'), () => {
+  NexT.utils.getScript('//cdn.jsdelivr.net/npm/gitalk@1/dist/gitalk.min.js', () => {
+    var gitalk = new Gitalk({
+      clientID    : 'df6d1f33bb4a66f5fa60',
+      clientSecret: '5fcc9fb756ac9d4b16381288da7b29f691b45e0a',
+      repo        : 'arc-lin.github.io',
+      owner       : 'Arc-lin',
+      admin       : ['Arc-lin'],
+      id          : 'de76aea205237e2651cd5a4b3e91b605',
+        language: 'zh-CN',
+      distractionFreeMode: false
+    });
+    gitalk.render('gitalk-container');
+  }, window.Gitalk);
+});
+</script>
+
+</body>
+</html>

@@ -1,0 +1,562 @@
+<!DOCTYPE html>
+<html lang="zh-Hans">
+<head>
+  <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=2">
+<meta name="theme-color" content="#222">
+<meta name="generator" content="Hexo 5.4.0">
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png">
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32-next.png">
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next.png">
+  <link rel="mask-icon" href="/images/logo.svg" color="#222">
+
+<link rel="stylesheet" href="/css/main.css">
+
+
+<link rel="stylesheet" href="/lib/font-awesome/css/all.min.css">
+  <link rel="stylesheet" href="//cdn.jsdelivr.net/gh/fancyapps/fancybox@3/dist/jquery.fancybox.min.css">
+
+<script id="hexo-configurations">
+    var NexT = window.NexT || {};
+    var CONFIG = {"hostname":"www.arclin.cn","root":"/","scheme":"Muse","version":"7.8.0","exturl":false,"sidebar":{"position":"left","display":"post","padding":18,"offset":12,"onmobile":false},"copycode":{"enable":false,"show_result":false,"style":null},"back2top":{"enable":true,"sidebar":false,"scrollpercent":false},"bookmark":{"enable":false,"color":"#222","save":"auto"},"fancybox":true,"mediumzoom":false,"lazyload":false,"pangu":false,"comments":{"style":"tabs","active":null,"storage":true,"lazyload":false,"nav":null},"algolia":{"appID":"VOFC7668C9","apiKey":"24c644edc8e7353bf2e8d8e31f03a940","indexName":"hexo","hits":{"per_page":10},"labels":{"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}},"localsearch":{"enable":true,"trigger":"auto","top_n_per_article":1,"unescape":false,"preload":false},"motion":{"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},"path":"search.xml"};
+  </script>
+
+  <meta name="description" content="Dankal_iOS 崩溃信息提交">
+<meta property="og:type" content="article">
+<meta property="og:title" content="Dankal_iOS崩溃信息提交">
+<meta property="og:url" content="https://www.arclin.cn/post/afeed214.html">
+<meta property="og:site_name" content="Arclin">
+<meta property="og:description" content="Dankal_iOS 崩溃信息提交">
+<meta property="og:locale">
+<meta property="article:published_time" content="2016-10-31T16:00:00.000Z">
+<meta property="article:modified_time" content="2021-06-06T18:52:24.961Z">
+<meta property="article:author" content="Arclin">
+<meta property="article:tag" content="iOS">
+<meta name="twitter:card" content="summary">
+
+<link rel="canonical" href="https://www.arclin.cn/post/afeed214.html">
+
+
+<script id="page-configurations">
+  // https://hexo.io/docs/variables.html
+  CONFIG.page = {
+    sidebar: "",
+    isHome : false,
+    isPost : true,
+    lang   : 'zh-Hans'
+  };
+</script>
+
+  <title>Dankal_iOS崩溃信息提交 | Arclin</title>
+  
+
+
+
+
+
+
+  <noscript>
+  <style>
+  .use-motion .brand,
+  .use-motion .menu-item,
+  .sidebar-inner,
+  .use-motion .post-block,
+  .use-motion .pagination,
+  .use-motion .comments,
+  .use-motion .post-header,
+  .use-motion .post-body,
+  .use-motion .collection-header { opacity: initial; }
+
+  .use-motion .site-title,
+  .use-motion .site-subtitle {
+    opacity: initial;
+    top: initial;
+  }
+
+  .use-motion .logo-line-before i { left: initial; }
+  .use-motion .logo-line-after i { right: initial; }
+  </style>
+</noscript>
+
+<link rel="alternate" href="/atom.xml" title="Arclin" type="application/atom+xml">
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage">
+  <div class="container use-motion">
+    <div class="headband"></div>
+
+    <header class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-container">
+  <div class="site-nav-toggle">
+    <div class="toggle" aria-label="切换导航栏">
+      <span class="toggle-line toggle-line-first"></span>
+      <span class="toggle-line toggle-line-middle"></span>
+      <span class="toggle-line toggle-line-last"></span>
+    </div>
+  </div>
+
+  <div class="site-meta">
+
+    <a href="/" class="brand" rel="start">
+      <span class="logo-line-before"><i></i></span>
+      <h1 class="site-title">Arclin</h1>
+      <span class="logo-line-after"><i></i></span>
+    </a>
+      <p class="site-subtitle" itemprop="description">Advocate Technology. Enjoy Technology.</p>
+  </div>
+
+  <div class="site-nav-right">
+    <div class="toggle popup-trigger">
+        <i class="fa fa-search fa-fw fa-lg"></i>
+    </div>
+  </div>
+</div>
+
+
+
+
+<nav class="site-nav">
+  <ul id="menu" class="main-menu menu">
+        <li class="menu-item menu-item-home">
+
+    <a href="/" rel="section"><i class="fa fa-home fa-fw"></i>首页</a>
+
+  </li>
+        <li class="menu-item menu-item-tags">
+
+    <a href="/tags/" rel="section"><i class="fa fa-tags fa-fw"></i>标签</a>
+
+  </li>
+        <li class="menu-item menu-item-categories">
+
+    <a href="/categories/" rel="section"><i class="fa fa-th fa-fw"></i>分类</a>
+
+  </li>
+        <li class="menu-item menu-item-archives">
+
+    <a href="/archives/" rel="section"><i class="fa fa-archive fa-fw"></i>归档</a>
+
+  </li>
+        <li class="menu-item menu-item-about">
+
+    <a href="/about/" rel="section"><i class="fa fa-user fa-fw"></i>关于</a>
+
+  </li>
+      <li class="menu-item menu-item-search">
+        <a role="button" class="popup-trigger"><i class="fa fa-search fa-fw"></i>搜索
+        </a>
+      </li>
+  </ul>
+</nav>
+
+
+
+  <div class="search-pop-overlay">
+    <div class="popup search-popup">
+        <div class="search-header">
+  <span class="search-icon">
+    <i class="fa fa-search"></i>
+  </span>
+  <div class="search-input-container">
+    <input autocomplete="off" autocapitalize="off"
+           placeholder="搜索..." spellcheck="false"
+           type="search" class="search-input">
+  </div>
+  <span class="popup-btn-close">
+    <i class="fa fa-times-circle"></i>
+  </span>
+</div>
+<div id="search-result">
+  <div id="no-result">
+    <i class="fa fa-spinner fa-pulse fa-5x fa-fw"></i>
+  </div>
+</div>
+
+    </div>
+  </div>
+
+</div>
+    </header>
+
+    
+  <div class="back-to-top">
+    <i class="fa fa-arrow-up"></i>
+    <span>0%</span>
+  </div>
+
+
+    <main class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          
+
+          <div class="content post posts-expand">
+            
+
+    
+  
+  
+  <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="zh-Hans">
+    <link itemprop="mainEntityOfPage" href="https://www.arclin.cn/post/afeed214.html">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="https://avatars.githubusercontent.com/u/12107804?v=4">
+      <meta itemprop="name" content="Arclin">
+      <meta itemprop="description" content="Stay hungry,stay foolish">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="Arclin">
+    </span>
+      <header class="post-header">
+        <h1 class="post-title" itemprop="name headline">
+          Dankal_iOS崩溃信息提交
+        </h1>
+
+        <div class="post-meta">
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-calendar"></i>
+              </span>
+              <span class="post-meta-item-text">发表于</span>
+
+              <time title="创建时间：2016-11-01 00:00:00" itemprop="dateCreated datePublished" datetime="2016-11-01T00:00:00+08:00">2016-11-01</time>
+            </span>
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-folder"></i>
+              </span>
+              <span class="post-meta-item-text">分类于</span>
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/iOS/" itemprop="url" rel="index"><span itemprop="name">iOS</span></a>
+                </span>
+            </span>
+
+          
+            <span class="post-meta-item" title="阅读次数" id="busuanzi_container_page_pv" style="display: none;">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-eye"></i>
+              </span>
+              <span class="post-meta-item-text">阅读次数：</span>
+              <span id="busuanzi_value_page_pv"></span>
+            </span>
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+        <p>Dankal_iOS 崩溃信息提交</p>
+<span id="more"></span>
+
+<ol>
+<li>获取到崩溃信息（异常原因，异常方法，异常类名，堆栈）</li>
+<li>获取到本机信息（型号，系统）</li>
+<li>保存为 plist到本地</li>
+<li>下次启动应用的时候发送信息到服务器(POST发送，记得添加 token 到HEADER)</li>
+<li>发送完之后删除掉 plist 文件</li>
+</ol>
+<hr>
+<h2 id="如何捕获崩溃信息"><a href="#如何捕获崩溃信息" class="headerlink" title="如何捕获崩溃信息"></a>如何捕获崩溃信息</h2><p>C 语言捕获</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br></pre></td><td class="code"><pre><span class="line">#include &lt;libkern&#x2F;OSAtomic.h&gt;</span><br><span class="line">#include &lt;execinfo.h&gt;</span><br><span class="line"></span><br><span class="line">&#x2F;&#x2F; 系统信号截获处理方法</span><br><span class="line">void signalHandler(int signal);</span><br><span class="line">&#x2F;&#x2F; 异常截获处理方法</span><br><span class="line">void exceptionHandler(NSException *exception);</span><br><span class="line">const int32_t _uncaughtExceptionMaximum &#x3D; 20;</span><br><span class="line"></span><br><span class="line">NSString * const UncaughtExceptionHandlerSignalKey &#x3D; @&quot;UncaughtExceptionHandlerSignalKey&quot;;</span><br><span class="line">NSString *const SingalExceptionHandlerAddressesKey &#x3D; @&quot;SingalExceptionHandlerAddressesKey&quot;;</span><br><span class="line">NSString *const ExceptionHandlerAddressesKey &#x3D; @&quot;ExceptionHandlerAddressesKey&quot;;</span><br><span class="line"></span><br><span class="line">void signalHandler(int signal)</span><br><span class="line">&#123;</span><br><span class="line">    volatile int32_t _uncaughtExceptionCount &#x3D; 0;</span><br><span class="line">    int32_t exceptionCount &#x3D; OSAtomicIncrement32(&amp;_uncaughtExceptionCount);</span><br><span class="line">    if (exceptionCount &gt; _uncaughtExceptionMaximum) &#x2F;&#x2F; 如果太多不用处理</span><br><span class="line">    &#123;</span><br><span class="line">        return;</span><br><span class="line">    &#125;</span><br><span class="line">    &#x2F;&#x2F; 获取信息</span><br><span class="line">    NSMutableDictionary *userInfo &#x3D;</span><br><span class="line">    [NSMutableDictionary dictionaryWithObject:[NSNumber numberWithInt:signal] forKey:UncaughtExceptionHandlerSignalKey];</span><br><span class="line">    </span><br><span class="line">    NSArray *callStack &#x3D; [DKUncaughtExceptionHandler backtrace];</span><br><span class="line">    [userInfo  setObject:callStack  forKey:SingalExceptionHandlerAddressesKey];</span><br><span class="line">    </span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line">void exceptionHandler(NSException *exception)</span><br><span class="line">&#123;</span><br><span class="line">    volatile int32_t _uncaughtExceptionCount &#x3D; 0;</span><br><span class="line">    int32_t exceptionCount &#x3D; OSAtomicIncrement32(&amp;_uncaughtExceptionCount);</span><br><span class="line">    if (exceptionCount &gt; _uncaughtExceptionMaximum) &#x2F;&#x2F; 如果太多不用处理</span><br><span class="line">    &#123;</span><br><span class="line">        return;</span><br><span class="line">    &#125;</span><br><span class="line">    </span><br><span class="line">    NSArray *callStack &#x3D; [DKUncaughtExceptionHandler backtrace];</span><br><span class="line">    NSMutableDictionary *userInfo &#x3D;[NSMutableDictionary dictionaryWithDictionary:[exception userInfo]];</span><br><span class="line">    [userInfo setObject:callStack forKey:ExceptionHandlerAddressesKey];</span><br><span class="line">    </span><br><span class="line">    &#x2F;&#x2F; 保存信息到本地</span><br><span class="line">    NSString *path &#x3D; [[NSHomeDirectory() stringByAppendingPathComponent:@&quot;Documents&quot;] stringByAppendingPathComponent:@&quot;crash.plist&quot;];</span><br><span class="line">    </span><br><span class="line">    &#x2F;&#x2F; 获取本机信息</span><br><span class="line">    struct utsname systemInfo;</span><br><span class="line">    uname(&amp;systemInfo);</span><br><span class="line">    </span><br><span class="line">    NSDictionary *crashInfo &#x3D; @&#123;@&quot;crash_time&quot;:[NSDate dateStringWithDateFormat:@&quot;yyyy-MM-dd HH:mm:ss&quot;],</span><br><span class="line">                                @&quot;device_type&quot;: [DKUncaughtExceptionHandler deviceVersion:[NSString stringWithCString:systemInfo.machine encoding:NSUTF8StringEncoding]],</span><br><span class="line">                                @&quot;device_system&quot;: [UIDevice currentDevice].systemVersion,</span><br><span class="line">                                @&quot;crash_type&quot;:exception.name,</span><br><span class="line">                                @&quot;crash_reason&quot;:exception.reason,</span><br><span class="line">                                @&quot;crash_stack&quot;:userInfo.descriptionInStringsFileFormat&#125;;</span><br><span class="line">    [crashInfo writeToFile:path atomically:YES];</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<h2 id="OC-部分获取调用堆栈和注册崩溃拦截"><a href="#OC-部分获取调用堆栈和注册崩溃拦截" class="headerlink" title="OC 部分获取调用堆栈和注册崩溃拦截"></a>OC 部分获取调用堆栈和注册崩溃拦截</h2><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br></pre></td><td class="code"><pre><span class="line">&#x2F;&#x2F;获取调用堆栈</span><br><span class="line">+ (NSArray *)backtrace</span><br><span class="line">&#123;</span><br><span class="line">    void* callstack[128];</span><br><span class="line">    int frames &#x3D; backtrace(callstack, 128);</span><br><span class="line">    char **strs &#x3D; backtrace_symbols(callstack,frames);</span><br><span class="line">    </span><br><span class="line">    NSMutableArray *backtrace &#x3D; [NSMutableArray arrayWithCapacity:frames];</span><br><span class="line">    for (int i&#x3D;0;i&lt;frames;i++)</span><br><span class="line">    &#123;</span><br><span class="line">        [backtrace addObject:[NSString stringWithUTF8String:strs[i]]];</span><br><span class="line">    &#125;</span><br><span class="line">    free(strs);</span><br><span class="line">    </span><br><span class="line">    return backtrace;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line">&#x2F;&#x2F; 注册崩溃拦截</span><br><span class="line">- (void)installExceptionHandler</span><br><span class="line">&#123;</span><br><span class="line">    NSSetUncaughtExceptionHandler(&amp;exceptionHandler);</span><br><span class="line">    signal(SIGHUP, signalHandler);</span><br><span class="line">    signal(SIGINT, signalHandler);</span><br><span class="line">    signal(SIGQUIT, signalHandler);</span><br><span class="line">    </span><br><span class="line">    signal(SIGABRT, signalHandler);</span><br><span class="line">    signal(SIGILL, signalHandler);</span><br><span class="line">    signal(SIGSEGV, signalHandler);</span><br><span class="line">    signal(SIGFPE, signalHandler);</span><br><span class="line">    signal(SIGBUS, signalHandler);</span><br><span class="line">    signal(SIGPIPE, signalHandler);</span><br><span class="line">    </span><br><span class="line">    NSString *path &#x3D; [[NSHomeDirectory() stringByAppendingPathComponent:@&quot;Documents&quot;] stringByAppendingPathComponent:@&quot;crash.plist&quot;];</span><br><span class="line">    if([[NSFileManager defaultManager] fileExistsAtPath:path])&#123;</span><br><span class="line">        NSDictionary *params &#x3D; [[NSDictionary alloc] initWithContentsOfFile:path];</span><br><span class="line">        [DKHTTPTool POST:去看 Coding 的Crash Reporter项目说明文档  parameters:params header:@&#123;@&quot;token&quot;:去看 Coding的Crash Reporter项目说明文档&#125; responseBlock:^(DKResponse *response) &#123;</span><br><span class="line">            if (!response.error) &#123;</span><br><span class="line">                NSError *error;</span><br><span class="line">                [[NSFileManager defaultManager] removeItemAtPath:path error:&amp;error];</span><br><span class="line">                if(error)DKLog(@&quot;%@&quot;,error);</span><br><span class="line">            &#125;</span><br><span class="line">        &#125;];</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<h2 id="发送请求的AFN封装方法"><a href="#发送请求的AFN封装方法" class="headerlink" title="发送请求的AFN封装方法"></a>发送请求的AFN封装方法</h2><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br></pre></td><td class="code"><pre><span class="line">+ (void)POST:(NSString *)URLString parameters:(id)parameters header:(NSDictionary *)headerField responseBlock:(DKHTTPResponseBlock)block</span><br><span class="line">&#123;</span><br><span class="line">    AFHTTPSessionManager *mgr &#x3D; [AFHTTPSessionManager manager];</span><br><span class="line">    AFHTTPRequestSerializer *requestSerializer &#x3D;  [AFJSONRequestSerializer serializer];</span><br><span class="line">    [headerField enumerateKeysAndObjectsUsingBlock:^(id  _Nonnull key, id  _Nonnull obj, BOOL * _Nonnull stop) &#123;</span><br><span class="line">        [requestSerializer setValue:obj forHTTPHeaderField:key];</span><br><span class="line">    &#125;];</span><br><span class="line">    mgr.requestSerializer &#x3D; requestSerializer;</span><br><span class="line">    [mgr POST:URLString parameters:parameters  progress:nil success:^(NSURLSessionDataTask * _Nonnull task, id  _Nullable responseObject) &#123;</span><br><span class="line">        DKResponse *resp &#x3D; [DKResponse mj_objectWithKeyValues:responseObject];</span><br><span class="line">        resp.rawData &#x3D; responseObject;</span><br><span class="line">        if(block)&#123;</span><br><span class="line">            block(resp);</span><br><span class="line">        &#125;</span><br><span class="line">    &#125; failure:^(NSURLSessionDataTask * _Nullable task, NSError * _Nonnull error) &#123;</span><br><span class="line">        DKResponse *resp &#x3D; [[DKResponse alloc] init];</span><br><span class="line">        resp.error &#x3D; error;</span><br><span class="line">        if (block) &#123;</span><br><span class="line">            block(resp);</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;];</span><br><span class="line">&#125; </span><br><span class="line">&#96;&#96;&#96;    </span><br><span class="line"></span><br><span class="line">## 在 AppDelegte内注册</span><br><span class="line"></span><br></pre></td></tr></table></figure>
+<ul>
+<li>(BOOL)application:(UIApplication *)application didFinishLaunchingWithOptions:(NSDictionary *)launchOptions<br>{<br>[[[DKUncaughtExceptionHandler alloc] init] installExceptionHandler];<br>  return YES:<br>}<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line"></span><br><span class="line">## iOS设备测试编号转机型</span><br><span class="line"></span><br></pre></td></tr></table></figure></li>
+</ul>
+<ul>
+<li>(NSString *) deviceVersion:(NSString *)deviceString<br>{<br>  //iPhone<br>  if ([deviceString isEqualToString:@”iPhone1,1”])    return @”iPhone 1G”;<br>  if ([deviceString isEqualToString:@”iPhone1,2”])    return @”iPhone 3G”;<br>  if ([deviceString isEqualToString:@”iPhone2,1”])    return @”iPhone 3GS”;<br>  if ([deviceString isEqualToString:@”iPhone3,1”])    return @”iPhone 4”;<br>  if ([deviceString isEqualToString:@”iPhone3,2”])    return @”Verizon iPhone 4”;<br>  if ([deviceString isEqualToString:@”iPhone4,1”])    return @”iPhone 4S”;<br>  if ([deviceString isEqualToString:@”iPhone5,1”])    return @”iPhone 5”;<br>  if ([deviceString isEqualToString:@”iPhone5,2”])    return @”iPhone 5”;<br>  if ([deviceString isEqualToString:@”iPhone5,3”])    return @”iPhone 5C”;<br>  if ([deviceString isEqualToString:@”iPhone5,4”])    return @”iPhone 5C”;<br>  if ([deviceString isEqualToString:@”iPhone6,1”])    return @”iPhone 5S”;<br>  if ([deviceString isEqualToString:@”iPhone6,2”])    return @”iPhone 5S”;<br>  if ([deviceString isEqualToString:@”iPhone7,1”])    return @”iPhone 6 Plus”;<br>  if ([deviceString isEqualToString:@”iPhone7,2”])    return @”iPhone 6”;<br>  if ([deviceString isEqualToString:@”iPhone8,1”])    return @”iPhone 6s”;<br>  if ([deviceString isEqualToString:@”iPhone8,2”])    return @”iPhone 6s Plus”;<br>  if ([deviceString isEqualToString:@”iPhone8,4”])    return @”iPhone SE”;<br>  if ([deviceString isEqualToString:@”iPhone9,1”])    return @”iPhone 7”;<br>  if ([deviceString isEqualToString:@”iPhone9,3”])    return @”iPhone 7”;<br>  if ([deviceString isEqualToString:@”iPhone9,2”])    return @”iPhone 7 Plus”;<br>  if ([deviceString isEqualToString:@”iPhone9,4”])    return @”iPhone 7 Plus”;  //iPod<br>  if ([deviceString isEqualToString:@”iPod1,1”])      return @”iPod Touch 1G”;<br>  if ([deviceString isEqualToString:@”iPod2,1”])      return @”iPod Touch 2G”;<br>  if ([deviceString isEqualToString:@”iPod3,1”])      return @”iPod Touch 3G”;<br>  if ([deviceString isEqualToString:@”iPod4,1”])      return @”iPod Touch 4G”;<br>  if ([deviceString isEqualToString:@”iPod5,1”])      return @”iPod Touch 5G”;  //iPad<br>  if ([deviceString isEqualToString:@”iPad1,1”])      return @”iPad”;<br>  if ([deviceString isEqualToString:@”iPad2,1”])      return @”iPad 2 (WiFi)”;<br>  if ([deviceString isEqualToString:@”iPad2,2”])      return @”iPad 2 (GSM)”;<br>  if ([deviceString isEqualToString:@”iPad2,3”])      return @”iPad 2 (CDMA)”;<br>  if ([deviceString isEqualToString:@”iPad2,4”])      return @”iPad 2 (32nm)”;<br>  if ([deviceString isEqualToString:@”iPad2,5”])      return @”iPad mini (WiFi)”;<br>  if ([deviceString isEqualToString:@”iPad2,6”])      return @”iPad mini (GSM)”;<br>  if ([deviceString isEqualToString:@”iPad2,7”])      return @”iPad mini (CDMA)”;  if ([deviceString isEqualToString:@”iPad3,1”])      return @”iPad 3(WiFi)”;<br>  if ([deviceString isEqualToString:@”iPad3,2”])      return @”iPad 3(CDMA)”;<br>  if ([deviceString isEqualToString:@”iPad3,3”])      return @”iPad 3(4G)”;<br>  if ([deviceString isEqualToString:@”iPad3,4”])      return @”iPad 4 (WiFi)”;<br>  if ([deviceString isEqualToString:@”iPad3,5”])      return @”iPad 4 (4G)”;<br>  if ([deviceString isEqualToString:@”iPad3,6”])      return @”iPad 4 (CDMA)”;  if ([deviceString isEqualToString:@”iPad4,1”])      return @”iPad Air”;<br>  if ([deviceString isEqualToString:@”iPad4,2”])      return @”iPad Air”;<br>  if ([deviceString isEqualToString:@”iPad4,3”])      return @”iPad Air”;<br>  if ([deviceString isEqualToString:@”iPad5,3”])      return @”iPad Air 2”;<br>  if ([deviceString isEqualToString:@”iPad5,4”])      return @”iPad Air 2”;<br>  if ([deviceString isEqualToString:@”i386”])         return @”Simulator”;<br>  if ([deviceString isEqualToString:@”x86_64”])       return @”Simulator”;  if ([deviceString isEqualToString:@”iPad4,4”]<pre><code>  ||[deviceString isEqualToString:@&quot;iPad4,5&quot;]
+  ||[deviceString isEqualToString:@&quot;iPad4,6&quot;])      return @&quot;iPad mini 2&quot;;
+</code></pre>
+  if ([deviceString isEqualToString:@”iPad4,7”]<pre><code>  ||[deviceString isEqualToString:@&quot;iPad4,8&quot;]
+  ||[deviceString isEqualToString:@&quot;iPad4,9&quot;])      return @&quot;iPad mini 3&quot;;
+</code></pre>
+  return deviceString;<br>}<br>```</li>
+</ul>
+
+    </div>
+
+    
+    
+    
+
+      <footer class="post-footer">
+          <div class="post-tags">
+              <a href="/tags/iOS/" rel="tag"># iOS</a>
+          </div>
+
+        
+
+
+        
+    <div class="post-nav">
+      <div class="post-nav-item">
+    <a href="/post/df879792.html" rel="prev" title="组合模式">
+      <i class="fa fa-chevron-left"></i> 组合模式
+    </a></div>
+      <div class="post-nav-item">
+    <a href="/post/89e1dd7e.html" rel="next" title="网络层方法封装2">
+      网络层方法封装2 <i class="fa fa-chevron-right"></i>
+    </a></div>
+    </div>
+      </footer>
+    
+  </article>
+  
+  
+  
+
+
+
+          </div>
+          
+    <div class="comments" id="gitalk-container"></div>
+
+<script>
+  window.addEventListener('tabs:register', () => {
+    let { activeClass } = CONFIG.comments;
+    if (CONFIG.comments.storage) {
+      activeClass = localStorage.getItem('comments_active') || activeClass;
+    }
+    if (activeClass) {
+      let activeTab = document.querySelector(`a[href="#comment-${activeClass}"]`);
+      if (activeTab) {
+        activeTab.click();
+      }
+    }
+  });
+  if (CONFIG.comments.storage) {
+    window.addEventListener('tabs:click', event => {
+      if (!event.target.matches('.tabs-comment .tab-content .tab-pane')) return;
+      let commentClass = event.target.classList[1];
+      localStorage.setItem('comments_active', commentClass);
+    });
+  }
+</script>
+
+        </div>
+          
+  
+  <div class="toggle sidebar-toggle">
+    <span class="toggle-line toggle-line-first"></span>
+    <span class="toggle-line toggle-line-middle"></span>
+    <span class="toggle-line toggle-line-last"></span>
+  </div>
+
+  <aside class="sidebar">
+    <div class="sidebar-inner">
+
+      <ul class="sidebar-nav motion-element">
+        <li class="sidebar-nav-toc">
+          文章目录
+        </li>
+        <li class="sidebar-nav-overview">
+          站点概览
+        </li>
+      </ul>
+
+      <!--noindex-->
+      <div class="post-toc-wrap sidebar-panel">
+          <div class="post-toc motion-element"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#%E5%A6%82%E4%BD%95%E6%8D%95%E8%8E%B7%E5%B4%A9%E6%BA%83%E4%BF%A1%E6%81%AF"><span class="nav-number">1.</span> <span class="nav-text">如何捕获崩溃信息</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#OC-%E9%83%A8%E5%88%86%E8%8E%B7%E5%8F%96%E8%B0%83%E7%94%A8%E5%A0%86%E6%A0%88%E5%92%8C%E6%B3%A8%E5%86%8C%E5%B4%A9%E6%BA%83%E6%8B%A6%E6%88%AA"><span class="nav-number">2.</span> <span class="nav-text">OC 部分获取调用堆栈和注册崩溃拦截</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E5%8F%91%E9%80%81%E8%AF%B7%E6%B1%82%E7%9A%84AFN%E5%B0%81%E8%A3%85%E6%96%B9%E6%B3%95"><span class="nav-number">3.</span> <span class="nav-text">发送请求的AFN封装方法</span></a></li></ol></div>
+      </div>
+      <!--/noindex-->
+
+      <div class="site-overview-wrap sidebar-panel">
+        <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+    <img class="site-author-image" itemprop="image" alt="Arclin"
+      src="https://avatars.githubusercontent.com/u/12107804?v=4">
+  <p class="site-author-name" itemprop="name">Arclin</p>
+  <div class="site-description" itemprop="description">Stay hungry,stay foolish</div>
+</div>
+<div class="site-state-wrap motion-element">
+  <nav class="site-state">
+      <div class="site-state-item site-state-posts">
+          <a href="/archives/">
+        
+          <span class="site-state-item-count">100</span>
+          <span class="site-state-item-name">日志</span>
+        </a>
+      </div>
+      <div class="site-state-item site-state-categories">
+            <a href="/categories/">
+          
+        <span class="site-state-item-count">12</span>
+        <span class="site-state-item-name">分类</span></a>
+      </div>
+      <div class="site-state-item site-state-tags">
+            <a href="/tags/">
+          
+        <span class="site-state-item-count">38</span>
+        <span class="site-state-item-name">标签</span></a>
+      </div>
+  </nav>
+</div>
+  <div class="links-of-author motion-element">
+      <span class="links-of-author-item">
+        <a href="https://github.com/Arc-lin" title="GitHub → https://github.com/Arc-lin" rel="noopener" target="_blank"><i class="fab fa-github fa-fw"></i>GitHub</a>
+      </span>
+      <span class="links-of-author-item">
+        <a href="mailto:arclin325@gmail.com" title="E-Mail → mailto:arclin325@gmail.com" rel="noopener" target="_blank"><i class="fa fa-envelope fa-fw"></i>E-Mail</a>
+      </span>
+  </div>
+
+
+
+      </div>
+
+    </div>
+  </aside>
+  <div id="sidebar-dimmer"></div>
+
+
+      </div>
+    </main>
+
+    <footer class="footer">
+      <div class="footer-inner">
+        
+
+        
+
+<div class="copyright">
+  
+  &copy; 
+  <span itemprop="copyrightYear">2022</span>
+  <span class="with-love">
+    <i class="fa fa-heart"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">Arclin</span>
+</div>
+  <div class="powered-by">由 <a href="https://hexo.io" class="theme-link" rel="noopener" target="_blank">Hexo</a> & <a href="https://muse.theme-next.org" class="theme-link" rel="noopener" target="_blank">NexT.Muse</a> 强力驱动
+  </div>
+
+        
+<div class="busuanzi-count">
+  <script async src="https://busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js"></script>
+    <span class="post-meta-item" id="busuanzi_container_site_uv" style="display: none;">
+      <span class="post-meta-item-icon">
+        <i class="fa fa-user"></i>
+      </span>
+      <span class="site-uv" title="总访客量">
+        <span id="busuanzi_value_site_uv"></span>
+      </span>
+    </span>
+    <span class="post-meta-divider">|</span>
+    <span class="post-meta-item" id="busuanzi_container_site_pv" style="display: none;">
+      <span class="post-meta-item-icon">
+        <i class="fa fa-eye"></i>
+      </span>
+      <span class="site-pv" title="总访问量">
+        <span id="busuanzi_value_site_pv"></span>
+      </span>
+    </span>
+</div>
+
+
+
+
+
+
+
+
+      </div>
+    </footer>
+  </div>
+
+  
+  <script src="/lib/anime.min.js"></script>
+  <script src="//cdn.jsdelivr.net/npm/jquery@3/dist/jquery.min.js"></script>
+  <script src="//cdn.jsdelivr.net/gh/fancyapps/fancybox@3/dist/jquery.fancybox.min.js"></script>
+  <script src="/lib/velocity/velocity.min.js"></script>
+  <script src="/lib/velocity/velocity.ui.min.js"></script>
+
+<script src="/js/utils.js"></script>
+
+<script src="/js/motion.js"></script>
+
+
+<script src="/js/schemes/muse.js"></script>
+
+
+<script src="/js/next-boot.js"></script>
+
+
+
+
+  
+  <script>
+    (function(){
+      var canonicalURL, curProtocol;
+      //Get the <link> tag
+      var x=document.getElementsByTagName("link");
+		//Find the last canonical URL
+		if(x.length > 0){
+			for (i=0;i<x.length;i++){
+				if(x[i].rel.toLowerCase() == 'canonical' && x[i].href){
+					canonicalURL=x[i].href;
+				}
+			}
+		}
+    //Get protocol
+	    if (!canonicalURL){
+	    	curProtocol = window.location.protocol.split(':')[0];
+	    }
+	    else{
+	    	curProtocol = canonicalURL.split(':')[0];
+	    }
+      //Get current URL if the canonical URL does not exist
+	    if (!canonicalURL) canonicalURL = window.location.href;
+	    //Assign script content. Replace current URL with the canonical URL
+      !function(){var e=/([http|https]:\/\/[a-zA-Z0-9\_\.]+\.baidu\.com)/gi,r=canonicalURL,t=document.referrer;if(!e.test(r)){var n=(String(curProtocol).toLowerCase() === 'https')?"https://sp0.baidu.com/9_Q4simg2RQJ8t7jm9iCKT-xh_/s.gif":"//api.share.baidu.com/s.gif";t?(n+="?r="+encodeURIComponent(document.referrer),r&&(n+="&l="+r)):r&&(n+="?l="+r);var i=new Image;i.src=n}}(window);})();
+  </script>
+
+
+
+
+  
+<script src="/js/local-search.js"></script>
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+  
+
+<link rel="stylesheet" href="//cdn.jsdelivr.net/npm/gitalk@1/dist/gitalk.min.css">
+
+<script>
+NexT.utils.loadComments(document.querySelector('#gitalk-container'), () => {
+  NexT.utils.getScript('//cdn.jsdelivr.net/npm/gitalk@1/dist/gitalk.min.js', () => {
+    var gitalk = new Gitalk({
+      clientID    : 'df6d1f33bb4a66f5fa60',
+      clientSecret: '5fcc9fb756ac9d4b16381288da7b29f691b45e0a',
+      repo        : 'arc-lin.github.io',
+      owner       : 'Arc-lin',
+      admin       : ['Arc-lin'],
+      id          : '3b47d6888de5b982764432b4c5b68fed',
+        language: 'zh-CN',
+      distractionFreeMode: false
+    });
+    gitalk.render('gitalk-container');
+  }, window.Gitalk);
+});
+</script>
+
+</body>
+</html>

@@ -1,0 +1,620 @@
+<!DOCTYPE html>
+<html lang="zh-Hans">
+<head>
+  <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=2">
+<meta name="theme-color" content="#222">
+<meta name="generator" content="Hexo 5.4.0">
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png">
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32-next.png">
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next.png">
+  <link rel="mask-icon" href="/images/logo.svg" color="#222">
+
+<link rel="stylesheet" href="/css/main.css">
+
+
+<link rel="stylesheet" href="/lib/font-awesome/css/all.min.css">
+  <link rel="stylesheet" href="//cdn.jsdelivr.net/gh/fancyapps/fancybox@3/dist/jquery.fancybox.min.css">
+
+<script id="hexo-configurations">
+    var NexT = window.NexT || {};
+    var CONFIG = {"hostname":"www.arclin.cn","root":"/","scheme":"Muse","version":"7.8.0","exturl":false,"sidebar":{"position":"left","display":"post","padding":18,"offset":12,"onmobile":false},"copycode":{"enable":false,"show_result":false,"style":null},"back2top":{"enable":true,"sidebar":false,"scrollpercent":false},"bookmark":{"enable":false,"color":"#222","save":"auto"},"fancybox":true,"mediumzoom":false,"lazyload":false,"pangu":false,"comments":{"style":"tabs","active":null,"storage":true,"lazyload":false,"nav":null},"algolia":{"appID":"VOFC7668C9","apiKey":"24c644edc8e7353bf2e8d8e31f03a940","indexName":"hexo","hits":{"per_page":10},"labels":{"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}},"localsearch":{"enable":true,"trigger":"auto","top_n_per_article":1,"unescape":false,"preload":false},"motion":{"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},"path":"search.xml"};
+  </script>
+
+  <meta name="description" content="iOS 14 新API">
+<meta property="og:type" content="article">
+<meta property="og:title" content="iOS 14新API">
+<meta property="og:url" content="https://www.arclin.cn/post/36f1cd4f.html">
+<meta property="og:site_name" content="Arclin">
+<meta property="og:description" content="iOS 14 新API">
+<meta property="og:locale">
+<meta property="og:image" content="https://s1.ax1x.com/2020/06/29/NfJ6zt.png">
+<meta property="og:image" content="https://s1.ax1x.com/2020/06/29/NfYs7F.png">
+<meta property="og:image" content="https://s1.ax1x.com/2020/06/29/NfYO1I.png">
+<meta property="og:image" content="https://i.loli.net/2020/06/29/iz1WnGFImlUvkty.png">
+<meta property="og:image" content="https://i.loli.net/2020/06/29/wMmTIykghRNqWQn.png">
+<meta property="og:image" content="https://i.loli.net/2020/06/29/uF3WonxPAsDyXaO.png">
+<meta property="og:image" content="https://i.loli.net/2020/06/29/L1XmoD2d7EKj49Y.png">
+<meta property="og:image" content="https://i.loli.net/2020/06/29/ZflMaksQFDuKp3T.png">
+<meta property="og:image" content="https://i.loli.net/2020/06/29/FVdgXvpGeTBfYKZ.png">
+<meta property="og:image" content="https://i.loli.net/2020/06/29/eiXyvjhfgAqQURr.png">
+<meta property="og:image" content="https://i.loli.net/2020/06/29/R9fc3SZIlpLhuwB.png">
+<meta property="og:image" content="https://i.loli.net/2020/06/29/kSgBdY3hjRWG21E.png">
+<meta property="og:image" content="https://i.loli.net/2020/06/29/svo9OnAS1BZdLDP.png">
+<meta property="og:image" content="https://i.loli.net/2020/06/29/9gh6mbKL7VWe3uH.png">
+<meta property="og:image" content="https://i.loli.net/2020/06/29/jsQr4xoevXNa2Ju.png">
+<meta property="og:image" content="https://i.loli.net/2020/06/29/X5CRUopcnOHG3I2.png">
+<meta property="og:image" content="https://i.loli.net/2020/06/29/UeLtJhGXOvbKmns.png">
+<meta property="og:image" content="https://i.loli.net/2020/06/30/Iaho8TuHE1P4iRx.png">
+<meta property="og:image" content="https://i.loli.net/2020/06/30/taEDOVHfAk2LnQe.png">
+<meta property="og:image" content="https://i.loli.net/2020/06/30/nlrR8VBkzqy2SdP.png">
+<meta property="og:image" content="https://i.loli.net/2020/06/30/PhtUgJrCR2OTQwY.png">
+<meta property="og:image" content="https://i.loli.net/2020/06/30/jlZKFpCybNJPoET.png">
+<meta property="og:image" content="https://i.loli.net/2020/06/30/2awdL6yOmUzIGrZ.jpg">
+<meta property="article:published_time" content="2020-06-29T03:08:18.000Z">
+<meta property="article:modified_time" content="2021-06-06T18:52:24.965Z">
+<meta property="article:author" content="Arclin">
+<meta property="article:tag" content="iOS">
+<meta property="article:tag" content="feature">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="https://s1.ax1x.com/2020/06/29/NfJ6zt.png">
+
+<link rel="canonical" href="https://www.arclin.cn/post/36f1cd4f.html">
+
+
+<script id="page-configurations">
+  // https://hexo.io/docs/variables.html
+  CONFIG.page = {
+    sidebar: "",
+    isHome : false,
+    isPost : true,
+    lang   : 'zh-Hans'
+  };
+</script>
+
+  <title>iOS 14新API | Arclin</title>
+  
+
+
+
+
+
+
+  <noscript>
+  <style>
+  .use-motion .brand,
+  .use-motion .menu-item,
+  .sidebar-inner,
+  .use-motion .post-block,
+  .use-motion .pagination,
+  .use-motion .comments,
+  .use-motion .post-header,
+  .use-motion .post-body,
+  .use-motion .collection-header { opacity: initial; }
+
+  .use-motion .site-title,
+  .use-motion .site-subtitle {
+    opacity: initial;
+    top: initial;
+  }
+
+  .use-motion .logo-line-before i { left: initial; }
+  .use-motion .logo-line-after i { right: initial; }
+  </style>
+</noscript>
+
+<link rel="alternate" href="/atom.xml" title="Arclin" type="application/atom+xml">
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage">
+  <div class="container use-motion">
+    <div class="headband"></div>
+
+    <header class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-container">
+  <div class="site-nav-toggle">
+    <div class="toggle" aria-label="切换导航栏">
+      <span class="toggle-line toggle-line-first"></span>
+      <span class="toggle-line toggle-line-middle"></span>
+      <span class="toggle-line toggle-line-last"></span>
+    </div>
+  </div>
+
+  <div class="site-meta">
+
+    <a href="/" class="brand" rel="start">
+      <span class="logo-line-before"><i></i></span>
+      <h1 class="site-title">Arclin</h1>
+      <span class="logo-line-after"><i></i></span>
+    </a>
+      <p class="site-subtitle" itemprop="description">Advocate Technology. Enjoy Technology.</p>
+  </div>
+
+  <div class="site-nav-right">
+    <div class="toggle popup-trigger">
+        <i class="fa fa-search fa-fw fa-lg"></i>
+    </div>
+  </div>
+</div>
+
+
+
+
+<nav class="site-nav">
+  <ul id="menu" class="main-menu menu">
+        <li class="menu-item menu-item-home">
+
+    <a href="/" rel="section"><i class="fa fa-home fa-fw"></i>首页</a>
+
+  </li>
+        <li class="menu-item menu-item-tags">
+
+    <a href="/tags/" rel="section"><i class="fa fa-tags fa-fw"></i>标签</a>
+
+  </li>
+        <li class="menu-item menu-item-categories">
+
+    <a href="/categories/" rel="section"><i class="fa fa-th fa-fw"></i>分类</a>
+
+  </li>
+        <li class="menu-item menu-item-archives">
+
+    <a href="/archives/" rel="section"><i class="fa fa-archive fa-fw"></i>归档</a>
+
+  </li>
+        <li class="menu-item menu-item-about">
+
+    <a href="/about/" rel="section"><i class="fa fa-user fa-fw"></i>关于</a>
+
+  </li>
+      <li class="menu-item menu-item-search">
+        <a role="button" class="popup-trigger"><i class="fa fa-search fa-fw"></i>搜索
+        </a>
+      </li>
+  </ul>
+</nav>
+
+
+
+  <div class="search-pop-overlay">
+    <div class="popup search-popup">
+        <div class="search-header">
+  <span class="search-icon">
+    <i class="fa fa-search"></i>
+  </span>
+  <div class="search-input-container">
+    <input autocomplete="off" autocapitalize="off"
+           placeholder="搜索..." spellcheck="false"
+           type="search" class="search-input">
+  </div>
+  <span class="popup-btn-close">
+    <i class="fa fa-times-circle"></i>
+  </span>
+</div>
+<div id="search-result">
+  <div id="no-result">
+    <i class="fa fa-spinner fa-pulse fa-5x fa-fw"></i>
+  </div>
+</div>
+
+    </div>
+  </div>
+
+</div>
+    </header>
+
+    
+  <div class="back-to-top">
+    <i class="fa fa-arrow-up"></i>
+    <span>0%</span>
+  </div>
+
+
+    <main class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          
+
+          <div class="content post posts-expand">
+            
+
+    
+  
+  
+  <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="zh-Hans">
+    <link itemprop="mainEntityOfPage" href="https://www.arclin.cn/post/36f1cd4f.html">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="https://avatars.githubusercontent.com/u/12107804?v=4">
+      <meta itemprop="name" content="Arclin">
+      <meta itemprop="description" content="Stay hungry,stay foolish">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="Arclin">
+    </span>
+      <header class="post-header">
+        <h1 class="post-title" itemprop="name headline">
+          iOS 14新API
+        </h1>
+
+        <div class="post-meta">
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-calendar"></i>
+              </span>
+              <span class="post-meta-item-text">发表于</span>
+
+              <time title="创建时间：2020-06-29 11:08:18" itemprop="dateCreated datePublished" datetime="2020-06-29T11:08:18+08:00">2020-06-29</time>
+            </span>
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-folder"></i>
+              </span>
+              <span class="post-meta-item-text">分类于</span>
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/iOS/" itemprop="url" rel="index"><span itemprop="name">iOS</span></a>
+                </span>
+            </span>
+
+          
+            <span class="post-meta-item" title="阅读次数" id="busuanzi_container_page_pv" style="display: none;">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-eye"></i>
+              </span>
+              <span class="post-meta-item-text">阅读次数：</span>
+              <span id="busuanzi_value_page_pv"></span>
+            </span>
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+        <p>iOS 14 新API</p>
+<span id="more"></span>
+
+<h3 id="Control-Appearance-update"><a href="#Control-Appearance-update" class="headerlink" title="Control Appearance update"></a>Control Appearance update</h3><p>控件外观更新，比如UISlider、 UIProgressView、UIActivityIndicatorView，长得稍微有点不一样，不影响适配。</p>
+<p><img src="https://s1.ax1x.com/2020/06/29/NfJ6zt.png"></p>
+<p>UIPageControl样式改变并且可以自定义icon</p>
+<p><img src="https://s1.ax1x.com/2020/06/29/NfYs7F.png"></p>
+<p>自定义小心心icon和书签icon</p>
+<p><img src="https://s1.ax1x.com/2020/06/29/NfYO1I.png"></p>
+<h3 id="Color-Picker"><a href="#Color-Picker" class="headerlink" title="Color Picker"></a>Color Picker</h3><p>新增颜色选择器<code>UIColorPickerViewController</code></p>
+<p>支持取色器 收藏常用颜色等等</p>
+<p>可以配置是否支持调整透明度等等，具体配置项目参考api文档</p>
+<p>建议Present弹出</p>
+<p><a href="https://sm.ms/image/iz1WnGFImlUvkty" target="_blank"><img src="https://i.loli.net/2020/06/29/iz1WnGFImlUvkty.png" width=50% ></a></p>
+<h3 id="Date-Picker"><a href="#Date-Picker" class="headerlink" title="Date Picker"></a>Date Picker</h3><p>UIDatePicker更新UI</p>
+<p>两种样式</p>
+<p>支持农历</p>
+<p><a href="https://sm.ms/image/wMmTIykghRNqWQn" target="_blank"><img src="https://i.loli.net/2020/06/29/wMmTIykghRNqWQn.png" width=50% ></a></p>
+<p><a href="https://sm.ms/image/uF3WonxPAsDyXaO" target="_blank"><img src="https://i.loli.net/2020/06/29/uF3WonxPAsDyXaO.png" width=50% ></a></p>
+<h3 id="Menus"><a href="#Menus" class="headerlink" title="Menus"></a>Menus</h3><p>貌似可以替代我们常有的角标弹窗列表按钮需求</p>
+<p>基于<code>UIButton</code>和<code>UIBarButtonItem</code>的新增的<code>menu</code>属性，可以配置长按或者单击(配置 <code>button.showsMenuAsPrimaryAction = true</code>)弹出菜单列表</p>
+<p><a href="https://sm.ms/image/L1XmoD2d7EKj49Y" target="_blank"><img src="https://i.loli.net/2020/06/29/L1XmoD2d7EKj49Y.png" width=50% ></a></p>
+<p><a href="https://sm.ms/image/ZflMaksQFDuKp3T" target="_blank"><img src="https://i.loli.net/2020/06/29/ZflMaksQFDuKp3T.png" width=50% ></a></p>
+<p>UINavigationBar 的原生返回按钮长按会弹出菜单，可以跳回导航栏栈中的任意一个页面，按钮标题为前面控制器的标题</p>
+<p><a href="https://sm.ms/image/FVdgXvpGeTBfYKZ" target="_blank"><img src="https://i.loli.net/2020/06/29/FVdgXvpGeTBfYKZ.png" width=50% ></a></p>
+<p>更新弹出菜单内容，将会实时更新并自带系统动画：</p>
+<p><code>updateVisibleMenu(_ block: (UIMenu) -&gt; UIMenu)</code></p>
+<h3 id="UIActions"><a href="#UIActions" class="headerlink" title="UIActions"></a>UIActions</h3><p>UIBarButtonItem 新增 fixedSpace(width:) 和 flexibleSpace方法 去调节item之间的间隔，不用像之前那样子创建一个fixedSpace类型的UIBarButtonItem去占位</p>
+<p>UIButton新增了一个初始化方法init(type:primaryAction:) type默认为.system 标题为primaryAction.title ，图片为 primaryAction.image</p>
+<h3 id="WidgetKit"><a href="#WidgetKit" class="headerlink" title="WidgetKit"></a>WidgetKit</h3><p>iOS14 重大新特性之一 支持三种宽度的widget，具体内容另外开篇再讲<br><a href="https://sm.ms/image/eiXyvjhfgAqQURr" target="_blank"><img src="https://i.loli.net/2020/06/29/eiXyvjhfgAqQURr.png" width=50% ></a></p>
+<h3 id="让你的app支持物理键盘"><a href="#让你的app支持物理键盘" class="headerlink" title="让你的app支持物理键盘"></a>让你的app支持物理键盘</h3><p><a target="_blank" rel="noopener" href="https://developer.apple.com/documentation/uikit/keyboards_and_input/adding_hardware_keyboard_support_to_your_app">具体内容查看文档</a></p>
+<h3 id="Asynchronously-Loading-Images-into-Table-and-Collection-Views"><a href="#Asynchronously-Loading-Images-into-Table-and-Collection-Views" class="headerlink" title="Asynchronously Loading Images into Table and Collection Views"></a>Asynchronously Loading Images into Table and Collection Views</h3><p><a target="_blank" rel="noopener" href="https://developer.apple.com/documentation/uikit/uiimage/asynchronously_loading_images_into_table_and_collection_views">文档</a></p>
+<p>tableView和CollectionView异步加载网络图片的API</p>
+<h3 id="PHPicker-图片选择器"><a href="#PHPicker-图片选择器" class="headerlink" title="PHPicker 图片选择器"></a>PHPicker 图片选择器</h3><p>新的图片选择器，支持多选，不需要用户允许相册访问权限，可以选择图片（包括livePhoto）和视频</p>
+<p><a href="https://sm.ms/image/R9fc3SZIlpLhuwB" target="_blank"><img src="https://i.loli.net/2020/06/29/R9fc3SZIlpLhuwB.png" width=50% ></a></p>
+<h3 id="定位权限更新"><a href="#定位权限更新" class="headerlink" title="定位权限更新"></a>定位权限更新</h3><p>旧的定位权限弹窗如下：</p>
+<p><a href="https://sm.ms/image/kSgBdY3hjRWG21E" target="_blank"><img src="https://i.loli.net/2020/06/29/kSgBdY3hjRWG21E.png" width=50% ></a></p>
+<p>新的定位权限弹窗如下：</p>
+<p><a href="https://sm.ms/image/svo9OnAS1BZdLDP" target="_blank"><img src="https://i.loli.net/2020/06/29/svo9OnAS1BZdLDP.png" width=50% ></a></p>
+<p>多了个小地图，并且小地图的左上角多了个按钮，点击选择是否允许准确定位。</p>
+<p>若不允许的话，开发者获取的定位会变成一个±5公里的范围，并且只能持续定位最多20分钟</p>
+<p>通过一个枚举值得知是否用户选择了模糊定位：</p>
+<p><a href="https://sm.ms/image/9gh6mbKL7VWe3uH" target="_blank"><img src="https://i.loli.net/2020/06/29/9gh6mbKL7VWe3uH.png" ></a></p>
+<p>用户可以改变设置，是否允许app获取准确定位</p>
+<p><a href="https://sm.ms/image/jsQr4xoevXNa2Ju" target="_blank"><img src="https://i.loli.net/2020/06/29/jsQr4xoevXNa2Ju.png" ></a></p>
+<p>开发者可以通过在<code>info.plist</code>里面配置信息解释为何需要用户选择准确定位</p>
+<p><a href="https://sm.ms/image/X5CRUopcnOHG3I2" target="_blank"><img src="https://i.loli.net/2020/06/29/X5CRUopcnOHG3I2.png" ></a></p>
+<p>让隐私弹窗默认选择模糊定位</p>
+<p><a href="https://sm.ms/image/UeLtJhGXOvbKmns" target="_blank"><img src="https://i.loli.net/2020/06/29/UeLtJhGXOvbKmns.png" width=50%></a></p>
+<h3 id="UICollectionView重大更新"><a href="#UICollectionView重大更新" class="headerlink" title="UICollectionView重大更新"></a>UICollectionView重大更新</h3><p>UICollection从数据源协议到Cell都有了新的API，开发者可以为cell添加各种“附件”，已适配复杂的列表样式，如下第二张图，另外可以在collectionView上使用类似tableView的样式，如下图</p>
+<p><a href="https://sm.ms/image/Iaho8TuHE1P4iRx" target="_blank"><img src="https://i.loli.net/2020/06/30/Iaho8TuHE1P4iRx.png" ></a></p>
+<p><a href="https://sm.ms/image/taEDOVHfAk2LnQe" target="_blank"><img src="https://i.loli.net/2020/06/30/taEDOVHfAk2LnQe.png"  width=50% ></a></p>
+<p>通过新的配置类，可以做成如下效果</p>
+<p><a href="https://sm.ms/image/nlrR8VBkzqy2SdP" target="_blank"><img src="https://i.loli.net/2020/06/30/nlrR8VBkzqy2SdP.png"  width=50% ></a></p>
+<p><a href="https://sm.ms/image/PhtUgJrCR2OTQwY" target="_blank"><img src="https://i.loli.net/2020/06/30/PhtUgJrCR2OTQwY.png"  width=50% ></a></p>
+<p>新增一个UICollectionListViewCell，可以做出如下样式的cell</p>
+<p><a href="https://sm.ms/image/jlZKFpCybNJPoET" target="_blank"><img src="https://i.loli.net/2020/06/30/jlZKFpCybNJPoET.png" width=50%  ></a></p>
+<p>Cell的注册方式也有所改变，可以看出苹果从API层面已经进入MVVM架构模式了，注册cell需要带上对应的CellViewModel</p>
+<p><a href="https://sm.ms/image/2awdL6yOmUzIGrZ" target="_blank"><img src="https://i.loli.net/2020/06/30/2awdL6yOmUzIGrZ.jpg" width=50% ></a></p>
+<p>另外也支持像UITableViewCell的侧滑操作等等，详细内容将会另外开篇讲述。</p>
+<p>具体查看<a target="_blank" rel="noopener" href="https://developer.apple.com/videos/play/wwdc2020/10097/">视频</a></p>
+
+    </div>
+
+    
+    
+    
+
+      <footer class="post-footer">
+          <div class="post-tags">
+              <a href="/tags/iOS/" rel="tag"># iOS</a>
+              <a href="/tags/feature/" rel="tag"># feature</a>
+          </div>
+
+        
+
+
+        
+    <div class="post-nav">
+      <div class="post-nav-item">
+    <a href="/post/6ae5f77f.html" rel="prev" title="依赖注入与Objection">
+      <i class="fa fa-chevron-left"></i> 依赖注入与Objection
+    </a></div>
+      <div class="post-nav-item">
+    <a href="/post/a44df9c3.html" rel="next" title="iOS 14 App Clips">
+      iOS 14 App Clips <i class="fa fa-chevron-right"></i>
+    </a></div>
+    </div>
+      </footer>
+    
+  </article>
+  
+  
+  
+
+
+
+          </div>
+          
+    <div class="comments" id="gitalk-container"></div>
+
+<script>
+  window.addEventListener('tabs:register', () => {
+    let { activeClass } = CONFIG.comments;
+    if (CONFIG.comments.storage) {
+      activeClass = localStorage.getItem('comments_active') || activeClass;
+    }
+    if (activeClass) {
+      let activeTab = document.querySelector(`a[href="#comment-${activeClass}"]`);
+      if (activeTab) {
+        activeTab.click();
+      }
+    }
+  });
+  if (CONFIG.comments.storage) {
+    window.addEventListener('tabs:click', event => {
+      if (!event.target.matches('.tabs-comment .tab-content .tab-pane')) return;
+      let commentClass = event.target.classList[1];
+      localStorage.setItem('comments_active', commentClass);
+    });
+  }
+</script>
+
+        </div>
+          
+  
+  <div class="toggle sidebar-toggle">
+    <span class="toggle-line toggle-line-first"></span>
+    <span class="toggle-line toggle-line-middle"></span>
+    <span class="toggle-line toggle-line-last"></span>
+  </div>
+
+  <aside class="sidebar">
+    <div class="sidebar-inner">
+
+      <ul class="sidebar-nav motion-element">
+        <li class="sidebar-nav-toc">
+          文章目录
+        </li>
+        <li class="sidebar-nav-overview">
+          站点概览
+        </li>
+      </ul>
+
+      <!--noindex-->
+      <div class="post-toc-wrap sidebar-panel">
+          <div class="post-toc motion-element"><ol class="nav"><li class="nav-item nav-level-3"><a class="nav-link" href="#Control-Appearance-update"><span class="nav-number">1.</span> <span class="nav-text">Control Appearance update</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#Color-Picker"><span class="nav-number">2.</span> <span class="nav-text">Color Picker</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#Date-Picker"><span class="nav-number">3.</span> <span class="nav-text">Date Picker</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#Menus"><span class="nav-number">4.</span> <span class="nav-text">Menus</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#UIActions"><span class="nav-number">5.</span> <span class="nav-text">UIActions</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#WidgetKit"><span class="nav-number">6.</span> <span class="nav-text">WidgetKit</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E8%AE%A9%E4%BD%A0%E7%9A%84app%E6%94%AF%E6%8C%81%E7%89%A9%E7%90%86%E9%94%AE%E7%9B%98"><span class="nav-number">7.</span> <span class="nav-text">让你的app支持物理键盘</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#Asynchronously-Loading-Images-into-Table-and-Collection-Views"><span class="nav-number">8.</span> <span class="nav-text">Asynchronously Loading Images into Table and Collection Views</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#PHPicker-%E5%9B%BE%E7%89%87%E9%80%89%E6%8B%A9%E5%99%A8"><span class="nav-number">9.</span> <span class="nav-text">PHPicker 图片选择器</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E5%AE%9A%E4%BD%8D%E6%9D%83%E9%99%90%E6%9B%B4%E6%96%B0"><span class="nav-number">10.</span> <span class="nav-text">定位权限更新</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#UICollectionView%E9%87%8D%E5%A4%A7%E6%9B%B4%E6%96%B0"><span class="nav-number">11.</span> <span class="nav-text">UICollectionView重大更新</span></a></li></ol></div>
+      </div>
+      <!--/noindex-->
+
+      <div class="site-overview-wrap sidebar-panel">
+        <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+    <img class="site-author-image" itemprop="image" alt="Arclin"
+      src="https://avatars.githubusercontent.com/u/12107804?v=4">
+  <p class="site-author-name" itemprop="name">Arclin</p>
+  <div class="site-description" itemprop="description">Stay hungry,stay foolish</div>
+</div>
+<div class="site-state-wrap motion-element">
+  <nav class="site-state">
+      <div class="site-state-item site-state-posts">
+          <a href="/archives/">
+        
+          <span class="site-state-item-count">100</span>
+          <span class="site-state-item-name">日志</span>
+        </a>
+      </div>
+      <div class="site-state-item site-state-categories">
+            <a href="/categories/">
+          
+        <span class="site-state-item-count">12</span>
+        <span class="site-state-item-name">分类</span></a>
+      </div>
+      <div class="site-state-item site-state-tags">
+            <a href="/tags/">
+          
+        <span class="site-state-item-count">38</span>
+        <span class="site-state-item-name">标签</span></a>
+      </div>
+  </nav>
+</div>
+  <div class="links-of-author motion-element">
+      <span class="links-of-author-item">
+        <a href="https://github.com/Arc-lin" title="GitHub → https://github.com/Arc-lin" rel="noopener" target="_blank"><i class="fab fa-github fa-fw"></i>GitHub</a>
+      </span>
+      <span class="links-of-author-item">
+        <a href="mailto:arclin325@gmail.com" title="E-Mail → mailto:arclin325@gmail.com" rel="noopener" target="_blank"><i class="fa fa-envelope fa-fw"></i>E-Mail</a>
+      </span>
+  </div>
+
+
+
+      </div>
+
+    </div>
+  </aside>
+  <div id="sidebar-dimmer"></div>
+
+
+      </div>
+    </main>
+
+    <footer class="footer">
+      <div class="footer-inner">
+        
+
+        
+
+<div class="copyright">
+  
+  &copy; 
+  <span itemprop="copyrightYear">2022</span>
+  <span class="with-love">
+    <i class="fa fa-heart"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">Arclin</span>
+</div>
+  <div class="powered-by">由 <a href="https://hexo.io" class="theme-link" rel="noopener" target="_blank">Hexo</a> & <a href="https://muse.theme-next.org" class="theme-link" rel="noopener" target="_blank">NexT.Muse</a> 强力驱动
+  </div>
+
+        
+<div class="busuanzi-count">
+  <script async src="https://busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js"></script>
+    <span class="post-meta-item" id="busuanzi_container_site_uv" style="display: none;">
+      <span class="post-meta-item-icon">
+        <i class="fa fa-user"></i>
+      </span>
+      <span class="site-uv" title="总访客量">
+        <span id="busuanzi_value_site_uv"></span>
+      </span>
+    </span>
+    <span class="post-meta-divider">|</span>
+    <span class="post-meta-item" id="busuanzi_container_site_pv" style="display: none;">
+      <span class="post-meta-item-icon">
+        <i class="fa fa-eye"></i>
+      </span>
+      <span class="site-pv" title="总访问量">
+        <span id="busuanzi_value_site_pv"></span>
+      </span>
+    </span>
+</div>
+
+
+
+
+
+
+
+
+      </div>
+    </footer>
+  </div>
+
+  
+  <script src="/lib/anime.min.js"></script>
+  <script src="//cdn.jsdelivr.net/npm/jquery@3/dist/jquery.min.js"></script>
+  <script src="//cdn.jsdelivr.net/gh/fancyapps/fancybox@3/dist/jquery.fancybox.min.js"></script>
+  <script src="/lib/velocity/velocity.min.js"></script>
+  <script src="/lib/velocity/velocity.ui.min.js"></script>
+
+<script src="/js/utils.js"></script>
+
+<script src="/js/motion.js"></script>
+
+
+<script src="/js/schemes/muse.js"></script>
+
+
+<script src="/js/next-boot.js"></script>
+
+
+
+
+  
+  <script>
+    (function(){
+      var canonicalURL, curProtocol;
+      //Get the <link> tag
+      var x=document.getElementsByTagName("link");
+		//Find the last canonical URL
+		if(x.length > 0){
+			for (i=0;i<x.length;i++){
+				if(x[i].rel.toLowerCase() == 'canonical' && x[i].href){
+					canonicalURL=x[i].href;
+				}
+			}
+		}
+    //Get protocol
+	    if (!canonicalURL){
+	    	curProtocol = window.location.protocol.split(':')[0];
+	    }
+	    else{
+	    	curProtocol = canonicalURL.split(':')[0];
+	    }
+      //Get current URL if the canonical URL does not exist
+	    if (!canonicalURL) canonicalURL = window.location.href;
+	    //Assign script content. Replace current URL with the canonical URL
+      !function(){var e=/([http|https]:\/\/[a-zA-Z0-9\_\.]+\.baidu\.com)/gi,r=canonicalURL,t=document.referrer;if(!e.test(r)){var n=(String(curProtocol).toLowerCase() === 'https')?"https://sp0.baidu.com/9_Q4simg2RQJ8t7jm9iCKT-xh_/s.gif":"//api.share.baidu.com/s.gif";t?(n+="?r="+encodeURIComponent(document.referrer),r&&(n+="&l="+r)):r&&(n+="?l="+r);var i=new Image;i.src=n}}(window);})();
+  </script>
+
+
+
+
+  
+<script src="/js/local-search.js"></script>
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+  
+
+<link rel="stylesheet" href="//cdn.jsdelivr.net/npm/gitalk@1/dist/gitalk.min.css">
+
+<script>
+NexT.utils.loadComments(document.querySelector('#gitalk-container'), () => {
+  NexT.utils.getScript('//cdn.jsdelivr.net/npm/gitalk@1/dist/gitalk.min.js', () => {
+    var gitalk = new Gitalk({
+      clientID    : 'df6d1f33bb4a66f5fa60',
+      clientSecret: '5fcc9fb756ac9d4b16381288da7b29f691b45e0a',
+      repo        : 'arc-lin.github.io',
+      owner       : 'Arc-lin',
+      admin       : ['Arc-lin'],
+      id          : '54fa9a19c35b1150b1a5e83786b53661',
+        language: 'zh-CN',
+      distractionFreeMode: false
+    });
+    gitalk.render('gitalk-container');
+  }, window.Gitalk);
+});
+</script>
+
+</body>
+</html>
