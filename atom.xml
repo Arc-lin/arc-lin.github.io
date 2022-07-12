@@ -6,7 +6,7 @@
   <link href="https://www.arclin.cn/atom.xml" rel="self"/>
   
   <link href="https://www.arclin.cn/"/>
-  <updated>2022-07-12T17:45:15.705Z</updated>
+  <updated>2022-07-12T17:50:45.919Z</updated>
   <id>https://www.arclin.cn/</id>
   
   <author>
@@ -21,7 +21,7 @@
     <link href="https://www.arclin.cn/post/1ff3bfb6.html"/>
     <id>https://www.arclin.cn/post/1ff3bfb6.html</id>
     <published>2022-07-12T16:52:48.000Z</published>
-    <updated>2022-07-12T17:45:15.705Z</updated>
+    <updated>2022-07-12T17:50:45.919Z</updated>
     
     <content type="html"><![CDATA[<p>本文简述Xcode 14 的编译优化</p><span id="more"></span><h1 id="Link-fast-Improve-build-and-launch-time"><a href="#Link-fast-Improve-build-and-launch-time" class="headerlink" title="Link fast: Improve build and launch time"></a>Link fast: Improve build and launch time</h1><h2 id="什么是链接"><a href="#什么是链接" class="headerlink" title="什么是链接"></a>什么是链接</h2><p><img src="https://s2.loli.net/2022/07/11/kCstwgSpumHbaeU.jpg" alt="链接过程"></p><p>如图所示，链接将不同的语言，通过前端编译器，编译为中间代码LLVM IR，然后再通过，然后再通过LLVM后端编译器，编译成对应处理器架构的机器语言。</p><p>通过这张图我们可以清晰地看到有了中间代码IR的存在，我们就可以在开发高级语言的时候不用去考虑不同处理器之间的细节，而是统一由LLVM去处理，大大降低了开发成本。</p><p>然后链接这一行为，是发生在LLVM后端编译器上的，因为我们平时写代码的时候，以OC语言为例，每个m代码文件都会被编译成o文件，那多个o文件之间的互相调用，要怎么做呢，这时候就是通过链接把他们都合并成一个文件。比如在iOS中，最后就是产出一个Mach-o文件。</p><p>也就是说，链接将<code>各个模块（各个文件的编译产物）</code>的函数连接起来，产出各个架构的可执行文件。</p><p>然后在iOS中，链接方式有两种</p><ul><li>静态链接（ld64）：影响app的编译时间和包大小，选择性加载</li><li>动态链接（dyld）：影响App的启动耗时</li></ul><p>在iOS中我们制作的一些<code>.a</code>或者<code>.framework</code>这些静态库最后就会经过静态链接过程链接到我们的可执行文件中。</p><p>动态链接一般就是链接一些系统库，在启动的时候按需，动态地加载。</p><h2 id="Mach-0文件"><a href="#Mach-0文件" class="headerlink" title="Mach-0文件"></a>Mach-0文件</h2><p><img src="https://s2.loli.net/2022/07/11/bto5WBdzQ9IGx8E.png" alt="mach-o_format_basic_structure.png"></p><p>首先贴下官方的<a href="https://github.com/aidansteele/osx-abi-macho-file-format-reference/blob/master/Mach-O_File_Format.pdf">文档介绍</a></p><p>一个<code>Mach-O</code>主要包括三个区域</p><ul><li>Header <ul><li>文件类型，目标架构类型等（比如可执行文件、静态库、arm64构架等）</li></ul></li><li>Load commands<ul><li>描述文件在虚拟内存中的逻辑结构、布局（数据段，代码段…都有哪些段，顺序如何，分别是做什么的，怎么做，由<code>Load commands</code>来描述）</li><li>包含着多种命令，包括代码签名命令，符号表命令等</li></ul></li><li>Raw segment data<ul><li>在<code>Load command</code>中定义的<code>Segment</code>的原始数据（在<code>Load command</code>中定义的那些段的原始具体数据）</li></ul></li></ul><h2 id="ld64-优化点"><a href="#ld64-优化点" class="headerlink" title="ld64 优化点"></a>ld64 优化点</h2><p>对于大部分项目来说，速度提升近2倍</p><h3 id="利用多核能力和优化算法加速链接"><a href="#利用多核能力和优化算法加速链接" class="headerlink" title="利用多核能力和优化算法加速链接"></a>利用多核能力和优化算法加速链接</h3><ul><li>与时俱进：利用多核能力，并行计算UUID和签名散列值，类似zld<ul><li>在以往的链接中，一个方法被调用之后，如果里面依赖着另外一个方法，那么链接器就回去找依赖的方法在哪儿，然后找到之后就继续找依赖的方法所依赖的另一个方法，是一串连续的操作。而上面这些操作都是单核串行执行的。Xcode 14优化之后将会利用硬件多核的能力去并行的查找，提高效率。</li></ul></li><li>算法调优：字符串表示（C++ string_view objects）升级</li><li>硬件加速：升级加密库</li><li>配置升级：优化链接配置参数</li></ul><p>静态链接参数 <strong>需要开启<code>all_load</code></strong> 才可以使用上述说明的使用多核能力提升链接速度</p><h3 id="静态链接参数说明"><a href="#静态链接参数说明" class="headerlink" title="静态链接参数说明"></a>静态链接参数说明</h3><ul><li><code>all_load</code>：适用于加载静态库的大部分方法或函数<ul><li>开了了<code>all_load</code>之后，链接器会无差别地把<code>.a</code>或者<code>.framework</code>里面的方法和函数链接起来，不同于以前的选择性加载：发现这个方法会被调用时再去取。</li><li>可以加快链接速度，可以并行解析加载</li><li>缺点：包体积变大，线上环境不建议开启。</li></ul></li><li><code>dead_strip</code>：链接器删除不可访问的代码和数据，配合<code>all_load</code><ul><li>因为<code>all_load</code>会无差别地链接所有方法和函数，导致了包体变大，所以这里开启<code>dead_strip</code>可以删除无用的方法和函数</li><li>注意这里有个风险点：通过runtime调用的方法是检测不到的，所以有可能会被裁掉，编译不会报错，运行时找不到符号才报错。线上环境不建议开启。</li></ul></li><li><code>no_exported_symbols</code>：不导出符号文件，节省时间很短，不考虑<ul><li>线上不能开启，因为我们需要用到符号表去排查问题</li></ul></li><li><code>no_deduplicate</code>：减少重复符号检查来提高链接速度，选择已加载的第一个符号<ul><li>不建议开启，相同的符号可能实现方法会不一样</li></ul></li></ul><p><img src="https://s2.loli.net/2022/07/13/5kwpzPU6rlXZnSC.png" alt="Xcode配置"></p><h2 id="dlyd-优化点"><a href="#dlyd-优化点" class="headerlink" title="dlyd 优化点"></a>dlyd 优化点</h2><p>编译过程中，不需要将主项目中对动态库中的接口的调用，链接到主项目中，而是在主项目中，留下了类似协议的调用，直到启动App，才将真正的实现，关联起来—也就是dlyd过程</p><p>举个例子就是编译链接的时候留一个占位符，表示自己需要这么一个函数，等到启动的时候，系统再从动态库去查找这个符号。</p><ul><li>优势：链接耗时</li><li>劣势：启动耗时，并且因为不同Data pages导致的缺页中断更加凸显</li></ul><h3 id="优化"><a href="#优化" class="headerlink" title="优化"></a>优化</h3><ul><li><p>dylib chainede fixups(13.4)动态库链式修复：即本身动态库里面方法和函数的地址和app需要用到的地址是不一样的，所以需要动态修复地址，但是需要将部署最低版本设到13.4以上，这样子启动时的动态库加载过程才会得到加速</p></li><li><p>page-in linking：针对DATA端的符号，内核提前加载</p></li></ul><h3 id="pre-main-注意事项"><a href="#pre-main-注意事项" class="headerlink" title="pre-main 注意事项"></a>pre-main 注意事项</h3><ol><li>禁止做I/O和网络操作</li><li>任何超过毫秒级别的操作都不应该放到这</li></ol><h2 id="Xcode-14-新增链接相关命令行工具"><a href="#Xcode-14-新增链接相关命令行工具" class="headerlink" title="Xcode 14 新增链接相关命令行工具"></a>Xcode 14 新增链接相关命令行工具</h2><ul><li><p><code>dyld_usage</code>：获取dyld正在做什么，应用在macos-app或者iOS模拟器</p></li><li><p><code>dyld_info</code>：检查磁盘上和当前dyld缓存中的二进制文件</p></li></ul>]]></content>
     
@@ -30,6 +30,16 @@
     
     
     
+    <category term="iOS" scheme="https://www.arclin.cn/categories/iOS/"/>
+    
+    
+    <category term="iOS" scheme="https://www.arclin.cn/tags/iOS/"/>
+    
+    <category term="Xcode" scheme="https://www.arclin.cn/tags/Xcode/"/>
+    
+    <category term="底层原理" scheme="https://www.arclin.cn/tags/%E5%BA%95%E5%B1%82%E5%8E%9F%E7%90%86/"/>
+    
+    <category term="feature" scheme="https://www.arclin.cn/tags/feature/"/>
     
   </entry>
   
