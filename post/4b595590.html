@@ -1,0 +1,654 @@
+<!DOCTYPE html>
+<html lang="zh-Hans">
+<head>
+  <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=2">
+<meta name="theme-color" content="#222">
+<meta name="generator" content="Hexo 5.4.0">
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png">
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32-next.png">
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next.png">
+  <link rel="mask-icon" href="/images/logo.svg" color="#222">
+
+<link rel="stylesheet" href="/css/main.css">
+
+
+<link rel="stylesheet" href="/lib/font-awesome/css/all.min.css">
+  <link rel="stylesheet" href="//cdn.jsdelivr.net/gh/fancyapps/fancybox@3/dist/jquery.fancybox.min.css">
+
+<script id="hexo-configurations">
+    var NexT = window.NexT || {};
+    var CONFIG = {"hostname":"www.arclin.cn","root":"/","scheme":"Muse","version":"7.8.0","exturl":false,"sidebar":{"position":"left","display":"post","padding":18,"offset":12,"onmobile":false},"copycode":{"enable":false,"show_result":false,"style":null},"back2top":{"enable":true,"sidebar":false,"scrollpercent":false},"bookmark":{"enable":false,"color":"#222","save":"auto"},"fancybox":true,"mediumzoom":false,"lazyload":false,"pangu":false,"comments":{"style":"tabs","active":null,"storage":true,"lazyload":false,"nav":null},"algolia":{"appID":"VOFC7668C9","apiKey":"24c644edc8e7353bf2e8d8e31f03a940","indexName":"hexo","hits":{"per_page":10},"labels":{"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}},"localsearch":{"enable":true,"trigger":"auto","top_n_per_article":1,"unescape":false,"preload":false},"motion":{"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},"path":"search.xml"};
+  </script>
+
+  <meta name="description" content="鸿蒙 API 12 推出了 V2 版本的状态管理装饰器，比起 V1 装饰器，V2 装饰器的职责更加地清晰，并且能力也得到了加强，建议后续开发使用 V2 版本的装饰器">
+<meta property="og:type" content="article">
+<meta property="og:title" content="鸿蒙状态管理装饰器V2">
+<meta property="og:url" content="https://www.arclin.cn/post/4b595590.html">
+<meta property="og:site_name" content="Arclin">
+<meta property="og:description" content="鸿蒙 API 12 推出了 V2 版本的状态管理装饰器，比起 V1 装饰器，V2 装饰器的职责更加地清晰，并且能力也得到了加强，建议后续开发使用 V2 版本的装饰器">
+<meta property="og:locale">
+<meta property="og:image" content="https://oss.hexoxe.com/2025/05/14/00/1747234940855.rar?type=t.png">
+<meta property="article:published_time" content="2024-07-22T14:58:58.000Z">
+<meta property="article:modified_time" content="2025-05-14T15:39:34.878Z">
+<meta property="article:author" content="Arclin">
+<meta property="article:tag" content="Harmony">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="https://oss.hexoxe.com/2025/05/14/00/1747234940855.rar?type=t.png">
+
+<link rel="canonical" href="https://www.arclin.cn/post/4b595590.html">
+
+
+<script id="page-configurations">
+  // https://hexo.io/docs/variables.html
+  CONFIG.page = {
+    sidebar: "",
+    isHome : false,
+    isPost : true,
+    lang   : 'zh-Hans'
+  };
+</script>
+
+  <title>鸿蒙状态管理装饰器V2 | Arclin</title>
+  
+
+
+
+
+
+
+  <noscript>
+  <style>
+  .use-motion .brand,
+  .use-motion .menu-item,
+  .sidebar-inner,
+  .use-motion .post-block,
+  .use-motion .pagination,
+  .use-motion .comments,
+  .use-motion .post-header,
+  .use-motion .post-body,
+  .use-motion .collection-header { opacity: initial; }
+
+  .use-motion .site-title,
+  .use-motion .site-subtitle {
+    opacity: initial;
+    top: initial;
+  }
+
+  .use-motion .logo-line-before i { left: initial; }
+  .use-motion .logo-line-after i { right: initial; }
+  </style>
+</noscript>
+
+<link rel="alternate" href="/atom.xml" title="Arclin" type="application/atom+xml">
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage">
+  <div class="container use-motion">
+    <div class="headband"></div>
+
+    <header class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-container">
+  <div class="site-nav-toggle">
+    <div class="toggle" aria-label="切换导航栏">
+      <span class="toggle-line toggle-line-first"></span>
+      <span class="toggle-line toggle-line-middle"></span>
+      <span class="toggle-line toggle-line-last"></span>
+    </div>
+  </div>
+
+  <div class="site-meta">
+
+    <a href="/" class="brand" rel="start">
+      <span class="logo-line-before"><i></i></span>
+      <h1 class="site-title">Arclin</h1>
+      <span class="logo-line-after"><i></i></span>
+    </a>
+      <p class="site-subtitle" itemprop="description">Advocate Technology. Enjoy Technology.</p>
+  </div>
+
+  <div class="site-nav-right">
+    <div class="toggle popup-trigger">
+        <i class="fa fa-search fa-fw fa-lg"></i>
+    </div>
+  </div>
+</div>
+
+
+
+
+<nav class="site-nav">
+  <ul id="menu" class="main-menu menu">
+        <li class="menu-item menu-item-home">
+
+    <a href="/" rel="section"><i class="fa fa-home fa-fw"></i>首页</a>
+
+  </li>
+        <li class="menu-item menu-item-tags">
+
+    <a href="/tags/" rel="section"><i class="fa fa-tags fa-fw"></i>标签</a>
+
+  </li>
+        <li class="menu-item menu-item-categories">
+
+    <a href="/categories/" rel="section"><i class="fa fa-th fa-fw"></i>分类</a>
+
+  </li>
+        <li class="menu-item menu-item-archives">
+
+    <a href="/archives/" rel="section"><i class="fa fa-archive fa-fw"></i>归档</a>
+
+  </li>
+        <li class="menu-item menu-item-about">
+
+    <a href="/about/" rel="section"><i class="fa fa-user fa-fw"></i>关于</a>
+
+  </li>
+      <li class="menu-item menu-item-search">
+        <a role="button" class="popup-trigger"><i class="fa fa-search fa-fw"></i>搜索
+        </a>
+      </li>
+  </ul>
+</nav>
+
+
+
+  <div class="search-pop-overlay">
+    <div class="popup search-popup">
+        <div class="search-header">
+  <span class="search-icon">
+    <i class="fa fa-search"></i>
+  </span>
+  <div class="search-input-container">
+    <input autocomplete="off" autocapitalize="off"
+           placeholder="搜索..." spellcheck="false"
+           type="search" class="search-input">
+  </div>
+  <span class="popup-btn-close">
+    <i class="fa fa-times-circle"></i>
+  </span>
+</div>
+<div id="search-result">
+  <div id="no-result">
+    <i class="fa fa-spinner fa-pulse fa-5x fa-fw"></i>
+  </div>
+</div>
+
+    </div>
+  </div>
+
+</div>
+    </header>
+
+    
+  <div class="back-to-top">
+    <i class="fa fa-arrow-up"></i>
+    <span>0%</span>
+  </div>
+
+
+    <main class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          
+
+          <div class="content post posts-expand">
+            
+
+    
+  
+  
+  <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="zh-Hans">
+    <link itemprop="mainEntityOfPage" href="https://www.arclin.cn/post/4b595590.html">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="https://avatars.githubusercontent.com/u/12107804?v=4">
+      <meta itemprop="name" content="Arclin">
+      <meta itemprop="description" content="Stay hungry,stay foolish">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="Arclin">
+    </span>
+      <header class="post-header">
+        <h1 class="post-title" itemprop="name headline">
+          鸿蒙状态管理装饰器V2
+        </h1>
+
+        <div class="post-meta">
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-calendar"></i>
+              </span>
+              <span class="post-meta-item-text">发表于</span>
+
+              <time title="创建时间：2024-07-22 22:58:58" itemprop="dateCreated datePublished" datetime="2024-07-22T22:58:58+08:00">2024-07-22</time>
+            </span>
+
+          
+            <span class="post-meta-item" title="阅读次数" id="busuanzi_container_page_pv" style="display: none;">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-eye"></i>
+              </span>
+              <span class="post-meta-item-text">阅读次数：</span>
+              <span id="busuanzi_value_page_pv"></span>
+            </span>
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+        <p>鸿蒙 API 12 推出了 V2 版本的状态管理装饰器，比起 V1 装饰器，V2 装饰器的职责更加地清晰，并且能力也得到了加强，建议后续开发使用 V2 版本的装饰器</p>
+<span id="more"></span>
+<p>相关文档：<a target="_blank" rel="noopener" href="https://developer.huawei.com/consumer/cn/doc/harmonyos-guides-V5/_u6001_u7ba1_u7406_uff08v2_u8bd5_u7528_u7248_uff09-V5">https://developer.huawei.com/consumer/cn/doc/harmonyos-guides-V5/_u6001_u7ba1_u7406_uff08v2_u8bd5_u7528_u7248_uff09-V5</a></p>
+<h1 id="前提"><a href="#前提" class="headerlink" title="前提"></a>前提</h1><p>V2 相关装饰器所涉及到的根视图组件都需要用@ComponentV2 进行修饰</p>
+<h1 id="ObservedV2"><a href="#ObservedV2" class="headerlink" title="@ObservedV2"></a>@ObservedV2</h1><p>举例:</p>
+<p><img src="https://oss.hexoxe.com/2025/05/14/00/1747234940855.rar?type=t.png"></p>
+<h2 id="问题"><a href="#问题" class="headerlink" title="问题"></a>问题</h2><p>在 V1 中，@Observed 无法深度观测，比如以下的例子</p>
+<ol>
+<li>先点击修改名字，名字变化，再点击修改班级，班级不会变化</li>
+<li>先点击修改班级，班级不会变化，再点击修改名字，名字和班级同时发生变化</li>
+</ol>
+<p>结论：</p>
+<p>直接修改第二层的属性，虽然对象本身已经发生了变化，但是无法被@Observed 观测到<br>修改第一层的属性的时候，会被@Observed 观测到，执行 UI 刷新，并且刷新是全体的，并不只是修改绑定的属性对应的 UI<br>(这里会引申出一个性能问题：如果某个对象有很多属性，只改变一个属性会导致其他无关控件也被刷新，造成无意义的性能损耗)</p>
+<figure class="highlight typescript"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">@Observed</span></span><br><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">Grade</span> </span>&#123;</span><br><span class="line">  grade: <span class="built_in">number</span></span><br><span class="line">  name: <span class="built_in">string</span></span><br><span class="line"></span><br><span class="line">  <span class="function"><span class="title">constructor</span>(<span class="params">grade: <span class="built_in">number</span>, name: <span class="built_in">string</span></span>)</span> &#123;</span><br><span class="line">    <span class="built_in">this</span>.grade = grade</span><br><span class="line">    <span class="built_in">this</span>.name = name</span><br><span class="line">  &#125;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="meta">@Observed</span></span><br><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">Student</span> </span>&#123;</span><br><span class="line">  name: <span class="built_in">string</span></span><br><span class="line">  age: <span class="built_in">number</span></span><br><span class="line">  grade: Grade</span><br><span class="line"></span><br><span class="line">  <span class="function"><span class="title">constructor</span>(<span class="params">name: <span class="built_in">string</span>, age: <span class="built_in">number</span>, grade: Grade</span>)</span> &#123;</span><br><span class="line">    <span class="built_in">this</span>.name = name</span><br><span class="line">    <span class="built_in">this</span>.age = age</span><br><span class="line">    <span class="built_in">this</span>.grade = grade</span><br><span class="line">  &#125;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="meta">@Entry</span></span><br><span class="line"><span class="meta">@Component</span></span><br><span class="line">struct Index &#123;</span><br><span class="line"></span><br><span class="line">  <span class="meta">@State</span> student: Student = <span class="keyword">new</span> Student(<span class="string">&quot;John&quot;</span>,<span class="number">18</span>, <span class="keyword">new</span> Grade(<span class="number">3</span>,<span class="string">&quot;B&quot;</span>))</span><br><span class="line"></span><br><span class="line">  <span class="function"><span class="title">build</span>(<span class="params"></span>)</span> &#123;</span><br><span class="line">      <span class="function"><span class="title">Column</span>(<span class="params">&#123; space: <span class="number">20</span> &#125;</span>)</span> &#123;</span><br><span class="line">        Blank()</span><br><span class="line">        Text(<span class="string">&quot;Name: &quot;</span> + <span class="built_in">this</span>.student.name)</span><br><span class="line">          .fontWeight(FontWeight.Bold)</span><br><span class="line">        Text(<span class="string">&quot;Age: &quot;</span> + <span class="built_in">this</span>.student.age)</span><br><span class="line">          .fontWeight(FontWeight.Bold)</span><br><span class="line">        <span class="function"><span class="title">Row</span>(<span class="params">&#123; space: <span class="number">20</span>&#125;</span>)</span> &#123;</span><br><span class="line">          Text(<span class="string">&quot;Grade: &quot;</span> + <span class="built_in">this</span>.student.grade.grade)</span><br><span class="line">            .fontWeight(FontWeight.Bold)</span><br><span class="line">          Text(<span class="string">&quot;Class: &quot;</span> + <span class="built_in">this</span>.student.grade.name)</span><br><span class="line">            .fontWeight(FontWeight.Bold)</span><br><span class="line">        &#125;</span><br><span class="line">        Button(<span class="string">&quot;修改名字&quot;</span>)</span><br><span class="line">          .onClick(<span class="function">() =&gt;</span> &#123;</span><br><span class="line">            <span class="built_in">this</span>.student.name = <span class="string">&quot;Mike&quot;</span></span><br><span class="line">          &#125;)</span><br><span class="line">        Button(<span class="string">&quot;修改班级&quot;</span>)</span><br><span class="line">          .onClick(<span class="function">() =&gt;</span> &#123;</span><br><span class="line">            <span class="built_in">this</span>.student.grade.name = <span class="string">&quot;C&quot;</span></span><br><span class="line">          &#125;)</span><br><span class="line">        Blank()</span><br><span class="line">      &#125;</span><br><span class="line">      .width(<span class="string">&quot;100%&quot;</span>)</span><br><span class="line">      .height(<span class="string">&#x27;100%&#x27;</span>)</span><br><span class="line">  &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<h2 id="解决"><a href="#解决" class="headerlink" title="解决"></a>解决</h2><p>被观察的类使用@ObservedV2 修饰，需要被观察到属性用@Trace 修饰即可</p>
+<p>结果：</p>
+<p>点击修改班级的时候，班级会发生变化；然而，点击修改名字的时候，名字不会变化</p>
+<p>结论：</p>
+<p>只有被@Trace 修饰的属性，修改的时候才会发生变化，没有@Trace 修饰的属性是不会被观察到的<br>使用该修饰器修饰的属性，被修改的时候只会重新渲染相关的组件，其他没有被修改的属性是不会重新渲染的，比起 V1 性能更好</p>
+<figure class="highlight typescript"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">@ObservedV2</span></span><br><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">Grade</span> </span>&#123;</span><br><span class="line">  grade: <span class="built_in">number</span></span><br><span class="line">  <span class="meta">@Trace</span> name: <span class="built_in">string</span></span><br><span class="line"></span><br><span class="line">  <span class="function"><span class="title">constructor</span>(<span class="params">grade: <span class="built_in">number</span>, name: <span class="built_in">string</span></span>)</span> &#123;</span><br><span class="line">    <span class="built_in">this</span>.grade = grade</span><br><span class="line">    <span class="built_in">this</span>.name = name</span><br><span class="line">  &#125;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="meta">@ObservedV2</span></span><br><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">Student</span> </span>&#123;</span><br><span class="line">  name: <span class="built_in">string</span></span><br><span class="line">  age: <span class="built_in">number</span></span><br><span class="line">  grade: Grade</span><br><span class="line"></span><br><span class="line">  <span class="function"><span class="title">constructor</span>(<span class="params">name: <span class="built_in">string</span>, age: <span class="built_in">number</span>, grade: Grade</span>)</span> &#123;</span><br><span class="line">    <span class="built_in">this</span>.name = name</span><br><span class="line">    <span class="built_in">this</span>.age = age</span><br><span class="line">    <span class="built_in">this</span>.grade = grade</span><br><span class="line">  &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<h2 id="其他"><a href="#其他" class="headerlink" title="其他"></a>其他</h2><p>@Trace 支持 model 嵌套，支持继承，支持修饰数组/Map/Date/Set</p>
+<h1 id="Local"><a href="#Local" class="headerlink" title="@Local"></a>@Local</h1><h2 id="问题-1"><a href="#问题-1" class="headerlink" title="问题"></a>问题</h2><ol>
+<li>@Local 与@State 用法相同，区别在于@State 的属性可以外部赋值，而@Local 不允许</li>
+</ol>
+<p>如果 student 用@State 修饰，下面代码是允许的，<br>如果 student 用@Local 修饰，则下面代码不允许</p>
+<figure class="highlight reasonml"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="constructor">Index(&#123; <span class="params">student</span>: <span class="params">new</span> Student(<span class="string">&quot;John&quot;</span>,18, <span class="params">new</span> Grade(3,<span class="string">&quot;B&quot;</span>)</span>) &#125;)</span><br></pre></td></tr></table></figure>
+
+<ol start="2">
+<li>上述的@ObserveV2 和@Trace 只能用于监听对象的属性，但是如果对象本身发生了变化，那 UI 不会刷新，如下代码点击“修改整体”， UI 不会刷新</li>
+</ol>
+<figure class="highlight reasonml"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br></pre></td><td class="code"><pre><span class="line">@Entry</span><br><span class="line">@ComponentV2</span><br><span class="line"><span class="keyword">struct</span> Index &#123;</span><br><span class="line"></span><br><span class="line">  student: Student = <span class="keyword">new</span> <span class="constructor">Student(<span class="string">&quot;John&quot;</span>,18, <span class="params">new</span> Grade(3,<span class="string">&quot;B&quot;</span>)</span>)</span><br><span class="line"></span><br><span class="line">  build<span class="literal">()</span> &#123;</span><br><span class="line">      <span class="constructor">Column(&#123; <span class="params">space</span>: 20 &#125;)</span> &#123;</span><br><span class="line">        <span class="constructor">Blank()</span></span><br><span class="line">        <span class="constructor">Text(<span class="string">&quot;Name: &quot;</span> + <span class="params">this</span>.<span class="params">student</span>.<span class="params">name</span>)</span></span><br><span class="line">          .font<span class="constructor">Weight(FontWeight.Bold)</span></span><br><span class="line">        <span class="constructor">Text(<span class="string">&quot;Age: &quot;</span> + <span class="params">this</span>.<span class="params">student</span>.<span class="params">age</span>)</span></span><br><span class="line">          .font<span class="constructor">Weight(FontWeight.Bold)</span></span><br><span class="line">        <span class="constructor">Row(&#123; <span class="params">space</span>: 20&#125;)</span> &#123;</span><br><span class="line">          <span class="constructor">Text(<span class="string">&quot;Grade: &quot;</span> + <span class="params">this</span>.<span class="params">student</span>.<span class="params">grade</span>.<span class="params">grade</span>)</span></span><br><span class="line">            .font<span class="constructor">Weight(FontWeight.Bold)</span></span><br><span class="line">          <span class="constructor">Text(<span class="string">&quot;Class: &quot;</span> + <span class="params">this</span>.<span class="params">student</span>.<span class="params">grade</span>.<span class="params">name</span>)</span></span><br><span class="line">            .font<span class="constructor">Weight(FontWeight.Bold)</span></span><br><span class="line">        &#125;</span><br><span class="line">        <span class="constructor">Button(<span class="string">&quot;修改整体&quot;</span>)</span></span><br><span class="line">          .on<span class="constructor">Click(()</span> =&gt; &#123;</span><br><span class="line">            this.student = <span class="keyword">new</span> <span class="constructor">Student(<span class="string">&quot;Date&quot;</span>, 23, <span class="params">new</span> Grade(23, <span class="string">&quot;None&quot;</span>)</span>)</span><br><span class="line">          &#125;)</span><br><span class="line">        <span class="constructor">Blank()</span></span><br><span class="line">      &#125;</span><br><span class="line">      .width(<span class="string">&quot;100%&quot;</span>)</span><br><span class="line">      .height(&#x27;<span class="number">100</span>%&#x27;)</span><br><span class="line">  &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<h2 id="解决-1"><a href="#解决-1" class="headerlink" title="解决"></a>解决</h2><p>使用@Local</p>
+<figure class="highlight haxe"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">@Local student: <span class="type">Student </span>= <span class="keyword">new</span> <span class="type">Student</span>(<span class="string">&quot;John&quot;</span>,<span class="number">18</span>, <span class="keyword">new</span> <span class="type">Grade</span>(<span class="number">3</span>,<span class="string">&quot;B&quot;</span>))</span><br></pre></td></tr></table></figure>
+
+<h1 id="Param"><a href="#Param" class="headerlink" title="@Param"></a>@Param</h1><p>搭配@Local 使用，用于父子组件数据单向传递，复杂类型比起@Prop 性能更好</p>
+<blockquote>
+<p>@Require 表示必须外部传入，本地不用初始化</p>
+</blockquote>
+<figure class="highlight reasonml"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br></pre></td><td class="code"><pre><span class="line">@Entry</span><br><span class="line">@ComponentV2</span><br><span class="line"><span class="keyword">struct</span> Index &#123;</span><br><span class="line"></span><br><span class="line">  @Local student: Student = <span class="keyword">new</span> <span class="constructor">Student(<span class="string">&quot;John&quot;</span>,18, <span class="params">new</span> Grade(3,<span class="string">&quot;B&quot;</span>)</span>)</span><br><span class="line"></span><br><span class="line">  build<span class="literal">()</span> &#123;</span><br><span class="line">      <span class="constructor">Column(&#123; <span class="params">space</span>: 20 &#125;)</span> &#123;</span><br><span class="line">        <span class="constructor">Blank()</span></span><br><span class="line">        <span class="constructor">Info(&#123; <span class="params">student</span>: <span class="params">this</span>.<span class="params">student</span> &#125;)</span></span><br><span class="line">        <span class="constructor">Button(<span class="string">&quot;修改整体&quot;</span>)</span></span><br><span class="line">          .on<span class="constructor">Click(()</span> =&gt; &#123;</span><br><span class="line">            this.student = <span class="keyword">new</span> <span class="constructor">Student(<span class="string">&quot;Date&quot;</span>, 23, <span class="params">new</span> Grade(23, <span class="string">&quot;None&quot;</span>)</span>)</span><br><span class="line">          &#125;)</span><br><span class="line">        <span class="constructor">Blank()</span></span><br><span class="line">      &#125;</span><br><span class="line">      .width(<span class="string">&quot;100%&quot;</span>)</span><br><span class="line">      .height(&#x27;<span class="number">100</span>%&#x27;)</span><br><span class="line">  &#125;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line">@ComponentV2</span><br><span class="line"><span class="keyword">struct</span> Info &#123;</span><br><span class="line">  @Require @Param student: Student</span><br><span class="line">  build<span class="literal">()</span> &#123;</span><br><span class="line">    <span class="constructor">Column(&#123; <span class="params">space</span>: 20 &#125;)</span> &#123;</span><br><span class="line">      <span class="constructor">Text(<span class="string">&quot;Name: &quot;</span> + <span class="params">this</span>.<span class="params">student</span>.<span class="params">name</span>)</span></span><br><span class="line">        .font<span class="constructor">Weight(FontWeight.Bold)</span></span><br><span class="line">      <span class="constructor">Text(<span class="string">&quot;Age: &quot;</span> + <span class="params">this</span>.<span class="params">student</span>.<span class="params">age</span>)</span></span><br><span class="line">        .font<span class="constructor">Weight(FontWeight.Bold)</span></span><br><span class="line">      <span class="constructor">Row(&#123; <span class="params">space</span>: 20&#125;)</span> &#123;</span><br><span class="line">        <span class="constructor">Text(<span class="string">&quot;Grade: &quot;</span> + <span class="params">this</span>.<span class="params">student</span>.<span class="params">grade</span>.<span class="params">grade</span>)</span></span><br><span class="line">          .font<span class="constructor">Weight(FontWeight.Bold)</span></span><br><span class="line">        <span class="constructor">Text(<span class="string">&quot;Class: &quot;</span> + <span class="params">this</span>.<span class="params">student</span>.<span class="params">grade</span>.<span class="params">name</span>)</span></span><br><span class="line">          .font<span class="constructor">Weight(FontWeight.Bold)</span></span><br><span class="line">      &#125;</span><br><span class="line">    &#125;</span><br><span class="line">  &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>@Param 修饰的属性如果是对象的话，可以在子组件内部修改对象的成员属性，此时会同步到父组件<br>但是不可以修改对象本身</p>
+<h1 id="Once"><a href="#Once" class="headerlink" title="@Once"></a>@Once</h1><p>修饰@Param 修饰的属性，表示属性只能被初始化一次，后面不再改变，就算子组件或者父组件修改了这个属性，值也不会改变</p>
+<figure class="highlight less"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line"><span class="variable">@ComponentV2</span></span><br><span class="line">struct Info &#123;</span><br><span class="line">  <span class="variable">@Require</span> <span class="variable">@Param</span> <span class="attribute">student</span>: Student;</span><br><span class="line">  <span class="variable">@Once</span> <span class="variable">@Param</span> <span class="attribute">type</span>: number;</span><br><span class="line">  ...</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<h1 id="Event"><a href="#Event" class="headerlink" title="@Event"></a>@Event</h1><p>因为@Param 修饰的变量不可以在子组件修改，所以推出@Event 补充这个功能<br>使用方法是修饰一个方法类型，回调属性回去给父组件进行修改<br>@Event 只能修饰方法类型<br>@Event 更多只是作为一种规范，其实不加这个修饰符也行</p>
+<figure class="highlight reasonml"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br></pre></td><td class="code"><pre><span class="line">@Entry</span><br><span class="line">@ComponentV2</span><br><span class="line"><span class="keyword">struct</span> Index &#123;</span><br><span class="line"></span><br><span class="line">  @Local student: Student = <span class="keyword">new</span> <span class="constructor">Student(<span class="string">&quot;John&quot;</span>,18, <span class="params">new</span> Grade(3,<span class="string">&quot;B&quot;</span>)</span>)</span><br><span class="line"></span><br><span class="line">  build<span class="literal">()</span> &#123;</span><br><span class="line">      <span class="constructor">Column(&#123; <span class="params">space</span>: 20 &#125;)</span> &#123;</span><br><span class="line">        <span class="constructor">Blank()</span></span><br><span class="line">        <span class="constructor">Info(&#123; <span class="params">student</span>: <span class="params">this</span>.<span class="params">student</span>, <span class="params">change</span>: (<span class="params">student</span>: Student)</span> =&gt; &#123;</span><br><span class="line">            this.student = student</span><br><span class="line">        &#125;&#125;)</span><br><span class="line">        <span class="constructor">Blank()</span></span><br><span class="line">      &#125;</span><br><span class="line">      .width(<span class="string">&quot;100%&quot;</span>)</span><br><span class="line">      .height(&#x27;<span class="number">100</span>%&#x27;)</span><br><span class="line">  &#125;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line">@ComponentV2</span><br><span class="line"><span class="keyword">struct</span> Info &#123;</span><br><span class="line">  @Require @Param student: Student</span><br><span class="line">  @Event change:<span class="function"> (<span class="params">x</span>: S<span class="params">tudent</span>) =&gt;</span> void =<span class="function"> <span class="params">()</span> =&gt;</span> &#123;&#125;</span><br><span class="line">  build<span class="literal">()</span> &#123;</span><br><span class="line">    <span class="constructor">Column(&#123; <span class="params">space</span>: 20 &#125;)</span> &#123;</span><br><span class="line">      <span class="constructor">Text(<span class="string">&quot;Name: &quot;</span> + <span class="params">this</span>.<span class="params">student</span>.<span class="params">name</span>)</span></span><br><span class="line">        .font<span class="constructor">Weight(FontWeight.Bold)</span></span><br><span class="line">      <span class="constructor">Text(<span class="string">&quot;Age: &quot;</span> + <span class="params">this</span>.<span class="params">student</span>.<span class="params">age</span>)</span></span><br><span class="line">        .font<span class="constructor">Weight(FontWeight.Bold)</span></span><br><span class="line">        .on<span class="constructor">Click(()</span> =&gt; &#123;</span><br><span class="line">          <span class="comment">// 无效代码：this.student = new Student(&quot;Info&quot;, 33, new Grade(33, &quot;Info What&quot;))</span></span><br><span class="line">          this.change( <span class="keyword">new</span> <span class="constructor">Student(<span class="string">&quot;Info&quot;</span>, 33, <span class="params">new</span> Grade(33, <span class="string">&quot;Info What&quot;</span>)</span>) )</span><br><span class="line">        &#125;)</span><br><span class="line">      <span class="constructor">Row(&#123; <span class="params">space</span>: 20&#125;)</span> &#123;</span><br><span class="line">        <span class="constructor">Text(<span class="string">&quot;Grade: &quot;</span> + <span class="params">this</span>.<span class="params">student</span>.<span class="params">grade</span>.<span class="params">grade</span>)</span></span><br><span class="line">          .font<span class="constructor">Weight(FontWeight.Bold)</span></span><br><span class="line">        <span class="constructor">Text(<span class="string">&quot;Class: &quot;</span> + <span class="params">this</span>.<span class="params">student</span>.<span class="params">grade</span>.<span class="params">name</span>)</span></span><br><span class="line">          .font<span class="constructor">Weight(FontWeight.Bold)</span></span><br><span class="line">      &#125;.on<span class="constructor">Click(()</span> =&gt; &#123;</span><br><span class="line">        this.student.name = <span class="string">&quot;Info Name&quot;</span></span><br><span class="line">      &#125;)</span><br><span class="line">    &#125;</span><br><span class="line">  &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<h1 id="！！"><a href="#！！" class="headerlink" title="！！"></a>！！</h1><p>配合@Event 和@Param 进行父子组件双向绑定<br>子组件需要定义一个@Param 属性和一个同名@Event 并加上$，在点击按钮的时候调用@Event 的属性回调新值出去</p>
+<figure class="highlight coffeescript"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br></pre></td><td class="code"><pre><span class="line">@ComponentV2</span><br><span class="line">struct Info &#123;</span><br><span class="line">  @Require @Param student: Student;</span><br><span class="line">  @Event $student: <span class="function"><span class="params">(x: Student)</span> =&gt;</span> <span class="keyword">void</span> = <span class="function"><span class="params">(x: Student)</span> =&gt;</span> &#123;&#125;</span><br><span class="line">  build() &#123;</span><br><span class="line">      Button(<span class="string">&quot;Change Student&quot;</span>)</span><br><span class="line">        .onClick(<span class="function"><span class="params">()</span> =&gt;</span> &#123;</span><br><span class="line">          <span class="regexp">//</span> 无效代码：<span class="built_in">this</span>.student = <span class="keyword">new</span> Student(<span class="string">&quot;Info&quot;</span>, <span class="number">33</span>, <span class="keyword">new</span> Grade(<span class="number">33</span>, <span class="string">&quot;Info What&quot;</span>))</span><br><span class="line">          <span class="built_in">this</span>.$student(<span class="keyword">new</span> Student(<span class="string">&quot;Info&quot;</span>, <span class="number">33</span>, <span class="keyword">new</span> Grade(<span class="number">33</span>, <span class="string">&quot;Info What&quot;</span>)))</span><br><span class="line">        &#125;)</span><br><span class="line">    &#125;</span><br><span class="line"> &#125;</span><br></pre></td></tr></table></figure>
+<p>父组件传参数给子组件的时候加上！！</p>
+<figure class="highlight less"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br></pre></td><td class="code"><pre><span class="line"><span class="variable">@Entry</span></span><br><span class="line"><span class="variable">@ComponentV2</span></span><br><span class="line">struct Index &#123;</span><br><span class="line"></span><br><span class="line">  <span class="variable">@Local</span> <span class="attribute">student</span>: Student = new Student(<span class="string">&quot;John&quot;</span>,<span class="number">18</span>, new Grade(<span class="number">3</span>,<span class="string">&quot;B&quot;</span>))</span><br><span class="line"></span><br><span class="line">  build() &#123;</span><br><span class="line">      <span class="selector-tag">Column</span>(&#123; space: 20 &#125;) &#123;</span><br><span class="line">        <span class="selector-tag">Blank</span>()</span><br><span class="line">        <span class="selector-tag">Info</span>(&#123; student: this.student!! &#125;)</span><br><span class="line">        <span class="selector-tag">Blank</span>()</span><br><span class="line">      &#125;</span><br><span class="line">      <span class="selector-class">.width</span>(<span class="string">&quot;100%&quot;</span>)</span><br><span class="line">      <span class="selector-class">.height</span>(<span class="string">&#x27;100%&#x27;</span>)</span><br><span class="line">  &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>实现效果为子组件修改传入的属性本身的时候，父子组件的属性值同时发生变化</p>
+<h1 id="Computed"><a href="#Computed" class="headerlink" title="@Computed"></a>@Computed</h1><p>@Compute 可以把某个属性标记为计算属性，如下代码的 sum，注意此时 sum 不是方法，sum 依旧作为属性存在<br>当点击“修改 Grade”的时候，页面发生变化，实时显示 sum 计算后的结果，并且多次点击，不会重复执行 get 方法体<br>注意：sum 会发生变化的前提是，参与 sum 计算的属性需要被@Trace 修饰，如果参与 sum 计算的属性没有被监听的能力的话，那就不会触发计算方法</p>
+<figure class="highlight typescript"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">@Entry</span></span><br><span class="line"><span class="meta">@ComponentV2</span></span><br><span class="line">struct Index &#123;</span><br><span class="line"></span><br><span class="line">  <span class="meta">@Local</span> student: Student = <span class="keyword">new</span> Student(<span class="string">&quot;John&quot;</span>,<span class="number">18</span>, <span class="keyword">new</span> Grade(<span class="number">3</span>,<span class="string">&quot;B&quot;</span>))</span><br><span class="line">  <span class="meta">@Computed</span> <span class="keyword">get</span> <span class="title">sum</span>() &#123;</span><br><span class="line">      <span class="keyword">let</span> result = <span class="built_in">this</span>.student.age + <span class="built_in">this</span>.student.grade.grade</span><br><span class="line">      <span class="built_in">console</span>.log(<span class="string">`result = <span class="subst">$&#123;result&#125;</span>`</span>)</span><br><span class="line">      <span class="keyword">return</span> result</span><br><span class="line">  &#125;</span><br><span class="line"></span><br><span class="line">  <span class="function"><span class="title">build</span>(<span class="params"></span>)</span> &#123;</span><br><span class="line">      <span class="function"><span class="title">Column</span>(<span class="params">&#123; space: <span class="number">20</span> &#125;</span>)</span> &#123;</span><br><span class="line">        Blank()</span><br><span class="line">        Text(<span class="string">`sum <span class="subst">$&#123;<span class="built_in">this</span>.sum&#125;</span>`</span>)</span><br><span class="line">          .fontWeight(FontWeight.Medium)</span><br><span class="line">        Button(<span class="string">&quot;修改Grade&quot;</span>)</span><br><span class="line">          .onClick(<span class="function">() =&gt;</span> &#123;</span><br><span class="line">            <span class="built_in">this</span>.student.grade.grade = <span class="number">30</span></span><br><span class="line">          &#125;)</span><br><span class="line">        Blank()</span><br><span class="line">      &#125;</span><br><span class="line">      .width(<span class="string">&quot;100%&quot;</span>)</span><br><span class="line">      .height(<span class="string">&#x27;100%&#x27;</span>)</span><br><span class="line">  &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<h1 id="Provider-和-Consumer"><a href="#Provider-和-Consumer" class="headerlink" title="@Provider 和@Consumer"></a>@Provider 和@Consumer</h1><h2 id="使用"><a href="#使用" class="headerlink" title="使用"></a>使用</h2><ol>
+<li>用于父组件和子孙组件跨层级数据沟通，只要在同个层级树上，都可以获取到对应的数据</li>
+<li>如下代码，点击 Change 按钮的时候，父组件和孙组件的 student2.name 都会更新 UI（前提是 name 属性加上了@Trace）</li>
+</ol>
+<p>也可以直接更新 student2 本身<br>3. 因为是跨组件传递，所以即使 Info 组件不声明 student2 属性，OtherInfo 组件也可以通过@Comsumer 得到祖父组件的值</p>
+<figure class="highlight reasonml"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br></pre></td><td class="code"><pre><span class="line">@Entry</span><br><span class="line">@ComponentV2</span><br><span class="line"><span class="keyword">struct</span> Index &#123;</span><br><span class="line"></span><br><span class="line">  @Local student: Student = <span class="keyword">new</span> <span class="constructor">Student(<span class="string">&quot;John&quot;</span>,18, <span class="params">new</span> Grade(3,<span class="string">&quot;B&quot;</span>)</span>)</span><br><span class="line"></span><br><span class="line">  @<span class="constructor">Provider()</span> student2: Student = <span class="keyword">new</span> <span class="constructor">Student(<span class="string">&quot;Mary&quot;</span>,20, <span class="params">new</span> Grade(4,<span class="string">&quot;B&quot;</span>)</span>)</span><br><span class="line"></span><br><span class="line">  build<span class="literal">()</span> &#123;</span><br><span class="line">      <span class="constructor">Column(&#123; <span class="params">space</span>: 20 &#125;)</span> &#123;</span><br><span class="line">        <span class="constructor">Blank()</span></span><br><span class="line">        <span class="constructor">Text(`<span class="params">name</span>: $&#123;<span class="params">this</span>.<span class="params">student2</span>.<span class="params">name</span>&#125;`)</span></span><br><span class="line">        <span class="constructor">Text(`<span class="params">age</span>: $&#123;<span class="params">this</span>.<span class="params">student2</span>.<span class="params">age</span>&#125;`)</span></span><br><span class="line">        <span class="constructor">Info()</span></span><br><span class="line">        <span class="constructor">Blank()</span></span><br><span class="line">      &#125;</span><br><span class="line">      .width(<span class="string">&quot;100%&quot;</span>)</span><br><span class="line">      .height(&#x27;<span class="number">100</span>%&#x27;)</span><br><span class="line">  &#125;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line">@ComponentV2</span><br><span class="line"><span class="keyword">struct</span> Info &#123;</span><br><span class="line"></span><br><span class="line">  @<span class="constructor">Consumer()</span> student2: Student = <span class="keyword">new</span> <span class="constructor">Student(<span class="string">&quot;&quot;</span>,0,<span class="params">new</span> Grade(0,<span class="string">&quot;&quot;</span>)</span>)</span><br><span class="line"></span><br><span class="line">  build<span class="literal">()</span> &#123;</span><br><span class="line">    <span class="constructor">Column(&#123; <span class="params">space</span>: 20 &#125;)</span> &#123;</span><br><span class="line">      <span class="constructor">OtherInfo()</span></span><br><span class="line">      <span class="constructor">Button(<span class="string">&quot;Change&quot;</span>)</span></span><br><span class="line">        .on<span class="constructor">Click(()</span> =&gt; &#123;</span><br><span class="line">          this.student2.name = <span class="string">&quot;Sarah&quot;</span></span><br><span class="line">        &#125;)</span><br><span class="line">    &#125;</span><br><span class="line">  &#125;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line">@ComponentV2</span><br><span class="line"><span class="keyword">struct</span> OtherInfo &#123;</span><br><span class="line"></span><br><span class="line">  @<span class="constructor">Consumer()</span> student2: Student = <span class="keyword">new</span> <span class="constructor">Student(<span class="string">&quot;&quot;</span>,0,<span class="params">new</span> Grade(0,<span class="string">&quot;&quot;</span>)</span>)</span><br><span class="line"></span><br><span class="line">  build<span class="literal">()</span> &#123;</span><br><span class="line">    <span class="constructor">Row(&#123;<span class="params">space</span>: 20&#125;)</span> &#123;</span><br><span class="line">      <span class="constructor">Text(`<span class="params">name</span>: $&#123;<span class="params">this</span>.<span class="params">student2</span>.<span class="params">name</span>&#125;`)</span></span><br><span class="line">      <span class="constructor">Text(`<span class="params">age</span>: $&#123;<span class="params">this</span>.<span class="params">student2</span>.<span class="params">age</span>&#125;`)</span></span><br><span class="line">    &#125;</span><br><span class="line">    .background<span class="constructor">Color(Color.Red)</span></span><br><span class="line">  &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<h2 id="别名"><a href="#别名" class="headerlink" title="别名"></a>别名</h2><p>@Provider 加上别名改为 stu, 那么子组件也要改成 stu 才能访问得到，如果还是使用 student2，则反问不到<br>同理@Consumer 也可以加上别名，那么孙组件的@Comsumer 就得对应改成相应的别名</p>
+<figure class="highlight reasonml"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br></pre></td><td class="code"><pre><span class="line">@Entry</span><br><span class="line">@ComponentV2</span><br><span class="line"><span class="keyword">struct</span> Index &#123;</span><br><span class="line"></span><br><span class="line">  @<span class="constructor">Provider(&#x27;<span class="params">stu</span>&#x27;)</span> student2: Student = <span class="keyword">new</span> <span class="constructor">Student(<span class="string">&quot;Mary&quot;</span>,20, <span class="params">new</span> Grade(4,<span class="string">&quot;B&quot;</span>)</span>)</span><br><span class="line"></span><br><span class="line">  build<span class="literal">()</span> &#123;</span><br><span class="line">      <span class="constructor">Column(&#123; <span class="params">space</span>: 20 &#125;)</span> &#123;</span><br><span class="line">        <span class="constructor">Blank()</span></span><br><span class="line">        <span class="constructor">Text(`<span class="params">name</span>: $&#123;<span class="params">this</span>.<span class="params">student2</span>.<span class="params">name</span>&#125;`)</span></span><br><span class="line">        <span class="constructor">Text(`<span class="params">age</span>: $&#123;<span class="params">this</span>.<span class="params">student2</span>.<span class="params">age</span>&#125;`)</span></span><br><span class="line">        <span class="constructor">Info()</span></span><br><span class="line">        <span class="constructor">Blank()</span></span><br><span class="line">      &#125;</span><br><span class="line">      .width(<span class="string">&quot;100%&quot;</span>)</span><br><span class="line">      .height(&#x27;<span class="number">100</span>%&#x27;)</span><br><span class="line">  &#125;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line">@ComponentV2</span><br><span class="line"><span class="keyword">struct</span> Info &#123;</span><br><span class="line"></span><br><span class="line">  @<span class="constructor">Consumer()</span> stu: Student = <span class="keyword">new</span> <span class="constructor">Student(<span class="string">&quot;&quot;</span>,0,<span class="params">new</span> Grade(0,<span class="string">&quot;&quot;</span>)</span>)</span><br><span class="line"></span><br><span class="line">  build<span class="literal">()</span> &#123;</span><br><span class="line">    <span class="constructor">Column(&#123; <span class="params">space</span>: 20 &#125;)</span> &#123;</span><br><span class="line">      <span class="constructor">OtherInfo()</span></span><br><span class="line">      <span class="constructor">Button(<span class="string">&quot;Change&quot;</span>)</span></span><br><span class="line">        .on<span class="constructor">Click(()</span> =&gt; &#123;</span><br><span class="line">          this.student2 =  <span class="keyword">new</span> <span class="constructor">Student(<span class="string">&quot;333&quot;</span>,0,<span class="params">new</span> Grade(0,<span class="string">&quot;222&quot;</span>)</span>)</span><br><span class="line">        &#125;)</span><br><span class="line">    &#125;</span><br><span class="line">  &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<h1 id="Monitor"><a href="#Monitor" class="headerlink" title="@Monitor"></a>@Monitor</h1><h2 id="介绍"><a href="#介绍" class="headerlink" title="介绍"></a>介绍</h2><p>可以在类或者结构体中监听某个属性或者某个对象的属性，只能修饰方法，并且方法固定一个参数为 IMoitor<br>相比起 V1 的@Watch 功能更加强大，可以获取到更新前后的值<br>IMonitor 类型:   IMonitor 类型的变量用作@Monitor 装饰方法的参数。</p>
+<table>
+<thead>
+<tr>
+<th align="center">属性</th>
+<th align="center">类型</th>
+<th align="center">参数</th>
+<th align="center">返回值</th>
+<th align="center">说明</th>
+</tr>
+</thead>
+<tbody><tr>
+<td align="center">dirty</td>
+<td align="center">Array<string></td>
+<td align="center">无</td>
+<td align="center">无</td>
+<td align="center">保存发生变化的属性名。</td>
+</tr>
+<tr>
+<td align="center">value<T></td>
+<td align="center">function</td>
+<td align="center">path?: string</td>
+<td align="center">IMonitorValue<T></td>
+<td align="center">获得指定属性（path）的变化信息。当不填 path 时返回@Monitor 监听顺序中第一个改变的属性的变化信息。</td>
+</tr>
+</tbody></table>
+<p>IMonitorValue<T>类型:  IMonitorValue<T>类型保存了属性变化的信息，包括属性名、变化前值、当前值。</p>
+<table>
+<thead>
+<tr>
+<th align="center">属性</th>
+<th align="center">类型</th>
+<th align="center">说明</th>
+</tr>
+</thead>
+<tbody><tr>
+<td align="center">before</td>
+<td align="center">T</td>
+<td align="center">监听属性变化之前的值。</td>
+</tr>
+<tr>
+<td align="center">now</td>
+<td align="center">T</td>
+<td align="center">监听属性变化之后的当前值。</td>
+</tr>
+<tr>
+<td align="center">path</td>
+<td align="center">string</td>
+<td align="center">监听的属性名。</td>
+</tr>
+</tbody></table>
+<h2 id="使用-1"><a href="#使用-1" class="headerlink" title="使用"></a>使用</h2><ol>
+<li>使用@Monitor 加上要监听的属性名，如果是监听对象的属性，就使用点语法（需要属性被@Trace 修饰）</li>
+<li>监听数组的时候可以用.0、.1 的方式表示要监听的内容下标，比如@Monitor(“dimensionTwo.0.0”, “dimensionTwo.1.1”)</li>
+<li>监听多个属性用逗号分隔</li>
+<li>可以用多个@Monitor，但是如果监听同个属性，那么只有最后一个方法会生效</li>
+<li>如果监听的对象变了，但是对象里面的所有属性都与变化前的一致，那么不会触发监听回调</li>
+<li>监听时标记的要监听的属性字符串需要初始化时确定，初始化后无法修改监听的属性。</li>
+</ol>
+<figure class="highlight typescript"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">@Entry</span></span><br><span class="line"><span class="meta">@ComponentV2</span></span><br><span class="line">struct Index &#123;</span><br><span class="line"></span><br><span class="line">  <span class="meta">@Local</span> student: Student = <span class="keyword">new</span> Student(<span class="string">&quot;John&quot;</span>,<span class="number">18</span>, <span class="keyword">new</span> Grade(<span class="number">3</span>,<span class="string">&quot;B&quot;</span>))</span><br><span class="line"></span><br><span class="line">  <span class="meta">@Local</span> count: <span class="built_in">number</span> = <span class="number">20</span></span><br><span class="line"></span><br><span class="line">  <span class="meta">@Monitor</span>(<span class="string">&quot;student.name&quot;</span>, <span class="string">&quot;count&quot;</span>)</span><br><span class="line">  <span class="function"><span class="title">onChange</span>(<span class="params">monitor: IMonitor</span>)</span> &#123;</span><br><span class="line">    monitor.dirty.forEach(<span class="function">(<span class="params">path: <span class="built_in">string</span></span>) =&gt;</span> &#123;</span><br><span class="line">      <span class="built_in">console</span>.log(<span class="string">`<span class="subst">$&#123;path&#125;</span> change from <span class="subst">$&#123;monitor.value(path)?.before&#125;</span> to <span class="subst">$&#123;monitor.value(path)?.now&#125;</span>`</span>)</span><br><span class="line">    &#125;)</span><br><span class="line">  &#125;</span><br><span class="line"></span><br><span class="line">  <span class="function"><span class="title">build</span>(<span class="params"></span>)</span> &#123;</span><br><span class="line">      <span class="function"><span class="title">Column</span>(<span class="params">&#123; space: <span class="number">20</span> &#125;</span>)</span> &#123;</span><br><span class="line">        Blank()</span><br><span class="line">        Text(<span class="string">&quot;Name: &quot;</span> + <span class="built_in">this</span>.student.name)</span><br><span class="line">          .fontWeight(FontWeight.Bold)</span><br><span class="line">        Button(<span class="string">&quot;修改count&quot;</span>)</span><br><span class="line">          .onClick(<span class="function">() =&gt;</span> &#123;</span><br><span class="line">            <span class="built_in">this</span>.count += <span class="number">1</span></span><br><span class="line">            <span class="built_in">this</span>.student.age = <span class="built_in">this</span>.count</span><br><span class="line">            <span class="built_in">this</span>.student.name = <span class="string">`name_<span class="subst">$&#123;<span class="built_in">this</span>.count&#125;</span>`</span></span><br><span class="line">          &#125;)</span><br><span class="line">        Blank()</span><br><span class="line">      &#125;</span><br><span class="line">      .width(<span class="string">&quot;100%&quot;</span>)</span><br><span class="line">      .height(<span class="string">&#x27;100%&#x27;</span>)</span><br><span class="line">  &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<h2 id="Type"><a href="#Type" class="headerlink" title="@Type"></a>@Type</h2><p>当持久化数据的时候，遇到嵌套属性，需要标记为@Type，目的是反序列化的时候能够保持原来的类型信息<br>这样子使用 PersistenceV2 获取数据的时候能够维持原数据结构</p>
+<figure class="highlight typescript"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">import</span> &#123; Type &#125; <span class="keyword">from</span> <span class="string">&#x27;@kit.ArkUI&#x27;</span>;</span><br><span class="line"></span><br><span class="line"><span class="comment">// 数据中心</span></span><br><span class="line"><span class="meta">@ObservedV2</span></span><br><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">SampleChild</span> </span>&#123;</span><br><span class="line">  <span class="meta">@Trace</span> p1: <span class="built_in">number</span> = <span class="number">0</span>;</span><br><span class="line">  p2: <span class="built_in">number</span> = <span class="number">10</span>;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="meta">@ObservedV2</span></span><br><span class="line"><span class="keyword">export</span> <span class="class"><span class="keyword">class</span> <span class="title">Sample</span> </span>&#123;</span><br><span class="line">  <span class="comment">// 对于复杂对象需要@Type修饰，确保序列化成功</span></span><br><span class="line">  <span class="meta">@Type</span>(SampleChild)</span><br><span class="line">  <span class="meta">@Trace</span> f: SampleChild = <span class="keyword">new</span> SampleChild();</span><br><span class="line">&#125;</span><br><span class="line"><span class="keyword">import</span> &#123; PersistenceV2 &#125; <span class="keyword">from</span> <span class="string">&#x27;@kit.ArkUI&#x27;</span>;</span><br><span class="line"><span class="keyword">import</span> &#123; Sample &#125; <span class="keyword">from</span> <span class="string">&#x27;../Sample&#x27;</span>;</span><br><span class="line"></span><br><span class="line"><span class="meta">@Entry</span></span><br><span class="line"><span class="meta">@ComponentV2</span></span><br><span class="line">struct Page &#123;</span><br><span class="line">  prop: Sample = PersistenceV2.connect(Sample, <span class="function">() =&gt;</span> <span class="keyword">new</span> Sample())!;</span><br><span class="line"></span><br><span class="line">  <span class="function"><span class="title">build</span>(<span class="params"></span>)</span> &#123;</span><br><span class="line">    <span class="function"><span class="title">Column</span>(<span class="params"></span>)</span> &#123;</span><br><span class="line">      Text(<span class="string">`Page1 add 1 to prop.p1: <span class="subst">$&#123;<span class="built_in">this</span>.prop.f.p1&#125;</span>`</span>)</span><br><span class="line">        .fontSize(<span class="number">30</span>)</span><br><span class="line">        .onClick(<span class="function">() =&gt;</span> &#123;</span><br><span class="line">          <span class="built_in">this</span>.prop.f.p1++;</span><br><span class="line">        &#125;)</span><br><span class="line">    &#125;</span><br><span class="line">  &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+    </div>
+
+    
+    
+    
+
+      <footer class="post-footer">
+          <div class="post-tags">
+              <a href="/tags/Harmony/" rel="tag"># Harmony</a>
+          </div>
+
+        
+
+
+        
+    <div class="post-nav">
+      <div class="post-nav-item">
+    <a href="/post/feb7c155.html" rel="prev" title="Swift6新特性">
+      <i class="fa fa-chevron-left"></i> Swift6新特性
+    </a></div>
+      <div class="post-nav-item"></div>
+    </div>
+      </footer>
+    
+  </article>
+  
+  
+  
+
+
+
+          </div>
+          
+    <div class="comments" id="gitalk-container"></div>
+
+<script>
+  window.addEventListener('tabs:register', () => {
+    let { activeClass } = CONFIG.comments;
+    if (CONFIG.comments.storage) {
+      activeClass = localStorage.getItem('comments_active') || activeClass;
+    }
+    if (activeClass) {
+      let activeTab = document.querySelector(`a[href="#comment-${activeClass}"]`);
+      if (activeTab) {
+        activeTab.click();
+      }
+    }
+  });
+  if (CONFIG.comments.storage) {
+    window.addEventListener('tabs:click', event => {
+      if (!event.target.matches('.tabs-comment .tab-content .tab-pane')) return;
+      let commentClass = event.target.classList[1];
+      localStorage.setItem('comments_active', commentClass);
+    });
+  }
+</script>
+
+        </div>
+          
+  
+  <div class="toggle sidebar-toggle">
+    <span class="toggle-line toggle-line-first"></span>
+    <span class="toggle-line toggle-line-middle"></span>
+    <span class="toggle-line toggle-line-last"></span>
+  </div>
+
+  <aside class="sidebar">
+    <div class="sidebar-inner">
+
+      <ul class="sidebar-nav motion-element">
+        <li class="sidebar-nav-toc">
+          文章目录
+        </li>
+        <li class="sidebar-nav-overview">
+          站点概览
+        </li>
+      </ul>
+
+      <!--noindex-->
+      <div class="post-toc-wrap sidebar-panel">
+          <div class="post-toc motion-element"><ol class="nav"><li class="nav-item nav-level-1"><a class="nav-link" href="#%E5%89%8D%E6%8F%90"><span class="nav-number">1.</span> <span class="nav-text">前提</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#ObservedV2"><span class="nav-number">2.</span> <span class="nav-text">@ObservedV2</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#%E9%97%AE%E9%A2%98"><span class="nav-number">2.1.</span> <span class="nav-text">问题</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E8%A7%A3%E5%86%B3"><span class="nav-number">2.2.</span> <span class="nav-text">解决</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E5%85%B6%E4%BB%96"><span class="nav-number">2.3.</span> <span class="nav-text">其他</span></a></li></ol></li><li class="nav-item nav-level-1"><a class="nav-link" href="#Local"><span class="nav-number">3.</span> <span class="nav-text">@Local</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#%E9%97%AE%E9%A2%98-1"><span class="nav-number">3.1.</span> <span class="nav-text">问题</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E8%A7%A3%E5%86%B3-1"><span class="nav-number">3.2.</span> <span class="nav-text">解决</span></a></li></ol></li><li class="nav-item nav-level-1"><a class="nav-link" href="#Param"><span class="nav-number">4.</span> <span class="nav-text">@Param</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#Once"><span class="nav-number">5.</span> <span class="nav-text">@Once</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#Event"><span class="nav-number">6.</span> <span class="nav-text">@Event</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#%EF%BC%81%EF%BC%81"><span class="nav-number">7.</span> <span class="nav-text">！！</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#Computed"><span class="nav-number">8.</span> <span class="nav-text">@Computed</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#Provider-%E5%92%8C-Consumer"><span class="nav-number">9.</span> <span class="nav-text">@Provider 和@Consumer</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#%E4%BD%BF%E7%94%A8"><span class="nav-number">9.1.</span> <span class="nav-text">使用</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E5%88%AB%E5%90%8D"><span class="nav-number">9.2.</span> <span class="nav-text">别名</span></a></li></ol></li><li class="nav-item nav-level-1"><a class="nav-link" href="#Monitor"><span class="nav-number">10.</span> <span class="nav-text">@Monitor</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#%E4%BB%8B%E7%BB%8D"><span class="nav-number">10.1.</span> <span class="nav-text">介绍</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E4%BD%BF%E7%94%A8-1"><span class="nav-number">10.2.</span> <span class="nav-text">使用</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#Type"><span class="nav-number">10.3.</span> <span class="nav-text">@Type</span></a></li></ol></li></ol></div>
+      </div>
+      <!--/noindex-->
+
+      <div class="site-overview-wrap sidebar-panel">
+        <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+    <img class="site-author-image" itemprop="image" alt="Arclin"
+      src="https://avatars.githubusercontent.com/u/12107804?v=4">
+  <p class="site-author-name" itemprop="name">Arclin</p>
+  <div class="site-description" itemprop="description">Stay hungry,stay foolish</div>
+</div>
+<div class="site-state-wrap motion-element">
+  <nav class="site-state">
+      <div class="site-state-item site-state-posts">
+          <a href="/archives/">
+        
+          <span class="site-state-item-count">102</span>
+          <span class="site-state-item-name">日志</span>
+        </a>
+      </div>
+      <div class="site-state-item site-state-categories">
+            <a href="/categories/">
+          
+        <span class="site-state-item-count">12</span>
+        <span class="site-state-item-name">分类</span></a>
+      </div>
+      <div class="site-state-item site-state-tags">
+            <a href="/tags/">
+          
+        <span class="site-state-item-count">39</span>
+        <span class="site-state-item-name">标签</span></a>
+      </div>
+  </nav>
+</div>
+  <div class="links-of-author motion-element">
+      <span class="links-of-author-item">
+        <a href="https://github.com/Arc-lin" title="GitHub → https://github.com/Arc-lin" rel="noopener" target="_blank"><i class="fab fa-github fa-fw"></i>GitHub</a>
+      </span>
+      <span class="links-of-author-item">
+        <a href="mailto:arclin325@gmail.com" title="E-Mail → mailto:arclin325@gmail.com" rel="noopener" target="_blank"><i class="fa fa-envelope fa-fw"></i>E-Mail</a>
+      </span>
+  </div>
+
+
+
+      </div>
+
+    </div>
+  </aside>
+  <div id="sidebar-dimmer"></div>
+
+
+      </div>
+    </main>
+
+    <footer class="footer">
+      <div class="footer-inner">
+        
+
+        
+
+<div class="copyright">
+  
+  &copy; 
+  <span itemprop="copyrightYear">2025</span>
+  <span class="with-love">
+    <i class="fa fa-heart"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">Arclin</span>
+</div>
+  <div class="powered-by">由 <a href="https://hexo.io" class="theme-link" rel="noopener" target="_blank">Hexo</a> & <a href="https://muse.theme-next.org" class="theme-link" rel="noopener" target="_blank">NexT.Muse</a> 强力驱动
+  </div>
+
+        
+<div class="busuanzi-count">
+  <script async src="https://busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js"></script>
+    <span class="post-meta-item" id="busuanzi_container_site_uv" style="display: none;">
+      <span class="post-meta-item-icon">
+        <i class="fa fa-user"></i>
+      </span>
+      <span class="site-uv" title="总访客量">
+        <span id="busuanzi_value_site_uv"></span>
+      </span>
+    </span>
+    <span class="post-meta-divider">|</span>
+    <span class="post-meta-item" id="busuanzi_container_site_pv" style="display: none;">
+      <span class="post-meta-item-icon">
+        <i class="fa fa-eye"></i>
+      </span>
+      <span class="site-pv" title="总访问量">
+        <span id="busuanzi_value_site_pv"></span>
+      </span>
+    </span>
+</div>
+
+
+
+
+
+
+
+
+      </div>
+    </footer>
+  </div>
+
+  
+  <script src="/lib/anime.min.js"></script>
+  <script src="//cdn.jsdelivr.net/npm/jquery@3/dist/jquery.min.js"></script>
+  <script src="//cdn.jsdelivr.net/gh/fancyapps/fancybox@3/dist/jquery.fancybox.min.js"></script>
+  <script src="/lib/velocity/velocity.min.js"></script>
+  <script src="/lib/velocity/velocity.ui.min.js"></script>
+
+<script src="/js/utils.js"></script>
+
+<script src="/js/motion.js"></script>
+
+
+<script src="/js/schemes/muse.js"></script>
+
+
+<script src="/js/next-boot.js"></script>
+
+
+
+
+  
+  <script>
+    (function(){
+      var canonicalURL, curProtocol;
+      //Get the <link> tag
+      var x=document.getElementsByTagName("link");
+		//Find the last canonical URL
+		if(x.length > 0){
+			for (i=0;i<x.length;i++){
+				if(x[i].rel.toLowerCase() == 'canonical' && x[i].href){
+					canonicalURL=x[i].href;
+				}
+			}
+		}
+    //Get protocol
+	    if (!canonicalURL){
+	    	curProtocol = window.location.protocol.split(':')[0];
+	    }
+	    else{
+	    	curProtocol = canonicalURL.split(':')[0];
+	    }
+      //Get current URL if the canonical URL does not exist
+	    if (!canonicalURL) canonicalURL = window.location.href;
+	    //Assign script content. Replace current URL with the canonical URL
+      !function(){var e=/([http|https]:\/\/[a-zA-Z0-9\_\.]+\.baidu\.com)/gi,r=canonicalURL,t=document.referrer;if(!e.test(r)){var n=(String(curProtocol).toLowerCase() === 'https')?"https://sp0.baidu.com/9_Q4simg2RQJ8t7jm9iCKT-xh_/s.gif":"//api.share.baidu.com/s.gif";t?(n+="?r="+encodeURIComponent(document.referrer),r&&(n+="&l="+r)):r&&(n+="?l="+r);var i=new Image;i.src=n}}(window);})();
+  </script>
+
+
+
+
+  
+<script src="/js/local-search.js"></script>
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+  
+
+<link rel="stylesheet" href="//cdn.jsdelivr.net/npm/gitalk@1/dist/gitalk.min.css">
+
+<script>
+NexT.utils.loadComments(document.querySelector('#gitalk-container'), () => {
+  NexT.utils.getScript('//cdn.jsdelivr.net/npm/gitalk@1/dist/gitalk.min.js', () => {
+    var gitalk = new Gitalk({
+      clientID    : 'df6d1f33bb4a66f5fa60',
+      clientSecret: '5fcc9fb756ac9d4b16381288da7b29f691b45e0a',
+      repo        : 'arc-lin.github.io',
+      owner       : 'Arc-lin',
+      admin       : ['Arc-lin'],
+      id          : '794e68dbe83677a1a20ee527c9e3fdc7',
+        language: 'zh-CN',
+      distractionFreeMode: false
+    });
+    gitalk.render('gitalk-container');
+  }, window.Gitalk);
+});
+</script>
+
+</body>
+</html>
