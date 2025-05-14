@@ -29,7 +29,7 @@
 <meta property="og:description" content="UISplitViewController在竖屏情况下叫出PopoverView后Dissmiss崩溃 1-[UIPopoverController dealloc] reached while popover is still visible.">
 <meta property="og:locale">
 <meta property="article:published_time" content="2016-11-08T16:00:00.000Z">
-<meta property="article:modified_time" content="2021-06-06T18:52:24.968Z">
+<meta property="article:modified_time" content="2022-07-12T16:51:57.239Z">
 <meta property="article:author" content="Arclin">
 <meta property="article:tag" content="iOS">
 <meta name="twitter:card" content="summary">
@@ -251,13 +251,13 @@
 
       
         <p>UISplitViewController在竖屏情况下叫出PopoverView后Dissmiss崩溃</p>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">-[UIPopoverController dealloc] reached while popover is still visible.</span><br></pre></td></tr></table></figure>
+<figure class="highlight swift"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="operator">-</span>[<span class="type">UIPopoverController</span> dealloc] reached <span class="keyword">while</span> popover <span class="keyword">is</span> still visible.</span><br></pre></td></tr></table></figure>
 
 <span id="more"></span>
 
 <p>错误的大体意思是：popover在仍旧可见的时候被销毁了（调用了dealloc）</p>
 <p>从错误可以得出的结论<br>当popover仍旧可见的时候，不准销毁popover对象<br>在销<br>毁popover对象之前，一定先让popover消失（不可见）</p>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br></pre></td><td class="code"><pre><span class="line">@property (retain, nonatomic) UIPopoverController *popoverController;</span><br><span class="line"></span><br><span class="line">- (void)splitViewController:(UISplitViewController *)svc willHideViewController:(UIViewController *)aViewController withBarButtonItem:(UIBarButtonItem *)barButtonItem forPopoverController:(UIPopoverController *)pc</span><br><span class="line">&#123;</span><br><span class="line">    self.popoverController &#x3D; pc;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line">- (void)dismissViewControllerAnimated:(BOOL)flag completion:(void (^)(void))completion</span><br><span class="line">&#123;</span><br><span class="line">    [self.popoverController dismissPopoverAnimated:YES];</span><br><span class="line">    [super dismissViewControllerAnimated:YES completion:nil];</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<figure class="highlight objectivec"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">@property</span> (<span class="keyword">retain</span>, <span class="keyword">nonatomic</span>) <span class="built_in">UIPopoverController</span> *popoverController;</span><br><span class="line"></span><br><span class="line">- (<span class="keyword">void</span>)splitViewController:(<span class="built_in">UISplitViewController</span> *)svc willHideViewController:(<span class="built_in">UIViewController</span> *)aViewController withBarButtonItem:(<span class="built_in">UIBarButtonItem</span> *)barButtonItem forPopoverController:(<span class="built_in">UIPopoverController</span> *)pc</span><br><span class="line">&#123;</span><br><span class="line">    <span class="keyword">self</span>.popoverController = pc;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line">- (<span class="keyword">void</span>)dismissViewControllerAnimated:(<span class="built_in">BOOL</span>)flag completion:(<span class="keyword">void</span> (^)(<span class="keyword">void</span>))completion</span><br><span class="line">&#123;</span><br><span class="line">    [<span class="keyword">self</span>.popoverController dismissPopoverAnimated:<span class="literal">YES</span>];</span><br><span class="line">    [<span class="keyword">super</span> dismissViewControllerAnimated:<span class="literal">YES</span> completion:<span class="literal">nil</span>];</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
     </div>
 
     
@@ -356,7 +356,7 @@
       <div class="site-state-item site-state-posts">
           <a href="/archives/">
         
-          <span class="site-state-item-count">100</span>
+          <span class="site-state-item-count">102</span>
           <span class="site-state-item-name">日志</span>
         </a>
       </div>
@@ -369,7 +369,7 @@
       <div class="site-state-item site-state-tags">
             <a href="/tags/">
           
-        <span class="site-state-item-count">38</span>
+        <span class="site-state-item-count">39</span>
         <span class="site-state-item-name">标签</span></a>
       </div>
   </nav>
@@ -404,7 +404,7 @@
 <div class="copyright">
   
   &copy; 
-  <span itemprop="copyrightYear">2022</span>
+  <span itemprop="copyrightYear">2025</span>
   <span class="with-love">
     <i class="fa fa-heart"></i>
   </span>

@@ -29,7 +29,7 @@
 <meta property="og:description" content="记录一些关于iOS的一些小技巧">
 <meta property="og:locale">
 <meta property="article:published_time" content="2016-06-11T16:30:00.000Z">
-<meta property="article:modified_time" content="2021-06-06T18:52:24.974Z">
+<meta property="article:modified_time" content="2022-07-12T16:51:57.246Z">
 <meta property="article:author" content="Arclin">
 <meta property="article:tag" content="iOS">
 <meta name="twitter:card" content="summary">
@@ -255,10 +255,10 @@
 
 <p>XCode Profile 的路径<br>xcode5 provisioning profile path：<br><code>~/Library/MobileDevice/Provisioning Profiles</code></p>
 <p>在升级XCode7.0使用UICollectionViewLayout进行自定义布局时，调试台会出现以下的警告打印。</p>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">UICollectionViewFlowLayout has cached frame mismatch for index path &#123;length &#x3D; 2, path &#x3D; 0 - 0&#125; - cached value: &#123;&#123;122, 15&#125;, &#123;170, 170&#125;&#125;; expected value: &#123;&#123;157, 50&#125;, &#123;100, 100&#125;&#125; </span><br><span class="line">This is likely occurring because the flow layout subclass LineLayout is modifying attributes returned by UICollectionViewFlowLayout without copying them</span><br></pre></td></tr></table></figure>
+<figure class="highlight apache"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"><span class="attribute">UICollectionViewFlowLayout</span> has cached frame mismatch for index path &#123;length = <span class="number">2</span>, path = <span class="number">0</span> - <span class="number">0</span>&#125; - cached value: &#123;&#123;<span class="number">122</span>, <span class="number">15</span>&#125;, &#123;<span class="number">170</span>, <span class="number">170</span>&#125;&#125;; expected value: &#123;&#123;<span class="number">157</span>, <span class="number">50</span>&#125;, &#123;<span class="number">100</span>, <span class="number">100</span>&#125;&#125; </span><br><span class="line"><span class="attribute">This</span> is likely occurring because the flow layout subclass LineLayout is modifying attributes returned by UICollectionViewFlowLayout without copying them</span><br></pre></td></tr></table></figure>
 
 <p>这个警告来源主要是在使用layoutAttributesForElementsInRect：方法返回的数组时，没有使用该数组的拷贝对象，而是直接使用了该数组。解决办法对该数组进行拷贝，并且是深拷贝。拷贝代码如下：</p>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line">- (NSArray *)deepCopyWithArray:(NSArray *)array</span><br><span class="line">&#123;</span><br><span class="line">    NSMutableArray *copys &#x3D; [NSMutableArray arrayWithCapacity:array.count];</span><br><span class="line"></span><br><span class="line">    for (UICollectionViewLayoutAttributes *attris in array) &#123;</span><br><span class="line">        [copys addObject:[attris copy]];</span><br><span class="line">    &#125;</span><br><span class="line">    return copys;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<figure class="highlight objectivec"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line">- (<span class="built_in">NSArray</span> *)deepCopyWithArray:(<span class="built_in">NSArray</span> *)array</span><br><span class="line">&#123;</span><br><span class="line">    <span class="built_in">NSMutableArray</span> *copys = [<span class="built_in">NSMutableArray</span> arrayWithCapacity:array.count];</span><br><span class="line"></span><br><span class="line">    <span class="keyword">for</span> (<span class="built_in">UICollectionViewLayoutAttributes</span> *attris <span class="keyword">in</span> array) &#123;</span><br><span class="line">        [copys addObject:[attris <span class="keyword">copy</span>]];</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="keyword">return</span> copys;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
 
 <p>将layoutAttributesForElementsInRect：方法返回的数组扔到这个方法中，并且使用返回后的数组就行了。</p>
 <ul>
@@ -291,8 +291,8 @@
       <i class="fa fa-chevron-left"></i> 关于案场管家的技术点总结
     </a></div>
       <div class="post-nav-item">
-    <a href="/post/8e2ebfdf.html" rel="next" title="利用MJExtension取出模型数组中的某个属性组成数组">
-      利用MJExtension取出模型数组中的某个属性组成数组 <i class="fa fa-chevron-right"></i>
+    <a href="/post/54b26395.html" rel="next" title="发现一个api">
+      发现一个api <i class="fa fa-chevron-right"></i>
     </a></div>
     </div>
       </footer>
@@ -368,7 +368,7 @@
       <div class="site-state-item site-state-posts">
           <a href="/archives/">
         
-          <span class="site-state-item-count">100</span>
+          <span class="site-state-item-count">102</span>
           <span class="site-state-item-name">日志</span>
         </a>
       </div>
@@ -381,7 +381,7 @@
       <div class="site-state-item site-state-tags">
             <a href="/tags/">
           
-        <span class="site-state-item-count">38</span>
+        <span class="site-state-item-count">39</span>
         <span class="site-state-item-name">标签</span></a>
       </div>
   </nav>
@@ -416,7 +416,7 @@
 <div class="copyright">
   
   &copy; 
-  <span itemprop="copyrightYear">2022</span>
+  <span itemprop="copyrightYear">2025</span>
   <span class="with-love">
     <i class="fa fa-heart"></i>
   </span>

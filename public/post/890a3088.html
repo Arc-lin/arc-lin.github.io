@@ -21,15 +21,15 @@
     var CONFIG = {"hostname":"www.arclin.cn","root":"/","scheme":"Muse","version":"7.8.0","exturl":false,"sidebar":{"position":"left","display":"post","padding":18,"offset":12,"onmobile":false},"copycode":{"enable":false,"show_result":false,"style":null},"back2top":{"enable":true,"sidebar":false,"scrollpercent":false},"bookmark":{"enable":false,"color":"#222","save":"auto"},"fancybox":true,"mediumzoom":false,"lazyload":false,"pangu":false,"comments":{"style":"tabs","active":null,"storage":true,"lazyload":false,"nav":null},"algolia":{"appID":"VOFC7668C9","apiKey":"24c644edc8e7353bf2e8d8e31f03a940","indexName":"hexo","hits":{"per_page":10},"labels":{"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}},"localsearch":{"enable":true,"trigger":"auto","top_n_per_article":1,"unescape":false,"preload":false},"motion":{"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},"path":"search.xml"};
   </script>
 
-  <meta name="description" content="[NSURL URLWithString:@”…………”] 返回空 nil但是貌似汉字或者空格等无法被识别，String不被认为是URLString，这个NSURL的值也就一直是nil要怎样才能够让它识别呢？解决方法如下 ：  转换编码    123str1 &#x3D; [str1 stringByAddingPercentEscapesUsingEncoding:NSUTF8StringEnc">
+  <meta name="description" content="[NSURL URLWithString:@”…………”] 返回空 nil但是貌似汉字或者空格等无法被识别，String不被认为是URLString，这个NSURL的值也就一直是nil要怎样才能够让它识别呢？解决方法如下 ：  转换编码    123str1 &#x3D; [str1 stringByAddingPercentEscapesUsingEncoding:NSUTF8StringEncoding">
 <meta property="og:type" content="article">
 <meta property="og:title" content="URLWithString返回空">
 <meta property="og:url" content="https://www.arclin.cn/post/890a3088.html">
 <meta property="og:site_name" content="Arclin">
-<meta property="og:description" content="[NSURL URLWithString:@”…………”] 返回空 nil但是貌似汉字或者空格等无法被识别，String不被认为是URLString，这个NSURL的值也就一直是nil要怎样才能够让它识别呢？解决方法如下 ：  转换编码    123str1 &#x3D; [str1 stringByAddingPercentEscapesUsingEncoding:NSUTF8StringEnc">
+<meta property="og:description" content="[NSURL URLWithString:@”…………”] 返回空 nil但是貌似汉字或者空格等无法被识别，String不被认为是URLString，这个NSURL的值也就一直是nil要怎样才能够让它识别呢？解决方法如下 ：  转换编码    123str1 &#x3D; [str1 stringByAddingPercentEscapesUsingEncoding:NSUTF8StringEncoding">
 <meta property="og:locale">
 <meta property="article:published_time" content="2016-10-16T16:00:00.000Z">
-<meta property="article:modified_time" content="2021-06-06T18:52:24.969Z">
+<meta property="article:modified_time" content="2022-07-12T16:51:57.239Z">
 <meta property="article:author" content="Arclin">
 <meta property="article:tag" content="iOS">
 <meta name="twitter:card" content="summary">
@@ -254,12 +254,12 @@
 <ol>
 <li>转换编码</li>
 </ol>
-  <figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">str1 &#x3D; [str1 stringByAddingPercentEscapesUsingEncoding:NSUTF8StringEncoding];</span><br><span class="line"></span><br><span class="line">NSURL *url &#x3D; [NSURL URLWithString:[Tool returnFormatString:str1]];</span><br></pre></td></tr></table></figure>
+  <figure class="highlight inform7"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">str1 = <span class="comment">[str1 stringByAddingPercentEscapesUsingEncoding:NSUTF8StringEncoding]</span>;</span><br><span class="line"></span><br><span class="line">NSURL *url = <span class="comment">[NSURL URLWithString:<span class="comment">[Tool returnFormatString:str1]</span>]</span>;</span><br></pre></td></tr></table></figure>
 
 <ol start="2">
 <li>除去空格</li>
 </ol>
-  <figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line">+(NSString *)returnFormatString:(NSString *)str</span><br><span class="line">&#123;</span><br><span class="line">    return [str stringByReplacingOccurrencesOfString:@&quot; &quot;withString:@&quot; &quot;];</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"> NSLog(@&quot;URL&#x3D;&#x3D;%@&quot;,url);</span><br></pre></td></tr></table></figure>
+  <figure class="highlight objectivec"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line">+(<span class="built_in">NSString</span> *)returnFormatString:(<span class="built_in">NSString</span> *)str</span><br><span class="line">&#123;</span><br><span class="line">    <span class="keyword">return</span> [str stringByReplacingOccurrencesOfString:<span class="string">@&quot; &quot;</span>withString:<span class="string">@&quot; &quot;</span>];</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"> <span class="built_in">NSLog</span>(<span class="string">@&quot;URL==%@&quot;</span>,url);</span><br></pre></td></tr></table></figure>
     </div>
 
     
@@ -358,7 +358,7 @@
       <div class="site-state-item site-state-posts">
           <a href="/archives/">
         
-          <span class="site-state-item-count">100</span>
+          <span class="site-state-item-count">102</span>
           <span class="site-state-item-name">日志</span>
         </a>
       </div>
@@ -371,7 +371,7 @@
       <div class="site-state-item site-state-tags">
             <a href="/tags/">
           
-        <span class="site-state-item-count">38</span>
+        <span class="site-state-item-count">39</span>
         <span class="site-state-item-name">标签</span></a>
       </div>
   </nav>
@@ -406,7 +406,7 @@
 <div class="copyright">
   
   &copy; 
-  <span itemprop="copyrightYear">2022</span>
+  <span itemprop="copyrightYear">2025</span>
   <span class="with-love">
     <i class="fa fa-heart"></i>
   </span>

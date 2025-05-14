@@ -29,7 +29,7 @@
 <meta property="og:description" content="本文只是作为iOS底层原理课程的笔记用，所以均为结论性内容，如有疑问可在评论区进行探讨。">
 <meta property="og:locale">
 <meta property="article:published_time" content="2021-05-25T14:34:00.000Z">
-<meta property="article:modified_time" content="2021-06-06T18:52:24.963Z">
+<meta property="article:modified_time" content="2022-07-12T16:51:57.241Z">
 <meta property="article:author" content="Arclin">
 <meta property="article:tag" content="iOS">
 <meta property="article:tag" content="底层原理">
@@ -265,14 +265,14 @@
 </ol>
 <p><code>class_getInstanceSize</code>计算出了NSObject对象内的成员变量（即isa）的占用内存大小</p>
 <h3 id="NSObject实质上是一个结构体对象"><a href="#NSObject实质上是一个结构体对象" class="headerlink" title="NSObject实质上是一个结构体对象"></a>NSObject实质上是一个结构体对象</h3><p>大概长这样</p>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">struct NSObject_IMPL &#123;</span><br><span class="line">	Class isa;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<figure class="highlight capnproto"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line"><span class="class"><span class="keyword">struct</span> <span class="title">NSObject_IMPL</span> </span>&#123;</span><br><span class="line">	Class isa;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
 
 <p>因为成员变量isa永远是对象（NSObject的子类对象）的第一个成员变量，所以对象的地址就是成员变量isa的地址</p>
 <h3 id="NSObject的子类"><a href="#NSObject的子类" class="headerlink" title="NSObject的子类"></a>NSObject的子类</h3><p>比如有这么一个类</p>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line">@interface Student : NSObject</span><br><span class="line">&#123;</span><br><span class="line">    @public</span><br><span class="line">    int _no;</span><br><span class="line">    int _age;</span><br><span class="line">    int _height;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<figure class="highlight angelscript"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line">@<span class="keyword">interface</span> <span class="symbol">Student</span> : <span class="symbol">NSObject</span></span><br><span class="line">&#123;</span><br><span class="line">    @<span class="keyword">public</span></span><br><span class="line">    <span class="built_in">int</span> _no;</span><br><span class="line">    <span class="built_in">int</span> _age;</span><br><span class="line">    <span class="built_in">int</span> _height;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
 
 <p>实例化一下</p>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">Student *stu &#x3D; [[Student alloc] init];</span><br></pre></td></tr></table></figure>
+<figure class="highlight inform7"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">Student *stu = <span class="comment">[<span class="comment">[Student alloc]</span> init]</span>;</span><br></pre></td></tr></table></figure>
 
 <p><code>class_getInstanceSize([Student class])</code> 得到 24（意思为这个类至少需要的内存）<br><code>malloc_size((__bridge const void *)stu)</code> 得到32（意思为系统分配给这个类的内存）</p>
 <p>一般情况下我们更关心<code>malloc_size</code>得到的值</p>
@@ -281,10 +281,10 @@
 <p>因为 <code>isa</code>、<code>_no</code>、<code>_age</code> 刚好够 16个字节了，这时候突然又来多了个<code>_height</code>，这时候就需要20个字节了 , 那么为了适配各个厂商的内存读取规则，又给他分配了16个（凑16的倍数），这个叫做内存对齐，所以一共给类分配了 32个字节</p>
 <p>注：int 占用4个字节 double占用8个字节</p>
 <p>分配原则：如果内存一行(16个字节)放不下，那么就直接开新的一行<br>比如</p>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">_no : Int </span><br><span class="line">_age : Double</span><br><span class="line">_height : Int</span><br></pre></td></tr></table></figure>
+<figure class="highlight ada"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">_no : <span class="type">Int</span> </span><br><span class="line">_age : <span class="type">Double</span></span><br><span class="line">_height : <span class="type">Int</span></span><br></pre></td></tr></table></figure>
 
 <p>第一行：<code>isa</code> :8个，<code>_no</code> 4个，第一行剩下4个字节的位置，不够放<code>_age</code>,但是够放<code>_height</code>，那就直接放<code>_height</code>，如果这时候<code>_height</code>是<code>Double</code>的话，没别的东西来占用这4个位置，那么就直接放弃，开辟下一行<br>第二行：前八个位置直接给<code>_age</code></p>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">0x108b0bb00: d1 81 00 00 01 80 1d 01  &lt;- isa   04 00 00 00 &lt;- age   00 00 00 00  &lt;- height ................</span><br><span class="line">0x108b0bb10: 00 00 00 00 00 00 00 00  &lt;- age 00 00 00 00 00 00 00 00  ................</span><br></pre></td></tr></table></figure>
+<figure class="highlight apache"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"><span class="attribute">0x108b0bb00</span>: d<span class="number">1</span> <span class="number">81</span> <span class="number">00</span> <span class="number">00</span> <span class="number">01</span> <span class="number">80</span> <span class="number">1</span>d <span class="number">01</span>  &lt;- isa   <span class="number">04</span> <span class="number">00</span> <span class="number">00</span> <span class="number">00</span> &lt;- age   <span class="number">00</span> <span class="number">00</span> <span class="number">00</span> <span class="number">00</span>  &lt;- height ................</span><br><span class="line"><span class="attribute">0x108b0bb10</span>: <span class="number">00</span> <span class="number">00</span> <span class="number">00</span> <span class="number">00</span> <span class="number">00</span> <span class="number">00</span> <span class="number">00</span> <span class="number">00</span>  &lt;- age <span class="number">00</span> <span class="number">00</span> <span class="number">00</span> <span class="number">00</span> <span class="number">00</span> <span class="number">00</span> <span class="number">00</span> <span class="number">00</span>  ................</span><br></pre></td></tr></table></figure>
 
 <h3 id="sizeof"><a href="#sizeof" class="headerlink" title="sizeof()"></a>sizeof()</h3><p>__sizeof()__方法是一个运算符，在编译期间就确定值，类似于宏替换，他的作用是计算传入的对象占用的内存的大小，如果传入的是类型（或者类名）的话，就计算类型占用的大小，比如传入一个对象的话，就是计算指向这个对象的指针的大小，指针占用的内存大小是8个字节，跟<code>class_getInstanceSize</code>的区别是<code>class_getInstanceSize</code>是计算类实例化后占用的大小。</p>
 
@@ -388,7 +388,7 @@
       <div class="site-state-item site-state-posts">
           <a href="/archives/">
         
-          <span class="site-state-item-count">100</span>
+          <span class="site-state-item-count">102</span>
           <span class="site-state-item-name">日志</span>
         </a>
       </div>
@@ -401,7 +401,7 @@
       <div class="site-state-item site-state-tags">
             <a href="/tags/">
           
-        <span class="site-state-item-count">38</span>
+        <span class="site-state-item-count">39</span>
         <span class="site-state-item-name">标签</span></a>
       </div>
   </nav>
@@ -436,7 +436,7 @@
 <div class="copyright">
   
   &copy; 
-  <span itemprop="copyrightYear">2022</span>
+  <span itemprop="copyrightYear">2025</span>
   <span class="with-love">
     <i class="fa fa-heart"></i>
   </span>

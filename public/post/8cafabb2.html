@@ -29,7 +29,7 @@
 <meta property="og:description" content="在区分开发环境和测试环境或生产环境的时候经常需要在XCode 添加Target, 所以在此记录一下">
 <meta property="og:locale">
 <meta property="article:published_time" content="2018-02-18T14:08:00.000Z">
-<meta property="article:modified_time" content="2021-06-06T18:52:24.969Z">
+<meta property="article:modified_time" content="2022-07-12T16:51:57.240Z">
 <meta property="article:author" content="Arclin">
 <meta property="article:tag" content="iOS">
 <meta property="article:tag" content="Xcode">
@@ -259,7 +259,7 @@
 <li>Change DisplayName &amp; Bundle Identifier</li>
 <li>A copy-info.plist，默认生成在程序环境根目录，也就是<code>A.xcodeproj</code>的同级目录中，如果想放到里层（比如与<code>A-info.plist</code>放在同级目录），可以先在Xcode删除<code>A copy-info.plist</code>索引，然后拷贝文件到制定目录中，然后更名为<code>B-info.plist</code>，在add到project中。在<code>Project</code>的<code>Build Settings</code>中，修改<code>Info.plist</code> File选项为<code>B-info.plist</code>的目录（相对路径）,这样就可以看到Info页了（就是B-info.plist），接着修改<code>ProductName</code>和<code>Bundle identifier</code>，使之成为另一个app。<code>Prefix Header的路径</code>，视具体需求而定是否要修改，如果两个target可以公用同一个<code>Prefix Header</code>，那么就不需要修改这里的路径</li>
 <li>修改scheme，在调试的Stop按钮边上，我们可以选择本工程中所有的target来做编译，如果不修改，在这里选择出来的名字就是A copy，为了与新建的target统一起来，同样也要修改这里的名字。点击scheme选择区，然后选Manager Scheme，找到A copy，然后改成你需要的名字，比如B</li>
-<li>生成一个新的target，一定会与原target有区别，这里可以定义预编译宏，来区分两个版本的不同代码，预编译宏可以在Build Settings中Preprocessor Macros定义，比如在我们新建的target B中定义预编译宏MACRO，然后在代码中通过<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">#if defined (MACRO)</span><br><span class="line">&#x2F;&#x2F;target  B需要执行的代码</span><br><span class="line">#else</span><br><span class="line">&#x2F;&#x2F;target A需要执行的代码</span><br><span class="line">#endif</span><br></pre></td></tr></table></figure>
+<li>生成一个新的target，一定会与原target有区别，这里可以定义预编译宏，来区分两个版本的不同代码，预编译宏可以在Build Settings中Preprocessor Macros定义，比如在我们新建的target B中定义预编译宏MACRO，然后在代码中通过<figure class="highlight gauss"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">#if defined (MACRO)</span></span><br><span class="line"><span class="comment">//target  B需要执行的代码</span></span><br><span class="line"><span class="meta">#<span class="meta-keyword">else</span></span></span><br><span class="line"><span class="comment">//target A需要执行的代码</span></span><br><span class="line"><span class="meta">#<span class="meta-keyword">endif</span></span></span><br></pre></td></tr></table></figure>
 来区分</li>
 <li>其他：Build Phases（各target编译所包含的内容，需要注意的是，如果创建了target B后，再往A里面添加资源或文件，target B中不会自动增加这些资源，需要手动添加）<ul>
 <li>Compile Sources<br>需要编译的代码文件</li>
@@ -368,7 +368,7 @@
       <div class="site-state-item site-state-posts">
           <a href="/archives/">
         
-          <span class="site-state-item-count">100</span>
+          <span class="site-state-item-count">102</span>
           <span class="site-state-item-name">日志</span>
         </a>
       </div>
@@ -381,7 +381,7 @@
       <div class="site-state-item site-state-tags">
             <a href="/tags/">
           
-        <span class="site-state-item-count">38</span>
+        <span class="site-state-item-count">39</span>
         <span class="site-state-item-name">标签</span></a>
       </div>
   </nav>
@@ -416,7 +416,7 @@
 <div class="copyright">
   
   &copy; 
-  <span itemprop="copyrightYear">2022</span>
+  <span itemprop="copyrightYear">2025</span>
   <span class="with-love">
     <i class="fa fa-heart"></i>
   </span>

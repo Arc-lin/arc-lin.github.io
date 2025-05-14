@@ -1,0 +1,656 @@
+<!DOCTYPE html>
+<html lang="zh-Hans">
+<head>
+  <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=2">
+<meta name="theme-color" content="#222">
+<meta name="generator" content="Hexo 5.4.0">
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png">
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32-next.png">
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next.png">
+  <link rel="mask-icon" href="/images/logo.svg" color="#222">
+
+<link rel="stylesheet" href="/css/main.css">
+
+
+<link rel="stylesheet" href="/lib/font-awesome/css/all.min.css">
+  <link rel="stylesheet" href="//cdn.jsdelivr.net/gh/fancyapps/fancybox@3/dist/jquery.fancybox.min.css">
+
+<script id="hexo-configurations">
+    var NexT = window.NexT || {};
+    var CONFIG = {"hostname":"www.arclin.cn","root":"/","scheme":"Muse","version":"7.8.0","exturl":false,"sidebar":{"position":"left","display":"post","padding":18,"offset":12,"onmobile":false},"copycode":{"enable":false,"show_result":false,"style":null},"back2top":{"enable":true,"sidebar":false,"scrollpercent":false},"bookmark":{"enable":false,"color":"#222","save":"auto"},"fancybox":true,"mediumzoom":false,"lazyload":false,"pangu":false,"comments":{"style":"tabs","active":null,"storage":true,"lazyload":false,"nav":null},"algolia":{"appID":"VOFC7668C9","apiKey":"24c644edc8e7353bf2e8d8e31f03a940","indexName":"hexo","hits":{"per_page":10},"labels":{"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}},"localsearch":{"enable":true,"trigger":"auto","top_n_per_article":1,"unescape":false,"preload":false},"motion":{"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},"path":"search.xml"};
+  </script>
+
+  <meta name="description" content="本文旨在介绍ybox桌面端的一些开发上使用的新技术以及设计方法。">
+<meta property="og:type" content="article">
+<meta property="og:title" content="Swift6新特性">
+<meta property="og:url" content="https://www.arclin.cn/post/feb7c155.html">
+<meta property="og:site_name" content="Arclin">
+<meta property="og:description" content="本文旨在介绍ybox桌面端的一些开发上使用的新技术以及设计方法。">
+<meta property="og:locale">
+<meta property="article:published_time" content="2024-07-09T13:53:21.000Z">
+<meta property="article:modified_time" content="2025-05-14T14:31:36.269Z">
+<meta property="article:author" content="Arclin">
+<meta property="article:tag" content="Swift">
+<meta name="twitter:card" content="summary">
+
+<link rel="canonical" href="https://www.arclin.cn/post/feb7c155.html">
+
+
+<script id="page-configurations">
+  // https://hexo.io/docs/variables.html
+  CONFIG.page = {
+    sidebar: "",
+    isHome : false,
+    isPost : true,
+    lang   : 'zh-Hans'
+  };
+</script>
+
+  <title>Swift6新特性 | Arclin</title>
+  
+
+
+
+
+
+
+  <noscript>
+  <style>
+  .use-motion .brand,
+  .use-motion .menu-item,
+  .sidebar-inner,
+  .use-motion .post-block,
+  .use-motion .pagination,
+  .use-motion .comments,
+  .use-motion .post-header,
+  .use-motion .post-body,
+  .use-motion .collection-header { opacity: initial; }
+
+  .use-motion .site-title,
+  .use-motion .site-subtitle {
+    opacity: initial;
+    top: initial;
+  }
+
+  .use-motion .logo-line-before i { left: initial; }
+  .use-motion .logo-line-after i { right: initial; }
+  </style>
+</noscript>
+
+<link rel="alternate" href="/atom.xml" title="Arclin" type="application/atom+xml">
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage">
+  <div class="container use-motion">
+    <div class="headband"></div>
+
+    <header class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-container">
+  <div class="site-nav-toggle">
+    <div class="toggle" aria-label="切换导航栏">
+      <span class="toggle-line toggle-line-first"></span>
+      <span class="toggle-line toggle-line-middle"></span>
+      <span class="toggle-line toggle-line-last"></span>
+    </div>
+  </div>
+
+  <div class="site-meta">
+
+    <a href="/" class="brand" rel="start">
+      <span class="logo-line-before"><i></i></span>
+      <h1 class="site-title">Arclin</h1>
+      <span class="logo-line-after"><i></i></span>
+    </a>
+      <p class="site-subtitle" itemprop="description">Advocate Technology. Enjoy Technology.</p>
+  </div>
+
+  <div class="site-nav-right">
+    <div class="toggle popup-trigger">
+        <i class="fa fa-search fa-fw fa-lg"></i>
+    </div>
+  </div>
+</div>
+
+
+
+
+<nav class="site-nav">
+  <ul id="menu" class="main-menu menu">
+        <li class="menu-item menu-item-home">
+
+    <a href="/" rel="section"><i class="fa fa-home fa-fw"></i>首页</a>
+
+  </li>
+        <li class="menu-item menu-item-tags">
+
+    <a href="/tags/" rel="section"><i class="fa fa-tags fa-fw"></i>标签</a>
+
+  </li>
+        <li class="menu-item menu-item-categories">
+
+    <a href="/categories/" rel="section"><i class="fa fa-th fa-fw"></i>分类</a>
+
+  </li>
+        <li class="menu-item menu-item-archives">
+
+    <a href="/archives/" rel="section"><i class="fa fa-archive fa-fw"></i>归档</a>
+
+  </li>
+        <li class="menu-item menu-item-about">
+
+    <a href="/about/" rel="section"><i class="fa fa-user fa-fw"></i>关于</a>
+
+  </li>
+      <li class="menu-item menu-item-search">
+        <a role="button" class="popup-trigger"><i class="fa fa-search fa-fw"></i>搜索
+        </a>
+      </li>
+  </ul>
+</nav>
+
+
+
+  <div class="search-pop-overlay">
+    <div class="popup search-popup">
+        <div class="search-header">
+  <span class="search-icon">
+    <i class="fa fa-search"></i>
+  </span>
+  <div class="search-input-container">
+    <input autocomplete="off" autocapitalize="off"
+           placeholder="搜索..." spellcheck="false"
+           type="search" class="search-input">
+  </div>
+  <span class="popup-btn-close">
+    <i class="fa fa-times-circle"></i>
+  </span>
+</div>
+<div id="search-result">
+  <div id="no-result">
+    <i class="fa fa-spinner fa-pulse fa-5x fa-fw"></i>
+  </div>
+</div>
+
+    </div>
+  </div>
+
+</div>
+    </header>
+
+    
+  <div class="back-to-top">
+    <i class="fa fa-arrow-up"></i>
+    <span>0%</span>
+  </div>
+
+
+    <main class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          
+
+          <div class="content post posts-expand">
+            
+
+    
+  
+  
+  <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="zh-Hans">
+    <link itemprop="mainEntityOfPage" href="https://www.arclin.cn/post/feb7c155.html">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="https://avatars.githubusercontent.com/u/12107804?v=4">
+      <meta itemprop="name" content="Arclin">
+      <meta itemprop="description" content="Stay hungry,stay foolish">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="Arclin">
+    </span>
+      <header class="post-header">
+        <h1 class="post-title" itemprop="name headline">
+          Swift6新特性
+        </h1>
+
+        <div class="post-meta">
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-calendar"></i>
+              </span>
+              <span class="post-meta-item-text">发表于</span>
+
+              <time title="创建时间：2024-07-09 21:53:21" itemprop="dateCreated datePublished" datetime="2024-07-09T21:53:21+08:00">2024-07-09</time>
+            </span>
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-folder"></i>
+              </span>
+              <span class="post-meta-item-text">分类于</span>
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/iOS/" itemprop="url" rel="index"><span itemprop="name">iOS</span></a>
+                </span>
+            </span>
+
+          
+            <span class="post-meta-item" title="阅读次数" id="busuanzi_container_page_pv" style="display: none;">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-eye"></i>
+              </span>
+              <span class="post-meta-item-text">阅读次数：</span>
+              <span id="busuanzi_value_page_pv"></span>
+            </span>
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+        <p>本文旨在介绍ybox桌面端的一些开发上使用的新技术以及设计方法。</p>
+<span id="more"></span>
+
+<h1 id="语法糖"><a href="#语法糖" class="headerlink" title="语法糖"></a>语法糖</h1><h2 id="if、switch-作为表达式之一"><a href="#if、switch-作为表达式之一" class="headerlink" title="if、switch 作为表达式之一"></a>if、switch 作为表达式之一</h2><blockquote>
+<p>swift5.9</p>
+</blockquote>
+<p>比如在一段网络请求方法中，当 paramsAsQuery为true的时候，需要将参数作为query插入到url中而不是放在httpBody里面<br>以前可能会这么写</p>
+<figure class="highlight lasso"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line"><span class="built_in">var</span> urlString: <span class="built_in">String</span>?</span><br><span class="line"><span class="keyword">if</span> paramsAsQuery,<span class="keyword">let</span> query = <span class="keyword">params</span>?.toQueryParameters() &#123;</span><br><span class="line">     urlString = <span class="string">&quot;\(urlString)?\(query)&quot;</span></span><br><span class="line">&#125; <span class="keyword">else</span> &#123;</span><br><span class="line">     urlString = url</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>现在可以这么写</p>
+<figure class="highlight swift"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">var</span> urlString <span class="operator">=</span> <span class="keyword">if</span> paramsAsQuery, <span class="keyword">let</span> query <span class="operator">=</span> params<span class="operator">?</span>.toQueryParameters() &#123;</span><br><span class="line">    <span class="string">&quot;<span class="subst">\(url)</span>?<span class="subst">\(query)</span>&quot;</span></span><br><span class="line">&#125; <span class="keyword">else</span> &#123;</span><br><span class="line">    url</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>除了if, switch也一样可以，用法同理</p>
+<h2 id="正则表达式"><a href="#正则表达式" class="headerlink" title="正则表达式"></a>正则表达式</h2><blockquote>
+<p>Swift 5.7</p>
+</blockquote>
+<p>有时需要判断分支是否符合以下格式：union/x.xx/union_x.xx_feature 或 union/x.xx/union_x.xx_maint，用来判断是否是主分支，会使用到正则表达式</p>
+<p>方法如下</p>
+<figure class="highlight swift"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">let</span> regex <span class="operator">=</span> <span class="keyword">try?</span> <span class="type">NSRegularExpression</span>(pattern: <span class="string">&quot;^union<span class="subst">\\</span>/<span class="subst">\\</span>d&#123;1,&#125;<span class="subst">\\</span>.<span class="subst">\\</span>d&#123;1,&#125;<span class="subst">\\</span>/union_<span class="subst">\\</span>d&#123;1,&#125;<span class="subst">\\</span>.<span class="subst">\\</span>d&#123;1,&#125;_feature$&quot;</span>, options: [])</span><br><span class="line"><span class="keyword">guard</span> <span class="keyword">let</span> results <span class="operator">=</span> regex<span class="operator">?</span>.matches(in: originStr, options: [], range: <span class="type">NSRange</span>(location: <span class="number">0</span>, length: originStr.count)) <span class="keyword">else</span> &#123;</span><br><span class="line">    <span class="keyword">return</span> <span class="literal">nil</span></span><br><span class="line">&#125;</span><br><span class="line"><span class="keyword">let</span> matchItems <span class="operator">=</span> results.map &#123;</span><br><span class="line">    <span class="keyword">if</span> <span class="keyword">let</span> range <span class="operator">=</span> <span class="type">Range</span>(<span class="variable">$0</span>.range, in: originStr) &#123;</span><br><span class="line">        <span class="keyword">return</span> <span class="string">&quot;<span class="subst">\(originStr[range])</span>&quot;</span></span><br><span class="line">    &#125;</span><br><span class="line">    <span class="keyword">return</span> <span class="string">&quot;&quot;</span></span><br><span class="line">&#125;</span><br><span class="line"><span class="keyword">return</span> matchItems</span><br></pre></td></tr></table></figure>
+
+<p>正则本身就复杂，还要考虑字符反转义，所以就很麻烦<br>Swift 5.7 之后，正则迎来了史诗级提升，上述代码可以简化为</p>
+<figure class="highlight xquery"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">let</span> pattern = /^<span class="keyword">union</span>\/\d&#123;<span class="number">1</span>,&#125;\.\d&#123;<span class="number">1</span>,&#125;\/<span class="keyword">union</span><span class="number">_</span>\d&#123;<span class="number">1</span>,&#125;\.\d&#123;<span class="number">1</span>,&#125;_feature$/</span><br><span class="line">guard <span class="keyword">let</span> matchName =<span class="built_in"> name</span>.firstMatch(of: pattern)?.output <span class="keyword">else</span> &#123;</span><br><span class="line">    <span class="keyword">return</span><span class="built_in"> false</span></span><br><span class="line">&#125;</span><br><span class="line"><span class="keyword">return</span> matchName</span><br></pre></td></tr></table></figure>
+
+<p>用 /…/ 两个斜杠的方式就可以构建一个正则表达式<br>如果觉得正则表达式太复杂，也可以使用DSL一样的构建方式构建正则对象</p>
+<figure class="highlight reasonml"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br></pre></td><td class="code"><pre><span class="line"> <span class="keyword">let</span> regex = Regex &#123;</span><br><span class="line">    <span class="string">&quot;union/&quot;</span></span><br><span class="line">    <span class="constructor">One(.<span class="params">digit</span>)</span></span><br><span class="line">    <span class="string">&quot;.&quot;</span></span><br><span class="line">    <span class="constructor">OneOrMore(.<span class="params">digit</span>)</span></span><br><span class="line">    <span class="string">&quot;/union_&quot;</span></span><br><span class="line">    <span class="constructor">One(.<span class="params">digit</span>)</span></span><br><span class="line">    <span class="string">&quot;.&quot;</span></span><br><span class="line">    <span class="constructor">OneOrMore(.<span class="params">digit</span>)</span></span><br><span class="line">    <span class="string">&quot;_feature&quot;</span></span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line">guard <span class="keyword">let</span> matchName = name.first<span class="constructor">Match(<span class="params">of</span>: <span class="params">regex</span>)</span>?.output <span class="keyword">else</span> &#123;</span><br><span class="line">    return <span class="literal">false</span></span><br><span class="line">&#125;</span><br><span class="line">return matchName</span><br></pre></td></tr></table></figure>
+
+<p>效果同上</p>
+<h1 id="Concurreny"><a href="#Concurreny" class="headerlink" title="Concurreny"></a>Concurreny</h1><h2 id="协程"><a href="#协程" class="headerlink" title="协程"></a>协程</h2><p>协程两个要素</p>
+<ol>
+<li>用await表示等待，如果异步函数返回正常则继续执行</li>
+<li>用try抛出异常，如果异步函数返回错误则执行catch逻辑</li>
+</ol>
+<p>举个例子，批量拉取代码，每个目录都需要执行一下git pull, 使用协程之前需要递归遍历一个个拉取</p>
+<figure class="highlight vim"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br></pre></td><td class="code"><pre><span class="line"> func pull(workspace: LocalWorkspace, component<span class="variable">s:</span> [Component], <span class="built_in">index</span>: Int = <span class="number">0</span>, operation: Operation, <span class="built_in">complete</span>: ((Component?, Bool)-&gt; Void)?) &#123;</span><br><span class="line">    <span class="keyword">if</span> <span class="built_in">index</span> &gt;= components.<span class="built_in">count</span> &#123;</span><br><span class="line">        <span class="built_in">complete</span>?(nil, true)</span><br><span class="line">        <span class="keyword">return</span></span><br><span class="line">    &#125;</span><br><span class="line">    <span class="keyword">let</span> component = components[<span class="built_in">index</span>] </span><br><span class="line">    pull(componen<span class="variable">t:</span> component) &#123; [weak self] success, errorMsg, <span class="keyword">comp</span> in</span><br><span class="line">        operation.<span class="built_in">complete</span>.<span class="keyword">append</span>(Result(name: <span class="keyword">comp</span>.name, succes<span class="variable">s:</span> success, conten<span class="variable">t:</span> success ? <span class="string">&quot;成功&quot;</span>: errorMsg))</span><br><span class="line">        operation.percent = CGFloat(operation.<span class="built_in">complete</span>.<span class="built_in">count</span>) / CGFloat(components.<span class="built_in">count</span>)</span><br><span class="line">        <span class="keyword">if</span> success &#123;</span><br><span class="line">            <span class="built_in">complete</span>?(<span class="keyword">comp</span>, true)</span><br><span class="line">            self?.pull(workspace: workspace, component<span class="variable">s:</span> components, <span class="built_in">index</span>: <span class="built_in">index</span> + <span class="number">1</span> , operation: operation, <span class="built_in">complete</span>: <span class="built_in">complete</span>)</span><br><span class="line">        &#125; <span class="keyword">else</span> &#123;</span><br><span class="line">            <span class="built_in">complete</span>?(<span class="keyword">comp</span>, false)</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>使用协程之后</p>
+<figure class="highlight reasonml"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br></pre></td><td class="code"><pre><span class="line">func pull(workspace: LocalWorkspace, components: <span class="literal">[C<span class="identifier">omponent</span>]</span>, operation: Operation) async &#123;</span><br><span class="line">    <span class="keyword">for</span> component <span class="keyword">in</span> components &#123;</span><br><span class="line">        <span class="keyword">do</span> &#123;</span><br><span class="line">            <span class="keyword">try</span> await pull(component: component)</span><br><span class="line">            operation.complete.append(<span class="constructor">Result(<span class="params">name</span>: <span class="params">component</span>.<span class="params">name</span>, <span class="params">success</span>: <span class="params">true</span>, <span class="params">content</span>: <span class="string">&quot;成功&quot;</span>)</span>)</span><br><span class="line">        &#125; catch &#123;</span><br><span class="line">            operation.complete.append(<span class="constructor">Result(<span class="params">name</span>: <span class="params">component</span>.<span class="params">name</span>, <span class="params">success</span>: <span class="params">false</span>, <span class="params">content</span>: <span class="params">error</span>.<span class="params">localizedDescription</span>)</span>)</span><br><span class="line">        &#125;</span><br><span class="line">        operation.percent = <span class="constructor">CGFloat(<span class="params">operation</span>.<span class="params">complete</span>.<span class="params">count</span>)</span><span class="operator"> / </span><span class="constructor">CGFloat(<span class="params">components</span>.<span class="params">count</span>)</span></span><br><span class="line">        await <span class="module-access"><span class="module"><span class="identifier">MainActor</span>.</span></span>run &#123;</span><br><span class="line">            update<span class="constructor">Component(<span class="params">component</span>)</span></span><br><span class="line">            currentOperation = operation</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>当然上面的执行还只是串行的效果，如果需要并行，可以简单修改</p>
+<figure class="highlight reasonml"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br></pre></td><td class="code"><pre><span class="line">func pull(workspace: LocalWorkspace, components: <span class="literal">[C<span class="identifier">omponent</span>]</span>, operation: Operation) async &#123;</span><br><span class="line">    await <span class="keyword">with</span><span class="constructor">TaskGroup(<span class="params">of</span>: String.<span class="params">self</span>)</span> &#123; group <span class="keyword">in</span></span><br><span class="line">        <span class="keyword">for</span> component <span class="keyword">in</span> components &#123;</span><br><span class="line">            group.addTask &#123;</span><br><span class="line">                <span class="keyword">do</span> &#123;</span><br><span class="line">                    <span class="keyword">try</span> await self.pull(component: component)</span><br><span class="line">                    operation.complete.append(<span class="constructor">Result(<span class="params">name</span>: <span class="params">component</span>.<span class="params">name</span>, <span class="params">success</span>: <span class="params">true</span>, <span class="params">content</span>: <span class="string">&quot;成功&quot;</span>)</span>)</span><br><span class="line">                &#125; catch &#123;</span><br><span class="line">                    operation.complete.append(<span class="constructor">Result(<span class="params">name</span>: <span class="params">component</span>.<span class="params">name</span>, <span class="params">success</span>: <span class="params">false</span>, <span class="params">content</span>: <span class="params">error</span>.<span class="params">localizedDescription</span>)</span>)</span><br><span class="line">                &#125;</span><br><span class="line">                operation.percent = <span class="constructor">CGFloat(<span class="params">operation</span>.<span class="params">complete</span>.<span class="params">count</span>)</span><span class="operator"> / </span><span class="constructor">CGFloat(<span class="params">components</span>.<span class="params">count</span>)</span></span><br><span class="line">                await <span class="module-access"><span class="module"><span class="identifier">MainActor</span>.</span></span>run &#123;</span><br><span class="line">                    self.update<span class="constructor">Component(<span class="params">component</span>)</span></span><br><span class="line">                    self.currentOperation = operation</span><br><span class="line">                &#125;</span><br><span class="line">                return component.name</span><br><span class="line">            &#125;</span><br><span class="line">        &#125;</span><br><span class="line">        <span class="keyword">for</span> await value <span class="keyword">in</span> group &#123;</span><br><span class="line">            print(<span class="string">&quot;\(value)拉取完成&quot;</span>)</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>拓展一下，如果不是数组类型的任务并发，可以使用async let方式使用控制并发，如下</p>
+<figure class="highlight swift"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">func</span> <span class="title">fetchUserData</span>()</span> <span class="keyword">async</span> &#123;</span><br><span class="line">    <span class="keyword">do</span> &#123;</span><br><span class="line">        <span class="keyword">async</span> <span class="keyword">let</span> profile <span class="operator">=</span> fetchUserProfile()</span><br><span class="line">        <span class="keyword">async</span> <span class="keyword">let</span> posts <span class="operator">=</span> fetchUserPosts()</span><br><span class="line"></span><br><span class="line">        <span class="comment">// 并行等待两个异步操作的结果</span></span><br><span class="line">        <span class="keyword">let</span> userProfile <span class="operator">=</span> <span class="keyword">try</span> <span class="keyword">await</span> profile</span><br><span class="line">        <span class="keyword">let</span> userPosts <span class="operator">=</span> <span class="keyword">try</span> <span class="keyword">await</span> posts</span><br><span class="line"></span><br><span class="line">        <span class="built_in">print</span>(<span class="string">&quot;User Profile: <span class="subst">\(userProfile)</span>&quot;</span>)</span><br><span class="line">        <span class="built_in">print</span>(<span class="string">&quot;User Posts: <span class="subst">\(userPosts)</span>&quot;</span>)</span><br><span class="line">    &#125; <span class="keyword">catch</span> &#123;</span><br><span class="line">        <span class="built_in">print</span>(<span class="string">&quot;Error: <span class="subst">\(error)</span>&quot;</span>)</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="type">Task</span> &#123;</span><br><span class="line">    <span class="keyword">await</span> fetchUserData()</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>使用MainActor替代主线程回调<br>有时候我们需要刷新单个工作区，需要重新查看当前工作区的所有组件的状态，可以调一个全局异步子线程去查询然后主线程回调，可以这么写</p>
+<figure class="highlight reasonml"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br></pre></td><td class="code"><pre><span class="line">func reload<span class="constructor">Workspace(<span class="params">_</span> <span class="params">workspace</span>: LocalWorkspace)</span> &#123;</span><br><span class="line">    workspace.isLoading = <span class="literal">true</span></span><br><span class="line">    <span class="module-access"><span class="module"><span class="identifier">DispatchQueue</span>.</span></span>global<span class="literal">()</span>.async &#123;</span><br><span class="line">        var newWpss: <span class="literal">[L<span class="identifier">ocalWorkspace</span>]</span> = <span class="literal">[]</span></span><br><span class="line">        <span class="keyword">for</span> wps <span class="keyword">in</span> self.workspaceViewModel.workSpaces &#123;</span><br><span class="line">            <span class="keyword">if</span> wps.path<span class="operator"> == </span>workspace.path &#123;</span><br><span class="line">                <span class="keyword">let</span> path = workspace.path</span><br><span class="line">                <span class="keyword">let</span> name = (path <span class="keyword">as</span> NSString).lastPathComponent</span><br><span class="line">                <span class="keyword">do</span> &#123;</span><br><span class="line">                    var components = <span class="keyword">try</span> <span class="module-access"><span class="module"><span class="identifier">Component</span>.</span></span>parse<span class="constructor">Components(<span class="params">workspace</span>: <span class="params">path</span>)</span>.map &#123;</span><br><span class="line">                        <span class="keyword">let</span> comp = <span class="constructor">Component($0)</span></span><br><span class="line">                        self.update<span class="constructor">Component(<span class="params">comp</span>)</span></span><br><span class="line">                        return comp</span><br><span class="line">                    &#125;</span><br><span class="line">                    components = components.sorted &#123; comp1, comp2 <span class="keyword">in</span></span><br><span class="line">                        return (comp1.unPushCount + comp1.unPullCount) &gt; (comp2.unPushCount + comp2.unPullCount)</span><br><span class="line">                    &#125;</span><br><span class="line">                    <span class="keyword">let</span> workspace = <span class="constructor">LocalWorkspace(<span class="params">name</span>: <span class="params">name</span>, <span class="params">path</span>: <span class="params">path</span>, <span class="params">components</span>: <span class="params">components</span>)</span></span><br><span class="line">                    newWpss.append(workspace)</span><br><span class="line">                &#125; catch &#123;</span><br><span class="line">                    </span><br><span class="line">                &#125;</span><br><span class="line">            &#125; <span class="keyword">else</span> &#123;</span><br><span class="line">                newWpss.append(wps)</span><br><span class="line">            &#125;</span><br><span class="line">        &#125;</span><br><span class="line">        <span class="module-access"><span class="module"><span class="identifier">DispatchQueue</span>.</span></span>main.async &#123;</span><br><span class="line">            self.workspaceViewModel = <span class="constructor">ComponentListViewModel(<span class="params">workSpaces</span>: <span class="params">newWpss</span>)</span></span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>通过使用@MainActor， 再将读取子线程修改到读取文件的那部分，那可以简单许多</p>
+<figure class="highlight swift"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">func</span> <span class="title">reloadWorkspace</span>(<span class="keyword">_</span> <span class="params">workspace</span>: <span class="type">LocalWorkspace</span>)</span> &#123;</span><br><span class="line">        <span class="type">Task</span> &#123; <span class="meta">@MainActor</span> <span class="keyword">in</span></span><br><span class="line">            workspace.isLoading <span class="operator">=</span> <span class="literal">true</span></span><br><span class="line">            <span class="keyword">for</span> wps <span class="keyword">in</span> <span class="keyword">self</span>.workspaceViewModel.workSpaces <span class="keyword">where</span> wps.path <span class="operator">==</span> workspace.path &#123;</span><br><span class="line">                <span class="keyword">do</span> &#123;</span><br><span class="line">                    <span class="keyword">let</span> baseComponents <span class="operator">=</span> <span class="keyword">try</span> <span class="keyword">await</span> <span class="type">Component</span>.parseComponents(workspace: path)</span><br><span class="line">                    <span class="keyword">var</span> components <span class="operator">=</span> baseComponents.map &#123;</span><br><span class="line">                        <span class="keyword">let</span> comp <span class="operator">=</span> <span class="type">Component</span>(<span class="variable">$0</span>)</span><br><span class="line">                        <span class="keyword">self</span>.updateComponent(comp)</span><br><span class="line">                        <span class="keyword">return</span> comp</span><br><span class="line">                    &#125;</span><br><span class="line">                    components <span class="operator">=</span> components.sorted &#123; comp1, comp2 <span class="keyword">in</span></span><br><span class="line">                        <span class="keyword">return</span> (comp1.unPushCount <span class="operator">+</span> comp1.unPullCount <span class="operator">+</span> comp1.unCommitCount) <span class="operator">&gt;</span> (comp2.unPushCount <span class="operator">+</span> comp2.unPullCount <span class="operator">+</span> comp2</span><br><span class="line">                            .unCommitCount)</span><br><span class="line">                    &#125;</span><br><span class="line">                    workspace.components <span class="operator">=</span> components</span><br><span class="line">                    workspace.isLoading <span class="operator">=</span> <span class="literal">false</span></span><br><span class="line">                &#125; <span class="keyword">catch</span> &#123;</span><br><span class="line">                    <span class="built_in">print</span>(error)</span><br><span class="line">                &#125;</span><br><span class="line">            &#125;</span><br><span class="line">            <span class="keyword">self</span>.workspaceViewModel <span class="operator">=</span> <span class="type">ComponentListViewModel</span>(workSpaces: <span class="keyword">self</span>.workspaceViewModel.workSpaces)</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br></pre></td></tr></table></figure>
+
+<p>系统会自动将Task里面包含的部分都强制在主线程执行<br>@MainActor除了可以修饰闭包之外，还可以直接写在方法前面，表示该方法都是在主线程执行的， 或者写在类或者结构体前面，这表示强制要求该类的方法或成员属性必须在主线程中执行或进行读写操作。<br>提问：下面这串代码最后会怎么输出？</p>
+<figure class="highlight swift"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">@MainActor</span></span><br><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">TestClass</span> </span>&#123;</span><br><span class="line">    <span class="keyword">var</span> testItem: <span class="type">String</span> <span class="operator">=</span> <span class="string">&quot;1&quot;</span> &#123;</span><br><span class="line">        <span class="keyword">didSet</span> &#123;</span><br><span class="line">            <span class="built_in">print</span>(<span class="string">&quot;访问的testItem在: <span class="subst">\(Thread.current)</span>&quot;</span>)</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line">    </span><br><span class="line">    <span class="function"><span class="keyword">func</span> <span class="title">globalThread</span>()</span> &#123;</span><br><span class="line">        <span class="built_in">print</span>(<span class="type">Thread</span>.current)</span><br><span class="line">        testItem <span class="operator">=</span> <span class="string">&quot;123&quot;</span></span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="type">DispatchQueue</span>.global().async &#123;</span><br><span class="line">    <span class="built_in">print</span>(<span class="string">&quot;当前线程111：<span class="subst">\(Thread.current)</span>&quot;</span>)</span><br><span class="line">    <span class="type">Task</span> &#123;</span><br><span class="line">        <span class="built_in">print</span>(<span class="string">&quot;当前线程222：<span class="subst">\(Thread.current)</span>&quot;</span>)</span><br><span class="line">        <span class="keyword">let</span> item <span class="operator">=</span> <span class="keyword">await</span> <span class="type">TestClass</span>()</span><br><span class="line">        <span class="keyword">await</span> item.globalThread()</span><br><span class="line">        <span class="built_in">print</span>(<span class="string">&quot;当前线程333：<span class="subst">\(Thread.current)</span>&quot;</span>)</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="built_in">print</span>(<span class="string">&quot;当前线程444：<span class="subst">\(Thread.current)</span>&quot;</span>)</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>结果：</p>
+<figure class="highlight nix"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line">当前线程<span class="number">111</span>：&lt;NSThread: <span class="number">0</span>x600001700640&gt;&#123;<span class="attr">number</span> = <span class="number">4</span>, <span class="attr">name</span> = (<span class="literal">null</span>)&#125;</span><br><span class="line">当前线程<span class="number">222</span>：&lt;NSThread: <span class="number">0</span>x60000170cbc0&gt;&#123;<span class="attr">number</span> = <span class="number">9</span>, <span class="attr">name</span> = (<span class="literal">null</span>)&#125;</span><br><span class="line">当前线程<span class="number">444</span>：&lt;NSThread: <span class="number">0</span>x600001700640&gt;&#123;<span class="attr">number</span> = <span class="number">4</span>, <span class="attr">name</span> = (<span class="literal">null</span>)&#125;</span><br><span class="line">&lt;_NSMainThread: <span class="number">0</span>x600001708240&gt;&#123;<span class="attr">number</span> = <span class="number">1</span>, <span class="attr">name</span> = main&#125;</span><br><span class="line">访问的testItem在: &lt;_NSMainThread: <span class="number">0</span>x600001708240&gt;&#123;<span class="attr">number</span> = <span class="number">1</span>, <span class="attr">name</span> = main&#125;</span><br><span class="line">当前线程<span class="number">333</span>：&lt;NSThread: <span class="number">0</span>x60000170cbc0&gt;&#123;<span class="attr">number</span> = <span class="number">9</span>, <span class="attr">name</span> = (<span class="literal">null</span>)&#125;</span><br></pre></td></tr></table></figure>
+
+<h2 id="数据竞争（Data-Race）"><a href="#数据竞争（Data-Race）" class="headerlink" title="数据竞争（Data Race）"></a>数据竞争（Data Race）</h2><p>在循环执行多个仓库的拉取或者推送的时候，需要看到对应进度以及成功或者失败的状态，失败的话要允许显示失败信息</p>
+<p>其中，pull操作本质上是fetch + merge 的流程，fetch本质是一个文件下载的流程，他的进度回调方法会在子线程<br>所以当多个仓库并发操作的时候，这里就会存在多个子线程同时更改Progress的情况，所以这里我们用actor避免数据竞争情况<br>actor : 属于引用类型，类似class但是不可继承<br>定义一个actor, 存储操作类型，已经完成的组件及其结果，还有当前进度</p>
+<figure class="highlight swift"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br></pre></td><td class="code"><pre><span class="line">  actor <span class="type">Operation</span> &#123;</span><br><span class="line">    <span class="keyword">private(set)</span> <span class="keyword">var</span> action: <span class="type">Component</span>.<span class="type">Action</span></span><br><span class="line">    <span class="keyword">private(set)</span> <span class="keyword">var</span> complete: [<span class="type">Result</span>] <span class="operator">=</span> []</span><br><span class="line">    <span class="keyword">private(set)</span> <span class="keyword">var</span> percent: <span class="type">CGFloat</span> <span class="operator">=</span> <span class="number">0.0</span></span><br><span class="line">    </span><br><span class="line">    <span class="function"><span class="keyword">init</span>(<span class="params">action</span>: <span class="type">Component</span>.<span class="type">Action</span>)</span> &#123;</span><br><span class="line">        <span class="keyword">self</span>.action <span class="operator">=</span> action</span><br><span class="line">    &#125;</span><br><span class="line">    </span><br><span class="line">    <span class="function"><span class="keyword">func</span> <span class="title">addComplete</span>(<span class="keyword">_</span> <span class="params">result</span>: <span class="type">Result</span>)</span> &#123;</span><br><span class="line">        complete.append(result)</span><br><span class="line">    &#125;</span><br><span class="line">    </span><br><span class="line">    <span class="function"><span class="keyword">func</span> <span class="title">updatePercent</span>(<span class="keyword">_</span> <span class="params">newValue</span>: <span class="type">CGFloat</span>)</span> &#123;</span><br><span class="line">        percent <span class="operator">=</span> newValue</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>值得注意的是，actor里面的方法和属性都需要通过await读写</p>
+<p>在dataProvider定义属性，提供给SwiftUI渲染, 当数据更新的时候，调用updateProgress方法更新数据进而更新UI</p>
+<figure class="highlight swift"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">@Published</span> <span class="keyword">var</span> progress: <span class="type">CGFloat</span> <span class="operator">=</span> <span class="number">0.0</span> </span><br><span class="line"><span class="meta">@Published</span> <span class="keyword">var</span> completeCount: <span class="type">Int</span> <span class="operator">=</span> <span class="number">0</span></span><br><span class="line"><span class="meta">@Published</span> <span class="keyword">var</span> totalCount: <span class="type">Int</span> <span class="operator">=</span> <span class="number">0</span></span><br><span class="line"><span class="meta">@Published</span> <span class="keyword">var</span> title: <span class="type">String</span>?</span><br><span class="line"><span class="meta">@Published</span> <span class="keyword">var</span> results: [<span class="type">Result</span>] <span class="operator">=</span> []</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">func</span> <span class="title">updateProgress</span>()</span> <span class="keyword">async</span> &#123;</span><br><span class="line">    <span class="keyword">guard</span> <span class="keyword">let</span> currentOperation <span class="operator">=</span> <span class="keyword">self</span>.currentOperation, <span class="keyword">await</span> currentOperation.action.components.count <span class="operator">&gt;</span> <span class="number">0</span> <span class="keyword">else</span> &#123; <span class="keyword">return</span> &#125;</span><br><span class="line">    progress <span class="operator">=</span> <span class="type">CGFloat</span>(<span class="keyword">await</span> currentOperation.complete.count) <span class="operator">/</span> <span class="type">CGFloat</span>(<span class="keyword">await</span> currentOperation.action.components.count)</span><br><span class="line">    completeCount <span class="operator">=</span> <span class="keyword">await</span> currentOperation.complete.count</span><br><span class="line">    totalCount <span class="operator">=</span> <span class="keyword">await</span> currentOperation.action.components.count</span><br><span class="line">    results <span class="operator">=</span> <span class="keyword">await</span> currentOperation.complete</span><br><span class="line">&#125;</span><br><span class="line"><span class="function"><span class="keyword">func</span> <span class="title">pull</span>(<span class="params">workspace</span>: <span class="type">LocalWorkspace</span>, <span class="params">components</span>: [<span class="type">Component</span>], <span class="params">operation</span>: <span class="type">Operation</span>)</span> <span class="keyword">async</span> &#123;</span><br><span class="line">    <span class="keyword">await</span> withTaskGroup(of: <span class="type">String</span>.<span class="keyword">self</span>) &#123; group <span class="keyword">in</span></span><br><span class="line">        <span class="keyword">for</span> component <span class="keyword">in</span> components &#123;</span><br><span class="line">            group.addTask &#123;</span><br><span class="line">                <span class="keyword">do</span> &#123;</span><br><span class="line">                    <span class="built_in">print</span>(<span class="string">&quot;<span class="subst">\(component.name)</span>开始执行&quot;</span>)</span><br><span class="line">                    <span class="keyword">try</span> <span class="keyword">await</span> <span class="keyword">self</span>.pull(component: component)</span><br><span class="line">                    <span class="keyword">await</span> operation.addComplete(<span class="type">Result</span>(name: component.name, success: <span class="literal">true</span>, content: <span class="string">&quot;成功&quot;</span>))</span><br><span class="line">                &#125; <span class="keyword">catch</span> &#123;</span><br><span class="line">                    <span class="keyword">await</span> operation.addComplete(<span class="type">Result</span>(name: component.name, success: <span class="literal">false</span>, content: error.localizedDescription))</span><br><span class="line">                &#125;</span><br><span class="line">                <span class="keyword">await</span> operation.updatePercent(<span class="type">CGFloat</span>(operation.complete.count) <span class="operator">/</span> <span class="type">CGFloat</span>(components.count))</span><br><span class="line">                <span class="keyword">self</span>.updateComponent(component)</span><br><span class="line">                <span class="keyword">await</span> <span class="keyword">self</span>.updateProgress()</span><br><span class="line">                <span class="keyword">return</span> component.name</span><br><span class="line">            &#125;</span><br><span class="line">        &#125;</span><br><span class="line">        <span class="keyword">for</span> <span class="keyword">await</span> value <span class="keyword">in</span> group &#123;</span><br><span class="line">            <span class="built_in">print</span>(<span class="string">&quot;<span class="subst">\(value)</span>拉取完成&quot;</span>)</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>在Task中，如果有actor对象发生行为，自动隔离其他线程对他的操作，相当于加锁，保证这个对象的操作是线程安全的，如果actor内某个方法不需要隔离（比如没有对属性进行操作），那么在方法前面加上nonisolated即可</p>
+<p>当然，保证线程安全 ≠ 在主线程上操作，如果需要在主线程上操作，可以搭配@MainActor + class，如</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">@MainActor</span></span><br><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">MyClass</span> </span>&#123;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+
+<h1 id="SwiftUI"><a href="#SwiftUI" class="headerlink" title="SwiftUI"></a>SwiftUI</h1><h2 id="EnvironmentObject"><a href="#EnvironmentObject" class="headerlink" title="@EnvironmentObject"></a>@EnvironmentObject</h2><p>众所周知，要弹窗必须在view下面添加一个alert属性，并且在里面定义alert的样式，如果很多地方都有弹窗需求，那么这个重复代码量就很大。</p>
+<figure class="highlight less"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">/// 第一件事，创建一个Bool控制弹窗显示和隐藏</span></span><br><span class="line"><span class="variable">@State</span> var isShowing = false</span><br><span class="line">VStack &#123;</span><br><span class="line">    <span class="selector-tag">Text</span>(<span class="string">&quot;Anything&quot;</span>)</span><br><span class="line">&#125; </span><br><span class="line"><span class="comment">// 第二个使其，设计弹窗样式，如果弹窗样式复杂，那代码量就更多</span></span><br><span class="line"><span class="selector-class">.alert</span>(<span class="attribute">isPresented</span>: isShowing) &#123;</span><br><span class="line">    <span class="selector-tag">Alert</span>(<span class="attribute">title</span>: Text(title), <span class="attribute">message</span>: Text(message), <span class="attribute">dismissButton</span>: .default(Text(<span class="string">&quot;OK&quot;</span>)))</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>目标：设计一个弹窗用来提示错误信息，使其在任意一个View上面都可以弹出，尽量减少重复编码</p>
+<p>首先设计一个类，在全局生效</p>
+<figure class="highlight swift"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">AlertManager</span>: <span class="title">ObservableObject</span> </span>&#123;</span><br><span class="line">    <span class="meta">@Published</span> <span class="keyword">var</span> isShowing: <span class="type">Bool</span> <span class="operator">=</span> <span class="literal">false</span></span><br><span class="line">    <span class="meta">@Published</span> <span class="keyword">var</span> title: <span class="type">String</span> <span class="operator">=</span> <span class="string">&quot;&quot;</span></span><br><span class="line">    <span class="meta">@Published</span> <span class="keyword">var</span> message: <span class="type">String</span> <span class="operator">=</span> <span class="string">&quot;&quot;</span></span><br><span class="line">   </span><br><span class="line">    <span class="function"><span class="keyword">func</span> <span class="title">showAlert</span>(<span class="params">title</span>: <span class="type">String</span>, <span class="params">message</span>: <span class="type">String</span>)</span> &#123;</span><br><span class="line">        <span class="keyword">self</span>.title <span class="operator">=</span> title</span><br><span class="line">        <span class="keyword">self</span>.message <span class="operator">=</span> message</span><br><span class="line">        <span class="keyword">self</span>.isShowing <span class="operator">=</span> <span class="literal">true</span></span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>实例化后注入到根视图中， 使用environmentObject注入</p>
+<figure class="highlight less"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br></pre></td><td class="code"><pre><span class="line"><span class="variable">@main</span></span><br><span class="line">struct <span class="attribute">yboxDesktopApp</span>: App &#123;</span><br><span class="line">    </span><br><span class="line">    <span class="variable">@StateObject</span> private var alertManager = AlertManager()</span><br><span class="line">  </span><br><span class="line">    var <span class="attribute">body</span>: some Scene &#123;</span><br><span class="line">        <span class="selector-tag">MenuBarExtra</span>(<span class="string">&quot;yboxDeskTop&quot;</span>, <span class="attribute">image</span>: <span class="string">&quot;icon50&quot;</span>) &#123;</span><br><span class="line">            <span class="selector-tag">ContentView</span>()</span><br><span class="line">                <span class="selector-class">.environmentObject</span>(alertManager)</span><br><span class="line">                <span class="selector-class">.onAppear</span> &#123;</span><br><span class="line">                    <span class="selector-tag">print</span>(<span class="string">&quot;Visible&quot;</span>)</span><br><span class="line">                &#125;</span><br><span class="line">        &#125;</span><br><span class="line">        <span class="selector-class">.menuBarExtraStyle</span>(.window)</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>之后可以在这个根视图下的任意一个子视图都可以访问到这个alertManager对象<br>如下，在view内定义好环境变量对象之后，点击按钮可以直接访问到alertManager对象，并调用其方法</p>
+<figure class="highlight less"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br></pre></td><td class="code"><pre><span class="line"><span class="selector-tag">struct</span> <span class="selector-tag">GitUserEditView</span>: <span class="selector-tag">View</span> &#123;</span><br><span class="line">    <span class="variable">@EnvironmentObject</span> var <span class="attribute">alertManager</span>: AlertManager</span><br><span class="line"></span><br><span class="line">    var <span class="attribute">body</span>: some View &#123;</span><br><span class="line">        <span class="selector-tag">VStack</span> &#123;</span><br><span class="line">            <span class="selector-tag">Button</span>(<span class="attribute">action</span>: &#123;</span><br><span class="line">                <span class="selector-tag">alertManager</span><span class="selector-class">.showAlert</span>(<span class="attribute">title</span>: <span class="string">&quot;提示&quot;</span>, <span class="attribute">message</span>: <span class="string">&quot;信息&quot;</span>)</span><br><span class="line">            &#125;) &#123;</span><br><span class="line">                <span class="selector-tag">Text</span>(<span class="string">&quot;点击&quot;</span>)</span><br><span class="line">            &#125;</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line">   &#125;</span><br></pre></td></tr></table></figure>
+<p>为了创建弹窗，我们创建一个ViewModifier用于修改View的属性</p>
+<figure class="highlight less"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><span class="line"><span class="selector-tag">struct</span> <span class="selector-tag">ErrorAlert</span>: <span class="selector-tag">ViewModifier</span> &#123;</span><br><span class="line">    <span class="variable">@EnvironmentObject</span> var <span class="attribute">errorManager</span>: AlertManager</span><br><span class="line"></span><br><span class="line">    func body(<span class="attribute">content</span>: Content) -&gt; some View &#123;</span><br><span class="line">        <span class="selector-tag">content</span></span><br><span class="line">            <span class="selector-class">.alert</span>(<span class="attribute">isPresented</span>: $errorManager.isShowing) &#123;</span><br><span class="line">                <span class="selector-tag">Alert</span>(<span class="attribute">title</span>: Text(errorManager.title), <span class="attribute">message</span>: Text(errorManager.message), <span class="attribute">dismissButton</span>: .default(Text(<span class="string">&quot;OK&quot;</span>)))</span><br><span class="line">            &#125;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>拓展一下View, 给他添加刚才创建的ViewModifier</p>
+<figure class="highlight swift"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line"><span class="class"><span class="keyword">extension</span> <span class="title">View</span> </span>&#123;</span><br><span class="line">    <span class="function"><span class="keyword">func</span> <span class="title">errorAlert</span>()</span> -&gt; <span class="keyword">some</span> <span class="type">View</span> &#123;</span><br><span class="line">        <span class="keyword">self</span>.modifier(<span class="type">ErrorAlert</span>())</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>完成上述工作之后，用如下方式就可以比较低成本的接入弹窗能力</p>
+<figure class="highlight less"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br></pre></td><td class="code"><pre><span class="line"><span class="selector-tag">struct</span> <span class="selector-tag">GitUserEditView</span>: <span class="selector-tag">View</span> &#123;</span><br><span class="line">    <span class="variable">@EnvironmentObject</span> var <span class="attribute">alertManager</span>: AlertManager</span><br><span class="line">    </span><br><span class="line">    var <span class="attribute">body</span>: some View &#123;</span><br><span class="line">        <span class="selector-tag">VStack</span> &#123;</span><br><span class="line">            <span class="selector-tag">Button</span>(<span class="attribute">action</span>: &#123;</span><br><span class="line">                <span class="selector-tag">alertManager</span><span class="selector-class">.showAlert</span>(<span class="attribute">title</span>: <span class="string">&quot;提示&quot;</span>, <span class="attribute">message</span>: <span class="string">&quot;信息&quot;</span>)</span><br><span class="line">            &#125;) &#123;</span><br><span class="line">                <span class="selector-tag">Text</span>(<span class="string">&quot;点击&quot;</span>)</span><br><span class="line">            &#125;</span><br><span class="line">        &#125;</span><br><span class="line">        <span class="selector-class">.errorAlert</span>()</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<h1 id="Swift-6"><a href="#Swift-6" class="headerlink" title="Swift 6"></a>Swift 6</h1><h2 id="数据竞争问题"><a href="#数据竞争问题" class="headerlink" title="数据竞争问题"></a>数据竞争问题</h2><p>Swift 6 之前，下面代码第十行会有警告，因为user会被认为是不安全的，可能会被其他方法引用导致数据竞争</p>
+<figure class="highlight swift"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br></pre></td><td class="code"><pre><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">User</span> </span>&#123;</span><br><span class="line">    <span class="keyword">var</span> name <span class="operator">=</span> <span class="string">&quot;Anonymous&quot;</span></span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="class"><span class="keyword">struct</span> <span class="title">ContentView</span>: <span class="title">View</span> </span>&#123;</span><br><span class="line">    <span class="keyword">var</span> body: <span class="keyword">some</span> <span class="type">View</span> &#123;</span><br><span class="line">        <span class="type">Text</span>(<span class="string">&quot;Hello, world!&quot;</span>)</span><br><span class="line">            .task &#123;</span><br><span class="line">                <span class="keyword">let</span> user <span class="operator">=</span> <span class="type">User</span>()</span><br><span class="line">                <span class="keyword">await</span> loadData(for: user)</span><br><span class="line">            &#125;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="keyword">func</span> <span class="title">loadData</span>(<span class="params">for</span> <span class="params">user</span>: <span class="type">User</span>)</span> <span class="keyword">async</span> &#123;</span><br><span class="line">        <span class="built_in">print</span>(<span class="string">&quot;Loading data for <span class="subst">\(user.name)</span>…&quot;</span>)</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>Swift 6以后警告消失，因为编译器检查到没有其他地方调用了，所以他是安全的<br>另外一个修改，在Swift 6中，如果ViewModel被标记为了@MainActor，那么使用他的LogInView也必须被标记为@MainActor</p>
+<figure class="highlight swift"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">@MainActor</span></span><br><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">ViewModel</span>: <span class="title">ObservableObject</span> </span>&#123;</span><br><span class="line">    <span class="function"><span class="keyword">func</span> <span class="title">authenticate</span>()</span> &#123;</span><br><span class="line">        <span class="built_in">print</span>(<span class="string">&quot;Authenticating…&quot;</span>)</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="meta">@MainActor</span></span><br><span class="line"><span class="class"><span class="keyword">struct</span> <span class="title">LogInView</span>: <span class="title">View</span> </span>&#123;</span><br><span class="line">    <span class="meta">@StateObject</span> <span class="keyword">private</span> <span class="keyword">var</span> model <span class="operator">=</span> <span class="type">ViewModel</span>()</span><br><span class="line"></span><br><span class="line">    <span class="keyword">var</span> body: <span class="keyword">some</span> <span class="type">View</span> &#123;</span><br><span class="line">        <span class="type">Button</span>(<span class="string">&quot;Hello, world&quot;</span>, action: startAuthentication)</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="keyword">func</span> <span class="title">startAuthentication</span>()</span> &#123;</span><br><span class="line">        model.authenticate()</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>同理， DataController被标记为@MainActor后，入参Logger也必须要@MainActor</p>
+<figure class="highlight less"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><span class="line"><span class="variable">@MainActor</span></span><br><span class="line">class Logger &#123;</span><br><span class="line"></span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="variable">@MainActor</span> </span><br><span class="line">class DataController &#123;</span><br><span class="line">    <span class="selector-tag">init</span>(<span class="attribute">logger</span>: Logger = Logger()) &#123;</span><br><span class="line"></span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>这一切都是为了避免数据竞争所作出的修改。</p>
+<h2 id="count-where"><a href="#count-where" class="headerlink" title="count(where:)"></a>count(where:)</h2><p>以前要在下面数组中得到85以上的数据个数，需要创建一个临时数组再数一下</p>
+<figure class="highlight xquery"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">let</span> scores = [<span class="number">100</span>, <span class="number">80</span>, <span class="number">85</span>]</span><br><span class="line"><span class="keyword">let</span> passcount = scores<span class="built_in">.filter</span>(&#123; <span class="variable">$0</span> &gt; <span class="number">85</span> &#125;)<span class="built_in">.count</span></span><br></pre></td></tr></table></figure>
+
+<p>Swift 6之后可以使用方法</p>
+<figure class="highlight xquery"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">let</span> passCount = scores<span class="built_in">.count</span> &#123; <span class="variable">$0</span> &gt;= <span class="number">85</span> &#125;</span><br></pre></td></tr></table></figure>
+
+<h2 id="类型化异常抛出"><a href="#类型化异常抛出" class="headerlink" title="类型化异常抛出"></a>类型化异常抛出</h2><p>以前我们写try catch的时候，在catch里面需要判断方法throw是的什么类型再进行处理</p>
+<figure class="highlight xquery"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line">do &#123;</span><br><span class="line">    <span class="keyword">try</span> xxx</span><br><span class="line">&#125; <span class="keyword">catch</span> <span class="keyword">let</span><span class="built_in"> error</span> <span class="keyword">as</span> NSError &#123;</span><br><span class="line">    handleNSError<span class="built_in">(error</span>)</span><br><span class="line">&#125; <span class="keyword">catch</span> <span class="keyword">let</span><span class="built_in"> error</span> <span class="keyword">as</span> CustomError &#123;</span><br><span class="line">    handleCustomError<span class="built_in">(error</span>)</span><br><span class="line">&#125; <span class="keyword">catch</span> &#123;</span><br><span class="line">   handleOtherError<span class="built_in">(error</span>)</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>Swift 6之后可以抛出指定类型的异常，外部可以直接知道Error的类型</p>
+<figure class="highlight swift"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">public</span> <span class="function"><span class="keyword">func</span> <span class="title">count</span>&lt;<span class="type">E</span>&gt;(<span class="params">where</span> <span class="params">predicate</span>: (<span class="type">Element</span>) <span class="keyword">throws</span>(<span class="type">E</span>) -&gt; <span class="type">Bool</span>)</span> <span class="keyword">throws</span>(<span class="type">E</span>) -&gt; <span class="type">Int</span></span><br></pre></td></tr></table></figure>
+
+<h2 id="import访问控制"><a href="#import访问控制" class="headerlink" title="import访问控制"></a>import访问控制</h2><p>Swift 6之后可以使用如下语法<br>private import SomeLibrary<br>当然private也可以改为public、internal等访问控制符<br>这个语法可以帮助我们隐藏某些库的引入，让外部无法知道我们依赖了哪些库</p>
+<h2 id="不可复制类型"><a href="#不可复制类型" class="headerlink" title="不可复制类型"></a>不可复制类型</h2><p>~Copyable是可复制前面带了一个取反符号，所以直译为不可复制类型<br>不可复制类型是在 Swift 5.9 中引入的，但在 Swift 6 中得到了几次升级<br>虽然翻译是这么翻译，但是我觉得更确切的说法应该是一次性类型。<br>使用方法如下，MissionImpossibleMessage标记为不可复制，并且read方法标记为了consuming<br>意味着message实例调用了read方法后会自动被销毁，他会被“消费”掉<br>继续执行print方法将会报错，因为message已经被销毁</p>
+<figure class="highlight swift"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br></pre></td><td class="code"><pre><span class="line"><span class="class"><span class="keyword">struct</span> <span class="title">MissionImpossibleMessage</span>: ~<span class="title">Copyable</span> </span>&#123;</span><br><span class="line">    <span class="keyword">private</span> <span class="keyword">var</span> message: <span class="type">String</span></span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="keyword">init</span>(<span class="params">message</span>: <span class="type">String</span>)</span> &#123;</span><br><span class="line">        <span class="keyword">self</span>.message <span class="operator">=</span> message</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    consuming <span class="function"><span class="keyword">func</span> <span class="title">read</span>()</span> &#123;</span><br><span class="line">        <span class="built_in">print</span>(message)</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="keyword">let</span> message <span class="operator">=</span> <span class="type">MissionImpossibleMessage</span>()</span><br><span class="line">message.read()</span><br><span class="line"><span class="built_in">print</span>(message)</span><br></pre></td></tr></table></figure>
+
+<h2 id="不连续下标"><a href="#不连续下标" class="headerlink" title="不连续下标"></a>不连续下标</h2><p>swift6升级了RangeSet, 支持从数组中分离出若干个满足条件的元素的不连续下标，并通过for循环结合下标进行遍历<br>比如下面的例子是从成绩表里面找到大于85分的成绩并打印出来<br>swift6之前我们可能会通过filter和map去解决问题，swift6之后多了一种解决方案</p>
+<figure class="highlight puppet"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br></pre></td><td class="code"><pre><span class="line">struct <span class="keyword">ExamResult</span> &#123;</span><br><span class="line">    var student: String</span><br><span class="line">    var score: Int</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="keyword">let</span> <span class="keyword">results</span> = [</span><br><span class="line">    ExamResult(student: <span class="string">&quot;Eric Effiong&quot;</span>, score: 95),</span><br><span class="line">    ExamResult(student: <span class="string">&quot;Maeve Wiley&quot;</span>, score: 70),</span><br><span class="line">    ExamResult(student: <span class="string">&quot;Otis Milburn&quot;</span>, score: 100)</span><br><span class="line">]</span><br><span class="line"></span><br><span class="line">let topResults = results.<span class="keyword">indices</span> &#123; student <span class="keyword">in</span></span><br><span class="line">    student.score &gt;= <span class="number">85</span></span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="keyword">for</span> <span class="keyword">result</span> <span class="keyword">in</span> <span class="keyword">results</span>[topResults] &#123;</span><br><span class="line">    print(<span class="string">&quot;\(result.student) scored \(result.score)%&quot;</span>)</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<h2 id="Int128"><a href="#Int128" class="headerlink" title="Int128"></a>Int128</h2><p>就是支持了128位的整型</p>
+<figure class="highlight apache"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="attribute">let</span> enoughForAnybody: Int<span class="number">128</span> = <span class="number">170</span>_<span class="number">141</span>_<span class="number">183</span>_<span class="number">460</span>_<span class="number">469</span>_<span class="number">231</span>_<span class="number">731</span>_<span class="number">687</span>_<span class="number">303</span>_<span class="number">715</span>_<span class="number">884</span>_<span class="number">105</span>_<span class="number">727</span></span><br></pre></td></tr></table></figure>
+
+<h2 id="其他"><a href="#其他" class="headerlink" title="其他"></a>其他</h2><p>Swift开始支持Windows、Linux、C++混编、嵌入式编程</p>
+
+    </div>
+
+    
+    
+    
+
+      <footer class="post-footer">
+          <div class="post-tags">
+              <a href="/tags/Swift/" rel="tag"># Swift</a>
+          </div>
+
+        
+
+
+        
+    <div class="post-nav">
+      <div class="post-nav-item">
+    <a href="/post/1ff3bfb6.html" rel="prev" title="Xcode 14 优化">
+      <i class="fa fa-chevron-left"></i> Xcode 14 优化
+    </a></div>
+      <div class="post-nav-item">
+    <a href="/post/4b595590.html" rel="next" title="鸿蒙状态管理装饰器V2">
+      鸿蒙状态管理装饰器V2 <i class="fa fa-chevron-right"></i>
+    </a></div>
+    </div>
+      </footer>
+    
+  </article>
+  
+  
+  
+
+
+
+          </div>
+          
+    <div class="comments" id="gitalk-container"></div>
+
+<script>
+  window.addEventListener('tabs:register', () => {
+    let { activeClass } = CONFIG.comments;
+    if (CONFIG.comments.storage) {
+      activeClass = localStorage.getItem('comments_active') || activeClass;
+    }
+    if (activeClass) {
+      let activeTab = document.querySelector(`a[href="#comment-${activeClass}"]`);
+      if (activeTab) {
+        activeTab.click();
+      }
+    }
+  });
+  if (CONFIG.comments.storage) {
+    window.addEventListener('tabs:click', event => {
+      if (!event.target.matches('.tabs-comment .tab-content .tab-pane')) return;
+      let commentClass = event.target.classList[1];
+      localStorage.setItem('comments_active', commentClass);
+    });
+  }
+</script>
+
+        </div>
+          
+  
+  <div class="toggle sidebar-toggle">
+    <span class="toggle-line toggle-line-first"></span>
+    <span class="toggle-line toggle-line-middle"></span>
+    <span class="toggle-line toggle-line-last"></span>
+  </div>
+
+  <aside class="sidebar">
+    <div class="sidebar-inner">
+
+      <ul class="sidebar-nav motion-element">
+        <li class="sidebar-nav-toc">
+          文章目录
+        </li>
+        <li class="sidebar-nav-overview">
+          站点概览
+        </li>
+      </ul>
+
+      <!--noindex-->
+      <div class="post-toc-wrap sidebar-panel">
+          <div class="post-toc motion-element"><ol class="nav"><li class="nav-item nav-level-1"><a class="nav-link" href="#%E8%AF%AD%E6%B3%95%E7%B3%96"><span class="nav-number">1.</span> <span class="nav-text">语法糖</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#if%E3%80%81switch-%E4%BD%9C%E4%B8%BA%E8%A1%A8%E8%BE%BE%E5%BC%8F%E4%B9%8B%E4%B8%80"><span class="nav-number">1.1.</span> <span class="nav-text">if、switch 作为表达式之一</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E6%AD%A3%E5%88%99%E8%A1%A8%E8%BE%BE%E5%BC%8F"><span class="nav-number">1.2.</span> <span class="nav-text">正则表达式</span></a></li></ol></li><li class="nav-item nav-level-1"><a class="nav-link" href="#Concurreny"><span class="nav-number">2.</span> <span class="nav-text">Concurreny</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#%E5%8D%8F%E7%A8%8B"><span class="nav-number">2.1.</span> <span class="nav-text">协程</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E6%95%B0%E6%8D%AE%E7%AB%9E%E4%BA%89%EF%BC%88Data-Race%EF%BC%89"><span class="nav-number">2.2.</span> <span class="nav-text">数据竞争（Data Race）</span></a></li></ol></li><li class="nav-item nav-level-1"><a class="nav-link" href="#SwiftUI"><span class="nav-number">3.</span> <span class="nav-text">SwiftUI</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#EnvironmentObject"><span class="nav-number">3.1.</span> <span class="nav-text">@EnvironmentObject</span></a></li></ol></li><li class="nav-item nav-level-1"><a class="nav-link" href="#Swift-6"><span class="nav-number">4.</span> <span class="nav-text">Swift 6</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#%E6%95%B0%E6%8D%AE%E7%AB%9E%E4%BA%89%E9%97%AE%E9%A2%98"><span class="nav-number">4.1.</span> <span class="nav-text">数据竞争问题</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#count-where"><span class="nav-number">4.2.</span> <span class="nav-text">count(where:)</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E7%B1%BB%E5%9E%8B%E5%8C%96%E5%BC%82%E5%B8%B8%E6%8A%9B%E5%87%BA"><span class="nav-number">4.3.</span> <span class="nav-text">类型化异常抛出</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#import%E8%AE%BF%E9%97%AE%E6%8E%A7%E5%88%B6"><span class="nav-number">4.4.</span> <span class="nav-text">import访问控制</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E4%B8%8D%E5%8F%AF%E5%A4%8D%E5%88%B6%E7%B1%BB%E5%9E%8B"><span class="nav-number">4.5.</span> <span class="nav-text">不可复制类型</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E4%B8%8D%E8%BF%9E%E7%BB%AD%E4%B8%8B%E6%A0%87"><span class="nav-number">4.6.</span> <span class="nav-text">不连续下标</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#Int128"><span class="nav-number">4.7.</span> <span class="nav-text">Int128</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E5%85%B6%E4%BB%96"><span class="nav-number">4.8.</span> <span class="nav-text">其他</span></a></li></ol></li></ol></div>
+      </div>
+      <!--/noindex-->
+
+      <div class="site-overview-wrap sidebar-panel">
+        <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+    <img class="site-author-image" itemprop="image" alt="Arclin"
+      src="https://avatars.githubusercontent.com/u/12107804?v=4">
+  <p class="site-author-name" itemprop="name">Arclin</p>
+  <div class="site-description" itemprop="description">Stay hungry,stay foolish</div>
+</div>
+<div class="site-state-wrap motion-element">
+  <nav class="site-state">
+      <div class="site-state-item site-state-posts">
+          <a href="/archives/">
+        
+          <span class="site-state-item-count">102</span>
+          <span class="site-state-item-name">日志</span>
+        </a>
+      </div>
+      <div class="site-state-item site-state-categories">
+            <a href="/categories/">
+          
+        <span class="site-state-item-count">12</span>
+        <span class="site-state-item-name">分类</span></a>
+      </div>
+      <div class="site-state-item site-state-tags">
+            <a href="/tags/">
+          
+        <span class="site-state-item-count">39</span>
+        <span class="site-state-item-name">标签</span></a>
+      </div>
+  </nav>
+</div>
+  <div class="links-of-author motion-element">
+      <span class="links-of-author-item">
+        <a href="https://github.com/Arc-lin" title="GitHub → https://github.com/Arc-lin" rel="noopener" target="_blank"><i class="fab fa-github fa-fw"></i>GitHub</a>
+      </span>
+      <span class="links-of-author-item">
+        <a href="mailto:arclin325@gmail.com" title="E-Mail → mailto:arclin325@gmail.com" rel="noopener" target="_blank"><i class="fa fa-envelope fa-fw"></i>E-Mail</a>
+      </span>
+  </div>
+
+
+
+      </div>
+
+    </div>
+  </aside>
+  <div id="sidebar-dimmer"></div>
+
+
+      </div>
+    </main>
+
+    <footer class="footer">
+      <div class="footer-inner">
+        
+
+        
+
+<div class="copyright">
+  
+  &copy; 
+  <span itemprop="copyrightYear">2025</span>
+  <span class="with-love">
+    <i class="fa fa-heart"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">Arclin</span>
+</div>
+  <div class="powered-by">由 <a href="https://hexo.io" class="theme-link" rel="noopener" target="_blank">Hexo</a> & <a href="https://muse.theme-next.org" class="theme-link" rel="noopener" target="_blank">NexT.Muse</a> 强力驱动
+  </div>
+
+        
+<div class="busuanzi-count">
+  <script async src="https://busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js"></script>
+    <span class="post-meta-item" id="busuanzi_container_site_uv" style="display: none;">
+      <span class="post-meta-item-icon">
+        <i class="fa fa-user"></i>
+      </span>
+      <span class="site-uv" title="总访客量">
+        <span id="busuanzi_value_site_uv"></span>
+      </span>
+    </span>
+    <span class="post-meta-divider">|</span>
+    <span class="post-meta-item" id="busuanzi_container_site_pv" style="display: none;">
+      <span class="post-meta-item-icon">
+        <i class="fa fa-eye"></i>
+      </span>
+      <span class="site-pv" title="总访问量">
+        <span id="busuanzi_value_site_pv"></span>
+      </span>
+    </span>
+</div>
+
+
+
+
+
+
+
+
+      </div>
+    </footer>
+  </div>
+
+  
+  <script src="/lib/anime.min.js"></script>
+  <script src="//cdn.jsdelivr.net/npm/jquery@3/dist/jquery.min.js"></script>
+  <script src="//cdn.jsdelivr.net/gh/fancyapps/fancybox@3/dist/jquery.fancybox.min.js"></script>
+  <script src="/lib/velocity/velocity.min.js"></script>
+  <script src="/lib/velocity/velocity.ui.min.js"></script>
+
+<script src="/js/utils.js"></script>
+
+<script src="/js/motion.js"></script>
+
+
+<script src="/js/schemes/muse.js"></script>
+
+
+<script src="/js/next-boot.js"></script>
+
+
+
+
+  
+  <script>
+    (function(){
+      var canonicalURL, curProtocol;
+      //Get the <link> tag
+      var x=document.getElementsByTagName("link");
+		//Find the last canonical URL
+		if(x.length > 0){
+			for (i=0;i<x.length;i++){
+				if(x[i].rel.toLowerCase() == 'canonical' && x[i].href){
+					canonicalURL=x[i].href;
+				}
+			}
+		}
+    //Get protocol
+	    if (!canonicalURL){
+	    	curProtocol = window.location.protocol.split(':')[0];
+	    }
+	    else{
+	    	curProtocol = canonicalURL.split(':')[0];
+	    }
+      //Get current URL if the canonical URL does not exist
+	    if (!canonicalURL) canonicalURL = window.location.href;
+	    //Assign script content. Replace current URL with the canonical URL
+      !function(){var e=/([http|https]:\/\/[a-zA-Z0-9\_\.]+\.baidu\.com)/gi,r=canonicalURL,t=document.referrer;if(!e.test(r)){var n=(String(curProtocol).toLowerCase() === 'https')?"https://sp0.baidu.com/9_Q4simg2RQJ8t7jm9iCKT-xh_/s.gif":"//api.share.baidu.com/s.gif";t?(n+="?r="+encodeURIComponent(document.referrer),r&&(n+="&l="+r)):r&&(n+="?l="+r);var i=new Image;i.src=n}}(window);})();
+  </script>
+
+
+
+
+  
+<script src="/js/local-search.js"></script>
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+  
+
+<link rel="stylesheet" href="//cdn.jsdelivr.net/npm/gitalk@1/dist/gitalk.min.css">
+
+<script>
+NexT.utils.loadComments(document.querySelector('#gitalk-container'), () => {
+  NexT.utils.getScript('//cdn.jsdelivr.net/npm/gitalk@1/dist/gitalk.min.js', () => {
+    var gitalk = new Gitalk({
+      clientID    : 'df6d1f33bb4a66f5fa60',
+      clientSecret: '5fcc9fb756ac9d4b16381288da7b29f691b45e0a',
+      repo        : 'arc-lin.github.io',
+      owner       : 'Arc-lin',
+      admin       : ['Arc-lin'],
+      id          : 'd64dddb5f63fb62cc81b667d212f043e',
+        language: 'zh-CN',
+      distractionFreeMode: false
+    });
+    gitalk.render('gitalk-container');
+  }, window.Gitalk);
+});
+</script>
+
+</body>
+</html>

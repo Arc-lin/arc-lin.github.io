@@ -30,7 +30,7 @@
 <meta property="og:locale">
 <meta property="og:image" content="https://github.com/Arc-lin/BlogImage/blob/master/1011.png?raw=true">
 <meta property="article:published_time" content="2017-02-22T16:00:00.000Z">
-<meta property="article:modified_time" content="2021-06-06T18:52:24.960Z">
+<meta property="article:modified_time" content="2022-07-12T16:51:57.237Z">
 <meta property="article:author" content="Arclin">
 <meta property="article:tag" content="iOS">
 <meta name="twitter:card" content="summary">
@@ -267,13 +267,13 @@
 <li>支持服务器端同步显示Log信息(建议搭建本地服务器,因为这样子Log发送快)</li>
 </ul>
 <p>使用</p>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">DKLog(@&quot;...&quot;); 普通log</span><br><span class="line">DKInfoLog(@&quot;...&quot;); 包含特殊信息的log</span><br><span class="line">DKWRANLog(@&quot;...&quot;); 警告log</span><br><span class="line">DKERRLog(@&quot;...&quot;); 错误log</span><br></pre></td></tr></table></figure>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line">&#x2F;**	</span><br><span class="line"> 初始化: 创建Txt的Log文件并写入输出</span><br><span class="line"> </span><br><span class="line"> @param path  文件夹路径,默认Documents</span><br><span class="line"> @param url   上传log地址 当发生崩溃事故的时候就会提示用户是否上传Log到服务器</span><br><span class="line"> @param debug 调试模式 *&#x2F;</span><br><span class="line">- (void)registerLoggerInPath:(NSString *)path uploadUrlStr:(NSString *)url debug:(BOOL)debug;</span><br><span class="line">eg:</span><br><span class="line">[[DKSharedLogger registerLoggerInPath:[NSHomeDirectory() stringByAppendingPathComponent:@&quot;Documents&quot;] uploadUrlStr:@&quot;http:&#x2F;&#x2F;192.168.1.91&#x2F;public&#x2F;index&#x2F;Index&#x2F;hello&quot; debug:YES];</span><br></pre></td></tr></table></figure>
+<figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line"><span class="built_in">DKLog</span>(@<span class="string">&quot;...&quot;</span>); 普通log</span><br><span class="line"><span class="built_in">DKInfoLog</span>(@<span class="string">&quot;...&quot;</span>); 包含特殊信息的log</span><br><span class="line"><span class="built_in">DKWRANLog</span>(@<span class="string">&quot;...&quot;</span>); 警告log</span><br><span class="line"><span class="built_in">DKERRLog</span>(@<span class="string">&quot;...&quot;</span>); 错误log</span><br></pre></td></tr></table></figure>
+<figure class="highlight objectivec"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">/**	</span></span><br><span class="line"><span class="comment"> 初始化: 创建Txt的Log文件并写入输出</span></span><br><span class="line"><span class="comment"> </span></span><br><span class="line"><span class="comment"> @param path  文件夹路径,默认Documents</span></span><br><span class="line"><span class="comment"> @param url   上传log地址 当发生崩溃事故的时候就会提示用户是否上传Log到服务器</span></span><br><span class="line"><span class="comment"> @param debug 调试模式 */</span></span><br><span class="line">- (<span class="keyword">void</span>)registerLoggerInPath:(<span class="built_in">NSString</span> *)path uploadUrlStr:(<span class="built_in">NSString</span> *)url debug:(<span class="built_in">BOOL</span>)debug;</span><br><span class="line">eg:</span><br><span class="line">[[DKSharedLogger registerLoggerInPath:[<span class="built_in">NSHomeDirectory</span>() stringByAppendingPathComponent:<span class="string">@&quot;Documents&quot;</span>] uploadUrlStr:<span class="string">@&quot;http://192.168.1.91/public/index/Index/hello&quot;</span> debug:<span class="literal">YES</span>];</span><br></pre></td></tr></table></figure>
 
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">[DKSharedLogger printLevel:DKLoggerLevelInfo|DKLoggerLevelWARN]; 在控制器只打印Info和Warn等级的Log</span><br></pre></td></tr></table></figure>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">[DKSharedLogger saveLevel:DKLoggerLevelError|DKLoggerLevelInfo]; 在文件中之写入Info和Error等级的Log</span><br></pre></td></tr></table></figure>
+<figure class="highlight coq"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">[DKSharedLogger printLevel:DKLoggerLevelInfo|<span class="type">DKLoggerLevelWARN</span>]; 在控制器只打印<span class="keyword">Info</span>和Warn等级的Log</span><br></pre></td></tr></table></figure>
+<figure class="highlight coq"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">[DKSharedLogger saveLevel:DKLoggerLevelError|<span class="type">DKLoggerLevelInfo</span>]; 在文件中之写入<span class="keyword">Info</span>和Error等级的Log</span><br></pre></td></tr></table></figure>
 
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">DK_VAR_DUMP(arr); 查看对象信息,例如变量arr</span><br></pre></td></tr></table></figure>
+<figure class="highlight reasonml"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="constructor">DK_VAR_DUMP(<span class="params">arr</span>)</span>; 查看对象信息,例如变量arr</span><br></pre></td></tr></table></figure>
 
 <p>长按界面2秒弹出log信息界面</p>
 <p><img src="https://github.com/Arc-lin/BlogImage/blob/master/1011.png?raw=true"></p>
@@ -376,7 +376,7 @@
       <div class="site-state-item site-state-posts">
           <a href="/archives/">
         
-          <span class="site-state-item-count">100</span>
+          <span class="site-state-item-count">102</span>
           <span class="site-state-item-name">日志</span>
         </a>
       </div>
@@ -389,7 +389,7 @@
       <div class="site-state-item site-state-tags">
             <a href="/tags/">
           
-        <span class="site-state-item-count">38</span>
+        <span class="site-state-item-count">39</span>
         <span class="site-state-item-name">标签</span></a>
       </div>
   </nav>
@@ -424,7 +424,7 @@
 <div class="copyright">
   
   &copy; 
-  <span itemprop="copyrightYear">2022</span>
+  <span itemprop="copyrightYear">2025</span>
   <span class="with-love">
     <i class="fa fa-heart"></i>
   </span>

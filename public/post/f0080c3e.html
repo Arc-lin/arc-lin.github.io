@@ -21,15 +21,15 @@
     var CONFIG = {"hostname":"www.arclin.cn","root":"/","scheme":"Muse","version":"7.8.0","exturl":false,"sidebar":{"position":"left","display":"post","padding":18,"offset":12,"onmobile":false},"copycode":{"enable":false,"show_result":false,"style":null},"back2top":{"enable":true,"sidebar":false,"scrollpercent":false},"bookmark":{"enable":false,"color":"#222","save":"auto"},"fancybox":true,"mediumzoom":false,"lazyload":false,"pangu":false,"comments":{"style":"tabs","active":null,"storage":true,"lazyload":false,"nav":null},"algolia":{"appID":"VOFC7668C9","apiKey":"24c644edc8e7353bf2e8d8e31f03a940","indexName":"hexo","hits":{"per_page":10},"labels":{"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}},"localsearch":{"enable":true,"trigger":"auto","top_n_per_article":1,"unescape":false,"preload":false},"motion":{"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},"path":"search.xml"};
   </script>
 
-  <meta name="description" content="ipad和iphone使用UIAlertViewController 1234567891011id aController;    if(DKDeviceiPad)&amp;#123;    alertC.modalPresentationStyle &#x3D; UIModalPresentationPopover;    UIPopoverPresentationController *popPc">
+  <meta name="description" content="ipad和iphone使用UIAlertViewController 1234567891011id aController;    if(DKDeviceiPad)&amp;#123;    alertC.modalPresentationStyle &#x3D; UIModalPresentationPopover;    UIPopoverPresentationController *popPc &#x3D; ale">
 <meta property="og:type" content="article">
 <meta property="og:title" content="ipad和iphone使用UIAlertViewController">
 <meta property="og:url" content="https://www.arclin.cn/post/f0080c3e.html">
 <meta property="og:site_name" content="Arclin">
-<meta property="og:description" content="ipad和iphone使用UIAlertViewController 1234567891011id aController;    if(DKDeviceiPad)&amp;#123;    alertC.modalPresentationStyle &#x3D; UIModalPresentationPopover;    UIPopoverPresentationController *popPc">
+<meta property="og:description" content="ipad和iphone使用UIAlertViewController 1234567891011id aController;    if(DKDeviceiPad)&amp;#123;    alertC.modalPresentationStyle &#x3D; UIModalPresentationPopover;    UIPopoverPresentationController *popPc &#x3D; ale">
 <meta property="og:locale">
 <meta property="article:published_time" content="2016-10-16T16:00:00.000Z">
-<meta property="article:modified_time" content="2021-06-06T18:52:24.965Z">
+<meta property="article:modified_time" content="2022-07-12T16:51:57.242Z">
 <meta property="article:author" content="Arclin">
 <meta property="article:tag" content="iOS">
 <meta name="twitter:card" content="summary">
@@ -251,7 +251,7 @@
 
       
         <p>ipad和iphone使用UIAlertViewController</p>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><span class="line">id aController;</span><br><span class="line">    if(DKDeviceiPad)&#123;</span><br><span class="line">    alertC.modalPresentationStyle &#x3D; UIModalPresentationPopover;</span><br><span class="line">    UIPopoverPresentationController *popPc &#x3D; alertC.popoverPresentationController;</span><br><span class="line">    popPc.barButtonItem &#x3D; self.downloadItem;</span><br><span class="line">    popPc.permittedArrowDirections &#x3D; UIPopoverArrowDirectionAny;</span><br><span class="line">    aController &#x3D; alertC;</span><br><span class="line">&#125;else&#123;</span><br><span class="line">    aController &#x3D; alertC;</span><br><span class="line">&#125;</span><br><span class="line">[window.rootViewController presentViewController:aController animated:YES completion:nil];</span><br></pre></td></tr></table></figure>
+<figure class="highlight objectivec"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">id</span> aController;</span><br><span class="line">    <span class="keyword">if</span>(DKDeviceiPad)&#123;</span><br><span class="line">    alertC.modalPresentationStyle = <span class="built_in">UIModalPresentationPopover</span>;</span><br><span class="line">    <span class="built_in">UIPopoverPresentationController</span> *popPc = alertC.popoverPresentationController;</span><br><span class="line">    popPc.barButtonItem = <span class="keyword">self</span>.downloadItem;</span><br><span class="line">    popPc.permittedArrowDirections = <span class="built_in">UIPopoverArrowDirectionAny</span>;</span><br><span class="line">    aController = alertC;</span><br><span class="line">&#125;<span class="keyword">else</span>&#123;</span><br><span class="line">    aController = alertC;</span><br><span class="line">&#125;</span><br><span class="line">[window.rootViewController presentViewController:aController animated:<span class="literal">YES</span> completion:<span class="literal">nil</span>];</span><br></pre></td></tr></table></figure>
     </div>
 
     
@@ -350,7 +350,7 @@
       <div class="site-state-item site-state-posts">
           <a href="/archives/">
         
-          <span class="site-state-item-count">100</span>
+          <span class="site-state-item-count">102</span>
           <span class="site-state-item-name">日志</span>
         </a>
       </div>
@@ -363,7 +363,7 @@
       <div class="site-state-item site-state-tags">
             <a href="/tags/">
           
-        <span class="site-state-item-count">38</span>
+        <span class="site-state-item-count">39</span>
         <span class="site-state-item-name">标签</span></a>
       </div>
   </nav>
@@ -398,7 +398,7 @@
 <div class="copyright">
   
   &copy; 
-  <span itemprop="copyrightYear">2022</span>
+  <span itemprop="copyrightYear">2025</span>
   <span class="with-love">
     <i class="fa fa-heart"></i>
   </span>

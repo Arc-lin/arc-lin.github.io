@@ -29,7 +29,7 @@
 <meta property="og:description" content="frp 内网穿透">
 <meta property="og:locale">
 <meta property="article:published_time" content="2018-02-18T14:05:00.000Z">
-<meta property="article:modified_time" content="2021-06-06T18:52:24.962Z">
+<meta property="article:modified_time" content="2022-07-12T16:51:57.240Z">
 <meta property="article:author" content="Arclin">
 <meta property="article:tag" content="frp">
 <meta name="twitter:card" content="summary">
@@ -254,19 +254,19 @@
 <span id="more"></span>
 
 <p><a target="_blank" rel="noopener" href="https://github.com/fatedier/frp/blob/master/README_zh.md">文档</a></p>
-<h3 id="服务器CentOS下载安装"><a href="#服务器CentOS下载安装" class="headerlink" title="服务器CentOS下载安装"></a>服务器CentOS下载安装</h3><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line">wget https:&#x2F;&#x2F;github.com&#x2F;fatedier&#x2F;frp&#x2F;releases&#x2F;download&#x2F;v0.13.0&#x2F;frp_0.13.0_linux_amd64.tar.gz</span><br><span class="line">tar -zxvf frp_0.13.0_linux_amd64.tar.gz</span><br><span class="line">cd frp_0.13.0_linux_amd64.tar.gz</span><br><span class="line">rm -f frpc</span><br><span class="line">rm -f frpc.ini</span><br><span class="line">vi frps.ini</span><br></pre></td></tr></table></figure>
+<h3 id="服务器CentOS下载安装"><a href="#服务器CentOS下载安装" class="headerlink" title="服务器CentOS下载安装"></a>服务器CentOS下载安装</h3><figure class="highlight apache"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line"><span class="attribute">wget</span> https://github.com/fatedier/frp/releases/download/v<span class="number">0</span>.<span class="number">13</span>.<span class="number">0</span>/frp_<span class="number">0</span>.<span class="number">13</span>.<span class="number">0</span>_linux_amd<span class="number">64</span>.tar.gz</span><br><span class="line"><span class="attribute">tar</span> -zxvf frp_<span class="number">0</span>.<span class="number">13</span>.<span class="number">0</span>_linux_amd<span class="number">64</span>.tar.gz</span><br><span class="line"><span class="attribute">cd</span> frp_<span class="number">0</span>.<span class="number">13</span>.<span class="number">0</span>_linux_amd<span class="number">64</span>.tar.gz</span><br><span class="line"><span class="attribute">rm</span> -f frpc</span><br><span class="line"><span class="attribute">rm</span> -f frpc.ini</span><br><span class="line"><span class="attribute">vi</span> frps.ini</span><br></pre></td></tr></table></figure>
 
 <p>编辑frps.ini</p>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line">[common]</span><br><span class="line">vhost_http_port &#x3D; 8001 # http访问端口</span><br><span class="line">bind_port &#x3D; 8009 # 远程响应的地址</span><br><span class="line">dashboard_port &#x3D; 8002 #控制面板端口号</span><br><span class="line"># dashboard 用户名密码，默认都为 admin</span><br><span class="line">dashboard_user &#x3D; admin</span><br><span class="line">dashboard_pwd &#x3D; admin</span><br></pre></td></tr></table></figure>
+<figure class="highlight ini"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line"><span class="section">[common]</span></span><br><span class="line"><span class="attr">vhost_http_port</span> = <span class="number">8001</span> <span class="comment"># http访问端口</span></span><br><span class="line"><span class="attr">bind_port</span> = <span class="number">8009</span> <span class="comment"># 远程响应的地址</span></span><br><span class="line"><span class="attr">dashboard_port</span> = <span class="number">8002</span> <span class="comment">#控制面板端口号</span></span><br><span class="line"><span class="comment"># dashboard 用户名密码，默认都为 admin</span></span><br><span class="line"><span class="attr">dashboard_user</span> = admin</span><br><span class="line"><span class="attr">dashboard_pwd</span> = admin</span><br></pre></td></tr></table></figure>
 
-<h3 id="启动服务端"><a href="#启动服务端" class="headerlink" title="启动服务端"></a>启动服务端</h3><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">.&#x2F;frps -c .&#x2F;frps.ini</span><br></pre></td></tr></table></figure>
+<h3 id="启动服务端"><a href="#启动服务端" class="headerlink" title="启动服务端"></a>启动服务端</h3><figure class="highlight awk"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">.<span class="regexp">/frps -c ./</span>frps.ini</span><br></pre></td></tr></table></figure>
 
-<h3 id="Mac客户端下载"><a href="#Mac客户端下载" class="headerlink" title="Mac客户端下载"></a>Mac客户端下载</h3><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line">wget https:&#x2F;&#x2F;github.com&#x2F;fatedier&#x2F;frp&#x2F;releases&#x2F;download&#x2F;v0.13.0&#x2F;frp_0.13.0_darwin_amd64.tar.gz</span><br><span class="line">tar -zxvf frp_0.13.0_darwin_amd64.tar.gz</span><br><span class="line">cd frp_0.13.0_darwin_amd64.tar.gz</span><br><span class="line">rm -f frps</span><br><span class="line">rm -f frps.ini</span><br><span class="line">vi frpc.ini</span><br></pre></td></tr></table></figure>
+<h3 id="Mac客户端下载"><a href="#Mac客户端下载" class="headerlink" title="Mac客户端下载"></a>Mac客户端下载</h3><figure class="highlight apache"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line"><span class="attribute">wget</span> https://github.com/fatedier/frp/releases/download/v<span class="number">0</span>.<span class="number">13</span>.<span class="number">0</span>/frp_<span class="number">0</span>.<span class="number">13</span>.<span class="number">0</span>_darwin_amd<span class="number">64</span>.tar.gz</span><br><span class="line"><span class="attribute">tar</span> -zxvf frp_<span class="number">0</span>.<span class="number">13</span>.<span class="number">0</span>_darwin_amd<span class="number">64</span>.tar.gz</span><br><span class="line"><span class="attribute">cd</span> frp_<span class="number">0</span>.<span class="number">13</span>.<span class="number">0</span>_darwin_amd<span class="number">64</span>.tar.gz</span><br><span class="line"><span class="attribute">rm</span> -f frps</span><br><span class="line"><span class="attribute">rm</span> -f frps.ini</span><br><span class="line"><span class="attribute">vi</span> frpc.ini</span><br></pre></td></tr></table></figure>
 
 <p>编辑frpc.ini</p>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line">[common]</span><br><span class="line">server_addr &#x3D; 120.78.175.51 # 远程服务器地址</span><br><span class="line">server_port &#x3D; 8009 # 服务端填写的bind_port</span><br><span class="line"></span><br><span class="line">[web]</span><br><span class="line">type &#x3D; http </span><br><span class="line">local_port &#x3D; 3000 # 本地要映射的端口</span><br><span class="line">custom_domains &#x3D; frp.arclin.me # 自定义的域名,需要在dnspod绑定远程主机地址</span><br></pre></td></tr></table></figure>
+<figure class="highlight ini"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line"><span class="section">[common]</span></span><br><span class="line"><span class="attr">server_addr</span> = <span class="number">120.78</span>.<span class="number">175.51</span> <span class="comment"># 远程服务器地址</span></span><br><span class="line"><span class="attr">server_port</span> = <span class="number">8009</span> <span class="comment"># 服务端填写的bind_port</span></span><br><span class="line"></span><br><span class="line"><span class="section">[web]</span></span><br><span class="line"><span class="attr">type</span> = http </span><br><span class="line"><span class="attr">local_port</span> = <span class="number">3000</span> <span class="comment"># 本地要映射的端口</span></span><br><span class="line"><span class="attr">custom_domains</span> = frp.arclin.me <span class="comment"># 自定义的域名,需要在dnspod绑定远程主机地址</span></span><br></pre></td></tr></table></figure>
 
-<h3 id="客户端运行"><a href="#客户端运行" class="headerlink" title="客户端运行"></a>客户端运行</h3><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">.&#x2F;frpc -c .&#x2F;frpc.ini</span><br></pre></td></tr></table></figure>
+<h3 id="客户端运行"><a href="#客户端运行" class="headerlink" title="客户端运行"></a>客户端运行</h3><figure class="highlight awk"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">.<span class="regexp">/frpc -c ./</span>frpc.ini</span><br></pre></td></tr></table></figure>
     </div>
 
     
@@ -366,7 +366,7 @@
       <div class="site-state-item site-state-posts">
           <a href="/archives/">
         
-          <span class="site-state-item-count">100</span>
+          <span class="site-state-item-count">102</span>
           <span class="site-state-item-name">日志</span>
         </a>
       </div>
@@ -379,7 +379,7 @@
       <div class="site-state-item site-state-tags">
             <a href="/tags/">
           
-        <span class="site-state-item-count">38</span>
+        <span class="site-state-item-count">39</span>
         <span class="site-state-item-name">标签</span></a>
       </div>
   </nav>
@@ -414,7 +414,7 @@
 <div class="copyright">
   
   &copy; 
-  <span itemprop="copyrightYear">2022</span>
+  <span itemprop="copyrightYear">2025</span>
   <span class="with-love">
     <i class="fa fa-heart"></i>
   </span>

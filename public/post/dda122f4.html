@@ -29,7 +29,7 @@
 <meta property="og:description" content="ngrok 内网穿透使用">
 <meta property="og:locale">
 <meta property="article:published_time" content="2018-02-18T14:02:00.000Z">
-<meta property="article:modified_time" content="2021-06-06T18:52:24.967Z">
+<meta property="article:modified_time" content="2022-07-12T16:51:57.243Z">
 <meta property="article:author" content="Arclin">
 <meta property="article:tag" content="ngrok">
 <meta name="twitter:card" content="summary">
@@ -253,19 +253,19 @@
         <p>ngrok 内网穿透使用</p>
 <span id="more"></span>
 
-<h3 id="安装golang"><a href="#安装golang" class="headerlink" title="安装golang"></a>安装golang</h3><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">sudo yum install build-essential golang mercurial git</span><br></pre></td></tr></table></figure>
+<h3 id="安装golang"><a href="#安装golang" class="headerlink" title="安装golang"></a>安装golang</h3><figure class="highlight mipsasm"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">sudo yum <span class="keyword">install </span><span class="keyword">build-essential </span>golang mercurial git</span><br></pre></td></tr></table></figure>
 
-<h3 id="运行脚本"><a href="#运行脚本" class="headerlink" title="运行脚本"></a>运行脚本</h3><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br></pre></td><td class="code"><pre><span class="line">cd ~</span><br><span class="line">git clone https:&#x2F;&#x2F;github.com&#x2F;tutumcloud&#x2F;ngrok.git ngrok</span><br><span class="line">export NGROK_DOMAIN&#x3D;&quot;ngrok.arclin.me&quot;</span><br><span class="line">cd ngrok</span><br><span class="line">openssl genrsa -out rootCA.key 2048</span><br><span class="line">openssl req -x509 -new -nodes -key rootCA.key -subj &quot;&#x2F;CN&#x3D;$NGROK_DOMAIN” -days 5000 -out rootCA.pem</span><br><span class="line">openssl genrsa -out device.key 2048</span><br><span class="line">openssl req -new -key device.key -subj &quot;&#x2F;CN&#x3D;$NGROK_DOMAIN” -out device.csr</span><br><span class="line">openssl x509 -req -in device.csr -CA rootCA.pem -CAkey rootCA.key -CAcreateserial -out device.crt -days 5000</span><br><span class="line">cp rootCA.pem assets&#x2F;client&#x2F;tls&#x2F;ngrokroot.crt</span><br><span class="line">cp device.crt assets&#x2F;server&#x2F;tls&#x2F;snakeoil.crt</span><br><span class="line">cp device.key assets&#x2F;server&#x2F;tls&#x2F;snakeoil.key</span><br><span class="line">GOOS&#x3D;linux GOARCH&#x3D;amd64</span><br><span class="line">make release-server</span><br><span class="line">cd &#x2F;usr&#x2F;lib&#x2F;golang&#x2F;src&#x2F;</span><br><span class="line">GOOS&#x3D;darwin GOARCH&#x3D;amd64 .&#x2F;make.bash</span><br><span class="line">cd ~&#x2F;ngrok</span><br><span class="line">GOOS&#x3D;darwin GOARCH&#x3D;amd64 make release-client</span><br></pre></td></tr></table></figure>
+<h3 id="运行脚本"><a href="#运行脚本" class="headerlink" title="运行脚本"></a>运行脚本</h3><figure class="highlight vim"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">cd</span> ~</span><br><span class="line">git clone http<span class="variable">s:</span>//github.<span class="keyword">com</span>/tutumcloud/ngrok.git ngrok</span><br><span class="line">export NGROK_DOMAIN=<span class="string">&quot;ngrok.arclin.me&quot;</span></span><br><span class="line"><span class="keyword">cd</span> ngrok</span><br><span class="line">openssl genrsa -out rootCA.key <span class="number">2048</span></span><br><span class="line">openssl req -x509 -<span class="keyword">new</span> -nodes -key rootCA.key -subj <span class="comment">&quot;/CN=$NGROK_DOMAIN” -days 5000 -out rootCA.pem</span></span><br><span class="line">openssl genrsa -out device.key <span class="number">2048</span></span><br><span class="line">openssl req -<span class="keyword">new</span> -key device.key -subj <span class="comment">&quot;/CN=$NGROK_DOMAIN” -out device.csr</span></span><br><span class="line">openssl x509 -req -in device.csr -CA rootCA.pem -CAkey rootCA.key -CAcreateserial -out device.crt -days <span class="number">5000</span></span><br><span class="line"><span class="keyword">cp</span> rootCA.pem assets/client/tls/ngrokroot.crt</span><br><span class="line"><span class="keyword">cp</span> device.crt assets/server/tls/snakeoil.crt</span><br><span class="line"><span class="keyword">cp</span> device.key assets/server/tls/snakeoil.key</span><br><span class="line">GOOS=linux GOARCH=amd64</span><br><span class="line"><span class="keyword">make</span> release-server</span><br><span class="line"><span class="keyword">cd</span> /usr/lib/golang/src/</span><br><span class="line">GOOS=darwin GOARCH=amd64 ./<span class="keyword">make</span>.bash</span><br><span class="line"><span class="keyword">cd</span> ~/ngrok</span><br><span class="line">GOOS=darwin GOARCH=amd64 <span class="keyword">make</span> release-client</span><br></pre></td></tr></table></figure>
 
-<h3 id="服务端运行脚本"><a href="#服务端运行脚本" class="headerlink" title="服务端运行脚本"></a>服务端运行脚本</h3><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">nohup  bin&#x2F;ngrokd -domain&#x3D;&quot;ngrok.arclin.me&quot; -httpAddr&#x3D;&quot;:8081&quot; -httpsAddr&#x3D;&quot;:8082&quot; &amp;</span><br></pre></td></tr></table></figure>
+<h3 id="服务端运行脚本"><a href="#服务端运行脚本" class="headerlink" title="服务端运行脚本"></a>服务端运行脚本</h3><figure class="highlight routeros"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">nohup  bin/ngrokd <span class="attribute">-domain</span>=<span class="string">&quot;ngrok.arclin.me&quot;</span> <span class="attribute">-httpAddr</span>=<span class="string">&quot;:8081&quot;</span> <span class="attribute">-httpsAddr</span>=<span class="string">&quot;:8082&quot;</span> &amp;</span><br></pre></td></tr></table></figure>
 <blockquote>
 <p>nohub 后台运行</p>
 </blockquote>
 <h3 id="客户端"><a href="#客户端" class="headerlink" title="客户端"></a>客户端</h3><p>新建 <code>./ngrok.cfg</code> 文件写入信息</p>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">server_addr:arclin.me:4443</span><br><span class="line">trust_host_root_certs: false</span><br></pre></td></tr></table></figure>
+<figure class="highlight vbnet"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"><span class="symbol">server_addr:</span>arclin.<span class="keyword">me</span>:<span class="number">4443</span></span><br><span class="line"><span class="symbol">trust_host_root_certs:</span> <span class="literal">false</span></span><br></pre></td></tr></table></figure>
 
 <p>客户端运行</p>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">.&#x2F;ngrok -config&#x3D;.&#x2F;ngrok.cfg -subdomain&#x3D;test 3000</span><br></pre></td></tr></table></figure>
+<figure class="highlight routeros"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">./ngrok <span class="attribute">-config</span>=./ngrok.cfg <span class="attribute">-subdomain</span>=test 3000</span><br></pre></td></tr></table></figure>
     </div>
 
     
@@ -365,7 +365,7 @@
       <div class="site-state-item site-state-posts">
           <a href="/archives/">
         
-          <span class="site-state-item-count">100</span>
+          <span class="site-state-item-count">102</span>
           <span class="site-state-item-name">日志</span>
         </a>
       </div>
@@ -378,7 +378,7 @@
       <div class="site-state-item site-state-tags">
             <a href="/tags/">
           
-        <span class="site-state-item-count">38</span>
+        <span class="site-state-item-count">39</span>
         <span class="site-state-item-name">标签</span></a>
       </div>
   </nav>
@@ -413,7 +413,7 @@
 <div class="copyright">
   
   &copy; 
-  <span itemprop="copyrightYear">2022</span>
+  <span itemprop="copyrightYear">2025</span>
   <span class="with-love">
     <i class="fa fa-heart"></i>
   </span>

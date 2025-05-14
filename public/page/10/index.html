@@ -193,6 +193,148 @@
   
   
   <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="zh-Hans">
+    <link itemprop="mainEntityOfPage" href="https://www.arclin.cn/post/cacc49a3.html">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="https://avatars.githubusercontent.com/u/12107804?v=4">
+      <meta itemprop="name" content="Arclin">
+      <meta itemprop="description" content="Stay hungry,stay foolish">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="Arclin">
+    </span>
+      <header class="post-header">
+        <h2 class="post-title" itemprop="name headline">
+          
+            <a href="/post/cacc49a3.html" class="post-title-link" itemprop="url">NavigationController的RootViewController和子ViewController的状态栏颜色不一样或者状态栏显示异常</a>
+        </h2>
+
+        <div class="post-meta">
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-calendar"></i>
+              </span>
+              <span class="post-meta-item-text">发表于</span>
+
+              <time title="创建时间：2016-10-17 00:00:00" itemprop="dateCreated datePublished" datetime="2016-10-17T00:00:00+08:00">2016-10-17</time>
+            </span>
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-folder"></i>
+              </span>
+              <span class="post-meta-item-text">分类于</span>
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/iOS/" itemprop="url" rel="index"><span itemprop="name">iOS</span></a>
+                </span>
+            </span>
+
+          
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+          <p>如果NavigationController的状态栏颜色跟子ViewController的状态栏颜色不一样，那么就像下面这么写</p>
+<p>在UINavigationController的子类写这个</p>
+<figure class="highlight objectivec"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">- (<span class="built_in">UIViewController</span> *)childViewControllerForStatusBarStyle&#123;</span><br><span class="line">    <span class="keyword">return</span> <span class="keyword">self</span>.topViewController;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+      
+    </div>
+
+    
+    
+    
+      <footer class="post-footer">
+        <div class="post-eof"></div>
+      </footer>
+  </article>
+  
+  
+  
+
+      
+  
+  
+  <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="zh-Hans">
+    <link itemprop="mainEntityOfPage" href="https://www.arclin.cn/post/79533f9e.html">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="https://avatars.githubusercontent.com/u/12107804?v=4">
+      <meta itemprop="name" content="Arclin">
+      <meta itemprop="description" content="Stay hungry,stay foolish">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="Arclin">
+    </span>
+      <header class="post-header">
+        <h2 class="post-title" itemprop="name headline">
+          
+            <a href="/post/79533f9e.html" class="post-title-link" itemprop="url">RACCommand使用注意</a>
+        </h2>
+
+        <div class="post-meta">
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-calendar"></i>
+              </span>
+              <span class="post-meta-item-text">发表于</span>
+
+              <time title="创建时间：2016-10-17 00:00:00" itemprop="dateCreated datePublished" datetime="2016-10-17T00:00:00+08:00">2016-10-17</time>
+            </span>
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-folder"></i>
+              </span>
+              <span class="post-meta-item-text">分类于</span>
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/iOS/" itemprop="url" rel="index"><span itemprop="name">iOS</span></a>
+                </span>
+            </span>
+
+          
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+          <p>RACCommand使用注意</p>
+          <!--noindex-->
+            <div class="post-button">
+              <a class="btn" href="/post/79533f9e.html#more" rel="contents">
+                阅读全文 &raquo;
+              </a>
+            </div>
+          <!--/noindex-->
+        
+      
+    </div>
+
+    
+    
+    
+      <footer class="post-footer">
+        <div class="post-eof"></div>
+      </footer>
+  </article>
+  
+  
+  
+
+      
+  
+  
+  <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="zh-Hans">
     <link itemprop="mainEntityOfPage" href="https://www.arclin.cn/post/452efb32.html">
 
     <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
@@ -242,7 +384,7 @@
       
           <p>关于cell上的按钮点击后会重复发送信号的问题</p>
 <p>RAC给<code>UITableViewCell</code>提供了一个方法：<code>rac_prepareForReuseSignal</code>，它的作用是当Cell即将要被重用时，告诉Cell。想象Cell上有多个button，Cell在初始化时给每个button都<code>addTarget:action:forControlEvents</code>，被重用时需要先移除这些target，下面这段代码就可以很方便地解决这个问题：</p>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line">[[[self.cancelButton</span><br><span class="line">    rac_signalForControlEvents:UIControlEventTouchUpInside]</span><br><span class="line">    takeUntil:self.rac_prepareForReuseSignal]</span><br><span class="line">    subscribeNext:^(UIButton *x) &#123;</span><br><span class="line">    &#x2F;&#x2F; do other things</span><br><span class="line">&#125;];</span><br></pre></td></tr></table></figure>
+<figure class="highlight clojure"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line">[[[self.cancelButton</span><br><span class="line">    rac_signalForControlEvents:UIControlEventTouchUpInside]</span><br><span class="line">    takeUntil:self.rac_prepareForReuseSignal]</span><br><span class="line">    subscribeNext:^(<span class="name">UIButton</span> *x) &#123;</span><br><span class="line">    // do other things</span><br><span class="line">&#125;]<span class="comment">;</span></span><br></pre></td></tr></table></figure>
       
     </div>
 
@@ -312,12 +454,12 @@
 <ol>
 <li>转换编码</li>
 </ol>
-  <figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">str1 &#x3D; [str1 stringByAddingPercentEscapesUsingEncoding:NSUTF8StringEncoding];</span><br><span class="line"></span><br><span class="line">NSURL *url &#x3D; [NSURL URLWithString:[Tool returnFormatString:str1]];</span><br></pre></td></tr></table></figure>
+  <figure class="highlight inform7"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">str1 = <span class="comment">[str1 stringByAddingPercentEscapesUsingEncoding:NSUTF8StringEncoding]</span>;</span><br><span class="line"></span><br><span class="line">NSURL *url = <span class="comment">[NSURL URLWithString:<span class="comment">[Tool returnFormatString:str1]</span>]</span>;</span><br></pre></td></tr></table></figure>
 
 <ol start="2">
 <li>除去空格</li>
 </ol>
-  <figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line">+(NSString *)returnFormatString:(NSString *)str</span><br><span class="line">&#123;</span><br><span class="line">    return [str stringByReplacingOccurrencesOfString:@&quot; &quot;withString:@&quot; &quot;];</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"> NSLog(@&quot;URL&#x3D;&#x3D;%@&quot;,url);</span><br></pre></td></tr></table></figure>
+  <figure class="highlight objectivec"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line">+(<span class="built_in">NSString</span> *)returnFormatString:(<span class="built_in">NSString</span> *)str</span><br><span class="line">&#123;</span><br><span class="line">    <span class="keyword">return</span> [str stringByReplacingOccurrencesOfString:<span class="string">@&quot; &quot;</span>withString:<span class="string">@&quot; &quot;</span>];</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"> <span class="built_in">NSLog</span>(<span class="string">@&quot;URL==%@&quot;</span>,url);</span><br></pre></td></tr></table></figure>
       
     </div>
 
@@ -384,7 +526,7 @@
 
       
           <p>ipad和iphone使用UIAlertViewController</p>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><span class="line">id aController;</span><br><span class="line">    if(DKDeviceiPad)&#123;</span><br><span class="line">    alertC.modalPresentationStyle &#x3D; UIModalPresentationPopover;</span><br><span class="line">    UIPopoverPresentationController *popPc &#x3D; alertC.popoverPresentationController;</span><br><span class="line">    popPc.barButtonItem &#x3D; self.downloadItem;</span><br><span class="line">    popPc.permittedArrowDirections &#x3D; UIPopoverArrowDirectionAny;</span><br><span class="line">    aController &#x3D; alertC;</span><br><span class="line">&#125;else&#123;</span><br><span class="line">    aController &#x3D; alertC;</span><br><span class="line">&#125;</span><br><span class="line">[window.rootViewController presentViewController:aController animated:YES completion:nil];</span><br></pre></td></tr></table></figure>
+<figure class="highlight objectivec"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">id</span> aController;</span><br><span class="line">    <span class="keyword">if</span>(DKDeviceiPad)&#123;</span><br><span class="line">    alertC.modalPresentationStyle = <span class="built_in">UIModalPresentationPopover</span>;</span><br><span class="line">    <span class="built_in">UIPopoverPresentationController</span> *popPc = alertC.popoverPresentationController;</span><br><span class="line">    popPc.barButtonItem = <span class="keyword">self</span>.downloadItem;</span><br><span class="line">    popPc.permittedArrowDirections = <span class="built_in">UIPopoverArrowDirectionAny</span>;</span><br><span class="line">    aController = alertC;</span><br><span class="line">&#125;<span class="keyword">else</span>&#123;</span><br><span class="line">    aController = alertC;</span><br><span class="line">&#125;</span><br><span class="line">[window.rootViewController presentViewController:aController animated:<span class="literal">YES</span> completion:<span class="literal">nil</span>];</span><br></pre></td></tr></table></figure>
       
     </div>
 
@@ -451,7 +593,7 @@
 
       
           <p>pan手势判断方向</p>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">UIPanGestureRecognizer *pan &#x3D; (UIPanGestureRecognizer *)gestureRecognizer;</span><br><span class="line">CGPoint point &#x3D; [pan translationInView:gestureRecognizer.view]; &#x2F;&#x2F; point.x &lt; 0 左滑</span><br></pre></td></tr></table></figure>
+<figure class="highlight objectivec"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"><span class="built_in">UIPanGestureRecognizer</span> *pan = (<span class="built_in">UIPanGestureRecognizer</span> *)gestureRecognizer;</span><br><span class="line"><span class="built_in">CGPoint</span> point = [pan translationInView:gestureRecognizer.view]; <span class="comment">// point.x &lt; 0 左滑</span></span><br></pre></td></tr></table></figure>
       
     </div>
 
@@ -600,17 +742,17 @@
 </ul>
 </li>
 </ul>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">__weak typeof(self) weakSelf &#x3D; self;</span><br><span class="line">dispatch_async(dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_DEFAULT, 0), ^&#123; </span><br><span class="line">	[weakSelf doSomething]; </span><br><span class="line">&#125;);</span><br></pre></td></tr></table></figure>
+<figure class="highlight objectivec"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">__<span class="keyword">weak</span> <span class="keyword">typeof</span>(<span class="keyword">self</span>) weakSelf = <span class="keyword">self</span>;</span><br><span class="line"><span class="built_in">dispatch_async</span>(dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_DEFAULT, <span class="number">0</span>), ^&#123; </span><br><span class="line">	[weakSelf doSomething]; </span><br><span class="line">&#125;);</span><br></pre></td></tr></table></figure>
 
 <ul>
 <li>clang 的文档表示，在 doSomething 内，weakSelf 不会被释放。但，下面的情况除外：</li>
 </ul>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">__weak typeof(self) weakSelf &#x3D; self;</span><br><span class="line">dispatch_async(dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_DEFAULT, 0), ^&#123;</span><br><span class="line"> 	[weakSelf doSomething]; </span><br><span class="line"> 	[weakSelf doOtherThing]; </span><br><span class="line">&#125;);</span><br></pre></td></tr></table></figure>
+<figure class="highlight objectivec"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">__<span class="keyword">weak</span> <span class="keyword">typeof</span>(<span class="keyword">self</span>) weakSelf = <span class="keyword">self</span>;</span><br><span class="line"><span class="built_in">dispatch_async</span>(dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_DEFAULT, <span class="number">0</span>), ^&#123;</span><br><span class="line"> 	[weakSelf doSomething]; </span><br><span class="line"> 	[weakSelf doOtherThing]; </span><br><span class="line">&#125;);</span><br></pre></td></tr></table></figure>
 
 <ul>
 <li>在 doSomething 中，weakSelf 不会变成 nil，不过在 doSomething 执行完成，调用第二个方法 doOtherThing 的时候，weakSelf 有可能被释放，于是，strongSelf 就派上用场了：</li>
 </ul>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line">__weak __typeof__(self) weakSelf &#x3D; self;</span><br><span class="line">dispatch_async(dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_DEFAULT, 0), ^&#123;</span><br><span class="line"> 	__strong typeof(self) strongSelf &#x3D; weakSelf;</span><br><span class="line">   [strongSelf doSomething];</span><br><span class="line">   [strongSelf doOtherThing];</span><br><span class="line"> &#125;);</span><br></pre></td></tr></table></figure>
+<figure class="highlight objectivec"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line">__<span class="keyword">weak</span> __typeof__(<span class="keyword">self</span>) weakSelf = <span class="keyword">self</span>;</span><br><span class="line"><span class="built_in">dispatch_async</span>(dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_DEFAULT, <span class="number">0</span>), ^&#123;</span><br><span class="line"> 	__<span class="keyword">strong</span> <span class="keyword">typeof</span>(<span class="keyword">self</span>) strongSelf = weakSelf;</span><br><span class="line">   [strongSelf doSomething];</span><br><span class="line">   [strongSelf doOtherThing];</span><br><span class="line"> &#125;);</span><br></pre></td></tr></table></figure>
 
 <ul>
 <li><p>__strong 确保在 Block 内，strongSelf 不会被释放。</p>
@@ -625,73 +767,6 @@
 </li>
 </ul>
 
-      
-    </div>
-
-    
-    
-    
-      <footer class="post-footer">
-        <div class="post-eof"></div>
-      </footer>
-  </article>
-  
-  
-  
-
-      
-  
-  
-  <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="zh-Hans">
-    <link itemprop="mainEntityOfPage" href="https://www.arclin.cn/post/54b26395.html">
-
-    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
-      <meta itemprop="image" content="https://avatars.githubusercontent.com/u/12107804?v=4">
-      <meta itemprop="name" content="Arclin">
-      <meta itemprop="description" content="Stay hungry,stay foolish">
-    </span>
-
-    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
-      <meta itemprop="name" content="Arclin">
-    </span>
-      <header class="post-header">
-        <h2 class="post-title" itemprop="name headline">
-          
-            <a href="/post/54b26395.html" class="post-title-link" itemprop="url">发现一个api</a>
-        </h2>
-
-        <div class="post-meta">
-            <span class="post-meta-item">
-              <span class="post-meta-item-icon">
-                <i class="far fa-calendar"></i>
-              </span>
-              <span class="post-meta-item-text">发表于</span>
-
-              <time title="创建时间：2016-10-17 00:00:00" itemprop="dateCreated datePublished" datetime="2016-10-17T00:00:00+08:00">2016-10-17</time>
-            </span>
-            <span class="post-meta-item">
-              <span class="post-meta-item-icon">
-                <i class="far fa-folder"></i>
-              </span>
-              <span class="post-meta-item-text">分类于</span>
-                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
-                  <a href="/categories/iOS/" itemprop="url" rel="index"><span itemprop="name">iOS</span></a>
-                </span>
-            </span>
-
-          
-
-        </div>
-      </header>
-
-    
-    
-    
-    <div class="post-body" itemprop="articleBody">
-
-      
-          <p>发现一个好用的api，用于找出selectedItem 在 dataSource 里面的位置，适用于tableView和collectionView</p>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line">NSIndexSet *indexSet &#x3D; [self.photos indexesOfObjectsPassingTest:^BOOL(DKPhoto * _Nonnull obj, NSUInteger idx, BOOL * _Nonnull stop) &#123;</span><br><span class="line">    if ([self.selectedPhotoArray containsObject:obj]) &#123;</span><br><span class="line">        return YES;</span><br><span class="line">    &#125;</span><br><span class="line">    return NO;</span><br><span class="line">&#125;];</span><br></pre></td></tr></table></figure>
       
     </div>
 
@@ -784,7 +859,7 @@
   
   
   <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="zh-Hans">
-    <link itemprop="mainEntityOfPage" href="https://www.arclin.cn/post/1b8f24c7.html">
+    <link itemprop="mainEntityOfPage" href="https://www.arclin.cn/post/54b26395.html">
 
     <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
       <meta itemprop="image" content="https://avatars.githubusercontent.com/u/12107804?v=4">
@@ -798,7 +873,7 @@
       <header class="post-header">
         <h2 class="post-title" itemprop="name headline">
           
-            <a href="/post/1b8f24c7.html" class="post-title-link" itemprop="url">记录一些关于iOS的一些小技巧</a>
+            <a href="/post/54b26395.html" class="post-title-link" itemprop="url">发现一个api</a>
         </h2>
 
         <div class="post-meta">
@@ -808,7 +883,7 @@
               </span>
               <span class="post-meta-item-text">发表于</span>
 
-              <time title="创建时间：2016-06-12 00:30:00" itemprop="dateCreated datePublished" datetime="2016-06-12T00:30:00+08:00">2016-06-12</time>
+              <time title="创建时间：2016-10-17 00:00:00" itemprop="dateCreated datePublished" datetime="2016-10-17T00:00:00+08:00">2016-10-17</time>
             </span>
             <span class="post-meta-item">
               <span class="post-meta-item-icon">
@@ -831,89 +906,8 @@
     <div class="post-body" itemprop="articleBody">
 
       
-          <p>记录一些关于iOS的一些小技巧</p>
-          <!--noindex-->
-            <div class="post-button">
-              <a class="btn" href="/post/1b8f24c7.html#more" rel="contents">
-                阅读全文 &raquo;
-              </a>
-            </div>
-          <!--/noindex-->
-        
-      
-    </div>
-
-    
-    
-    
-      <footer class="post-footer">
-        <div class="post-eof"></div>
-      </footer>
-  </article>
-  
-  
-  
-
-      
-  
-  
-  <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="zh-Hans">
-    <link itemprop="mainEntityOfPage" href="https://www.arclin.cn/post/8ff6aa28.html">
-
-    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
-      <meta itemprop="image" content="https://avatars.githubusercontent.com/u/12107804?v=4">
-      <meta itemprop="name" content="Arclin">
-      <meta itemprop="description" content="Stay hungry,stay foolish">
-    </span>
-
-    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
-      <meta itemprop="name" content="Arclin">
-    </span>
-      <header class="post-header">
-        <h2 class="post-title" itemprop="name headline">
-          
-            <a href="/post/8ff6aa28.html" class="post-title-link" itemprop="url">关于案场管家的技术点总结</a>
-        </h2>
-
-        <div class="post-meta">
-            <span class="post-meta-item">
-              <span class="post-meta-item-icon">
-                <i class="far fa-calendar"></i>
-              </span>
-              <span class="post-meta-item-text">发表于</span>
-
-              <time title="创建时间：2016-06-12 00:00:00" itemprop="dateCreated datePublished" datetime="2016-06-12T00:00:00+08:00">2016-06-12</time>
-            </span>
-            <span class="post-meta-item">
-              <span class="post-meta-item-icon">
-                <i class="far fa-folder"></i>
-              </span>
-              <span class="post-meta-item-text">分类于</span>
-                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
-                  <a href="/categories/iOS/" itemprop="url" rel="index"><span itemprop="name">iOS</span></a>
-                </span>
-            </span>
-
-          
-
-        </div>
-      </header>
-
-    
-    
-    
-    <div class="post-body" itemprop="articleBody">
-
-      
-          <p>案场管家的技术点总结</p>
-          <!--noindex-->
-            <div class="post-button">
-              <a class="btn" href="/post/8ff6aa28.html#more" rel="contents">
-                阅读全文 &raquo;
-              </a>
-            </div>
-          <!--/noindex-->
-        
+          <p>发现一个好用的api，用于找出selectedItem 在 dataSource 里面的位置，适用于tableView和collectionView</p>
+<figure class="highlight objectivec"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line"><span class="built_in">NSIndexSet</span> *indexSet = [<span class="keyword">self</span>.photos indexesOfObjectsPassingTest:^<span class="built_in">BOOL</span>(DKPhoto * _Nonnull obj, <span class="built_in">NSUInteger</span> idx, <span class="built_in">BOOL</span> * _Nonnull stop) &#123;</span><br><span class="line">    <span class="keyword">if</span> ([<span class="keyword">self</span>.selectedPhotoArray containsObject:obj]) &#123;</span><br><span class="line">        <span class="keyword">return</span> <span class="literal">YES</span>;</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="keyword">return</span> <span class="literal">NO</span>;</span><br><span class="line">&#125;];</span><br></pre></td></tr></table></figure>
       
     </div>
 
@@ -931,7 +925,7 @@
 
   
   <nav class="pagination">
-    <a class="extend prev" rel="prev" href="/page/9/"><i class="fa fa-angle-left" aria-label="上一页"></i></a><a class="page-number" href="/">1</a><span class="space">&hellip;</span><a class="page-number" href="/page/9/">9</a><span class="page-number current">10</span>
+    <a class="extend prev" rel="prev" href="/page/9/"><i class="fa fa-angle-left" aria-label="上一页"></i></a><a class="page-number" href="/">1</a><span class="space">&hellip;</span><a class="page-number" href="/page/9/">9</a><span class="page-number current">10</span><a class="page-number" href="/page/11/">11</a><a class="extend next" rel="next" href="/page/11/"><i class="fa fa-angle-right" aria-label="下一页"></i></a>
   </nav>
 
 
@@ -999,7 +993,7 @@
       <div class="site-state-item site-state-posts">
           <a href="/archives/">
         
-          <span class="site-state-item-count">100</span>
+          <span class="site-state-item-count">102</span>
           <span class="site-state-item-name">日志</span>
         </a>
       </div>
@@ -1012,7 +1006,7 @@
       <div class="site-state-item site-state-tags">
             <a href="/tags/">
           
-        <span class="site-state-item-count">38</span>
+        <span class="site-state-item-count">39</span>
         <span class="site-state-item-name">标签</span></a>
       </div>
   </nav>
@@ -1047,7 +1041,7 @@
 <div class="copyright">
   
   &copy; 
-  <span itemprop="copyrightYear">2022</span>
+  <span itemprop="copyrightYear">2025</span>
   <span class="with-love">
     <i class="fa fa-heart"></i>
   </span>

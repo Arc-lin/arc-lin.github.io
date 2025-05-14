@@ -29,7 +29,7 @@
 <meta property="og:description" content="花了一天时间解决这个问题，找了好多资料都没找到，最后终于想到了办法。">
 <meta property="og:locale">
 <meta property="article:published_time" content="2018-05-10T02:46:00.000Z">
-<meta property="article:modified_time" content="2021-06-06T18:52:24.965Z">
+<meta property="article:modified_time" content="2022-07-12T16:51:57.237Z">
 <meta property="article:author" content="Arclin">
 <meta property="article:tag" content="Jenkins">
 <meta name="twitter:card" content="summary">
@@ -254,14 +254,14 @@
 <span id="more"></span>
 
 <h3 id="背景"><a href="#背景" class="headerlink" title="背景"></a>背景</h3><p>在Jenkins上使用蒲公英上传软件安装包有两种方法，一种是使用命令行的方式<br>类似下面这种</p>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line">IPANAME&#x3D;&quot;jinkens-myapp&quot;</span><br><span class="line">fastlane gym --export_method ad-hoc --output_name $&#123;IPANAME&#125;</span><br><span class="line"></span><br><span class="line">MSG&#x3D;&#96;git log -1 --pretty&#x3D;%B&#96;</span><br><span class="line">PASSWORD&#x3D;123456</span><br><span class="line">curl -F &quot;file&#x3D;@$&#123;IPANAME&#125;&quot; -F &quot;uKey&#x3D;USER_KEY&quot; -F &quot;_api_key&#x3D;API_KEY&quot; -F &quot;updateDescription&#x3D;$&#123;MSG&#125;&quot; -F &quot;password&#x3D;$&#123;PASSWORD&#125;&quot; https:&#x2F;&#x2F;qiniu-storage.pgyer.com&#x2F;apiv1&#x2F;app&#x2F;upload</span><br></pre></td></tr></table></figure>
+<figure class="highlight powershell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line">IPANAME=<span class="string">&quot;jinkens-myapp&quot;</span></span><br><span class="line">fastlane gym -<span class="literal">-export_method</span> ad<span class="literal">-hoc</span> -<span class="literal">-output_name</span> <span class="variable">$</span>&#123;IPANAME&#125;</span><br><span class="line"></span><br><span class="line">MSG=`git log <span class="literal">-1</span> -<span class="literal">-pretty</span>=%B`</span><br><span class="line">PASSWORD=<span class="number">123456</span></span><br><span class="line"><span class="built_in">curl</span> <span class="operator">-F</span> <span class="string">&quot;file=@<span class="variable">$</span>&#123;IPANAME&#125;&quot;</span> <span class="operator">-F</span> <span class="string">&quot;uKey=USER_KEY&quot;</span> <span class="operator">-F</span> <span class="string">&quot;_api_key=API_KEY&quot;</span> <span class="operator">-F</span> <span class="string">&quot;updateDescription=<span class="variable">$</span>&#123;MSG&#125;&quot;</span> <span class="operator">-F</span> <span class="string">&quot;password=<span class="variable">$</span>&#123;PASSWORD&#125;&quot;</span> https://qiniu<span class="literal">-storage</span>.pgyer.com/apiv1/app/upload</span><br></pre></td></tr></table></figure>
 
 <p>这种方式的话就可以直接通过命令行获得<code>commit message</code>作为版本更新说明，但是缺点是无法直接通过环境变量获得上传后的App的各种信息，比如安装包地址，app二维码图片的等等。</p>
 <p>第二种方式是通过蒲公英在Jenkins上发布的插件<code>Upload to pgyer</code>，优点是上传后的各种App的信息都会被注入到环境变量中，可以在邮件模板中直接调用。缺点是Upload description必须写死为某个值，或者使用某个环境变量，但是Jenkins的Git插件又不提供给你最后一条<code>commit message</code>的环境变量。</p>
 <p>所以说为了结合两种方式的优点，想出了如下办法解决了。</p>
 <h3 id="方法"><a href="#方法" class="headerlink" title="方法"></a>方法</h3><ol>
 <li>安装插件    <code>Environment Injector Plugin</code></li>
-<li>构建步骤添加<code>Execute Shell</code>，填写 <figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line"># 把commit message写入文件中</span><br><span class="line">MSG&#x3D;$(git log -1 --pretty&#x3D;%B)</span><br><span class="line">echo &quot;commitMessage&#x3D;&quot;$&#123;MSG&#125; &gt; commitMessage.txt</span><br></pre></td></tr></table></figure></li>
+<li>构建步骤添加<code>Execute Shell</code>，填写 <figure class="highlight routeros"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment"># 把commit message写入文件中</span></span><br><span class="line"><span class="attribute">MSG</span>=$(git log -1 <span class="attribute">--pretty</span>=%B)</span><br><span class="line">echo <span class="string">&quot;commitMessage=&quot;</span><span class="variable">$&#123;MSG&#125;</span> &gt; commitMessage.txt</span><br></pre></td></tr></table></figure></li>
 <li>构件步骤中添加<code>Inject Environment variables</code>，<code>Properties File Path</code>填写<code>$&#123;WORKSPACE&#125;/commitMessage.txt</code>(也有可能是别的路径，不要写错了)</li>
 <li>最后在蒲公英插件<code>Upload to pgyer</code>上<code>updateDescription</code>中填写<code>$&#123;commitMessage&#125;</code></li>
 </ol>
@@ -366,7 +366,7 @@
       <div class="site-state-item site-state-posts">
           <a href="/archives/">
         
-          <span class="site-state-item-count">100</span>
+          <span class="site-state-item-count">102</span>
           <span class="site-state-item-name">日志</span>
         </a>
       </div>
@@ -379,7 +379,7 @@
       <div class="site-state-item site-state-tags">
             <a href="/tags/">
           
-        <span class="site-state-item-count">38</span>
+        <span class="site-state-item-count">39</span>
         <span class="site-state-item-name">标签</span></a>
       </div>
   </nav>
@@ -414,7 +414,7 @@
 <div class="copyright">
   
   &copy; 
-  <span itemprop="copyrightYear">2022</span>
+  <span itemprop="copyrightYear">2025</span>
   <span class="with-love">
     <i class="fa fa-heart"></i>
   </span>
