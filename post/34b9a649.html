@@ -29,7 +29,7 @@
 <meta property="og:description" content="本文讲述KVC的底层实现和KVC是否能触发KVO呢？">
 <meta property="og:locale">
 <meta property="article:published_time" content="2021-05-30T03:59:00.000Z">
-<meta property="article:modified_time" content="2021-06-06T18:52:24.963Z">
+<meta property="article:modified_time" content="2022-07-12T16:51:57.240Z">
 <meta property="article:author" content="Arclin">
 <meta property="article:tag" content="iOS">
 <meta property="article:tag" content="底层原理">
@@ -254,11 +254,11 @@
         <p>本文讲述KVC的底层实现和KVC是否能触发KVO呢？</p>
 <span id="more"></span>
 
-<h2 id="KVC的使用"><a href="#KVC的使用" class="headerlink" title="KVC的使用"></a>KVC的使用</h2><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">[self.person setValue:@10 forKey:@&quot;age&quot;]</span><br><span class="line"></span><br><span class="line">[self.person setValue:@10 forKeyPath:@&quot;age&quot;]</span><br></pre></td></tr></table></figure>
+<h2 id="KVC的使用"><a href="#KVC的使用" class="headerlink" title="KVC的使用"></a>KVC的使用</h2><figure class="highlight ruby"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">[<span class="keyword">self</span>.person <span class="symbol">setValue:</span><span class="variable">@10</span> <span class="symbol">forKey:</span>@<span class="string">&quot;age&quot;</span>]</span><br><span class="line"></span><br><span class="line">[<span class="keyword">self</span>.person <span class="symbol">setValue:</span><span class="variable">@10</span> <span class="symbol">forKeyPath:</span>@<span class="string">&quot;age&quot;</span>]</span><br></pre></td></tr></table></figure>
 
 <p>keyPath和key的区别是，keyPath可以使用路径的方式进行赋值，比如person对象内有cat模型属性，cat对象里面有age属性，那么就可以使用<code>[self.person setValue:@10 forKeyPath:@&quot;cat.age&quot;]</code>的方式使用KVC，而key方式只支持直接访问的方式赋值</p>
 <h2 id="赋值过程"><a href="#赋值过程" class="headerlink" title="赋值过程"></a>赋值过程</h2><p><code>setValue:forKey</code>首先会先寻找<code>setKey:</code>方法，如果找不到，那么就会寻找<code>_setKey:</code>方法，类似下面这样子</p>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line">&#x2F;&#x2F;&#x2F; 优先找这个方法</span><br><span class="line">- （void）setAge:(int)age &#123;</span><br><span class="line">	_age &#x3D; age;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line">&#x2F;&#x2F;&#x2F; 找不到上面那个方法的话，就找下面这儿方法</span><br><span class="line">- （void）_setAge:(int)age &#123;</span><br><span class="line">	_age &#x3D; age;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<figure class="highlight angelscript"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">/// 优先找这个方法</span></span><br><span class="line">- （<span class="built_in">void</span>）setAge:(<span class="built_in">int</span>)age &#123;</span><br><span class="line">	_age = age;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="comment">/// 找不到上面那个方法的话，就找下面这儿方法</span></span><br><span class="line">- （<span class="built_in">void</span>）_setAge:(<span class="built_in">int</span>)age &#123;</span><br><span class="line">	_age = age;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
 
 <p>如果上述两个方法都找不到，那么就会去访问类方法<code>+ (BOOL)accessInstanceVariablesDirectly</code>，询问是否允许直接访问成员变量，默认返回YES</p>
 <ul>
@@ -267,7 +267,7 @@
 <li><p>如果返回YES，那么程序会去直接访问成员变量，查找的顺序是<code>_key、_isKey、key、isKey</code>，类似下面这样子</p>
 </li>
 </ul>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line">&#123;</span><br><span class="line">    @public </span><br><span class="line">    int _age;</span><br><span class="line">    int _isAge;</span><br><span class="line">    int age;</span><br><span class="line">    int isAge;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<figure class="highlight angelscript"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line">&#123;</span><br><span class="line">    @<span class="keyword">public</span> </span><br><span class="line">    <span class="built_in">int</span> _age;</span><br><span class="line">    <span class="built_in">int</span> _isAge;</span><br><span class="line">    <span class="built_in">int</span> age;</span><br><span class="line">    <span class="built_in">int</span> isAge;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
 <ol>
 <li>如果找到了成员变量，那么就直接赋值</li>
 <li>如果找不到成员变量，那么就抛出上述异常</li>

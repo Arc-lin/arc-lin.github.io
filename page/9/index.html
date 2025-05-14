@@ -466,7 +466,7 @@
           <ol>
 <li>修改 info.plist</li>
 </ol>
-  <figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br></pre></td><td class="code"><pre><span class="line">&lt;key&gt;NSUbiquitousContainers&lt;&#x2F;key&gt;</span><br><span class="line">    &lt;dict&gt;</span><br><span class="line">        &lt;key&gt;iCloud.com.example.app&lt;&#x2F;key&gt;</span><br><span class="line">        &lt;dict&gt;</span><br><span class="line">            &lt;key&gt;NSUbiquitousContainerIsDocumentScopePublic&lt;&#x2F;key&gt;</span><br><span class="line">            &lt;true&#x2F;&gt;</span><br><span class="line">            &lt;key&gt;NSUbiquitousContainerName&lt;&#x2F;key&gt;</span><br><span class="line">            &lt;string&gt;App name to display in iCloud Drive&lt;&#x2F;string&gt;</span><br><span class="line">            &lt;key&gt;NSUbiquitousContainerSupportedFolderLevels&lt;&#x2F;key&gt;</span><br><span class="line">            &lt;string&gt;None&lt;&#x2F;string&gt;</span><br><span class="line">        &lt;&#x2F;dict&gt;</span><br><span class="line">    &lt;&#x2F;dict&gt;</span><br></pre></td></tr></table></figure>
+  <figure class="highlight xml"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br></pre></td><td class="code"><pre><span class="line"><span class="tag">&lt;<span class="name">key</span>&gt;</span>NSUbiquitousContainers<span class="tag">&lt;/<span class="name">key</span>&gt;</span></span><br><span class="line">    <span class="tag">&lt;<span class="name">dict</span>&gt;</span></span><br><span class="line">        <span class="tag">&lt;<span class="name">key</span>&gt;</span>iCloud.com.example.app<span class="tag">&lt;/<span class="name">key</span>&gt;</span></span><br><span class="line">        <span class="tag">&lt;<span class="name">dict</span>&gt;</span></span><br><span class="line">            <span class="tag">&lt;<span class="name">key</span>&gt;</span>NSUbiquitousContainerIsDocumentScopePublic<span class="tag">&lt;/<span class="name">key</span>&gt;</span></span><br><span class="line">            <span class="tag">&lt;<span class="name">true</span>/&gt;</span></span><br><span class="line">            <span class="tag">&lt;<span class="name">key</span>&gt;</span>NSUbiquitousContainerName<span class="tag">&lt;/<span class="name">key</span>&gt;</span></span><br><span class="line">            <span class="tag">&lt;<span class="name">string</span>&gt;</span>App name to display in iCloud Drive<span class="tag">&lt;/<span class="name">string</span>&gt;</span></span><br><span class="line">            <span class="tag">&lt;<span class="name">key</span>&gt;</span>NSUbiquitousContainerSupportedFolderLevels<span class="tag">&lt;/<span class="name">key</span>&gt;</span></span><br><span class="line">            <span class="tag">&lt;<span class="name">string</span>&gt;</span>None<span class="tag">&lt;/<span class="name">string</span>&gt;</span></span><br><span class="line">        <span class="tag">&lt;/<span class="name">dict</span>&gt;</span></span><br><span class="line">    <span class="tag">&lt;/<span class="name">dict</span>&gt;</span></span><br></pre></td></tr></table></figure>
 
 <ol start="2">
 <li>修改版本构件号(必改)</li>
@@ -575,7 +575,7 @@
 <li><p>DKModuelABaseViewController : DKModuelAConfig.h</p>
 </li>
 </ul>
-<h3 id="调用-import"><a href="#调用-import" class="headerlink" title="调用(import)"></a>调用(import)</h3><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line">DKHomeViewController</span><br><span class="line">    |-DKLoginViewController</span><br><span class="line">        |-DKRegisterViewController</span><br><span class="line">        |-DKLoginBaseViewController</span><br><span class="line">            |—DKViewController</span><br><span class="line">                |_ UIKit</span><br></pre></td></tr></table></figure>
+<h3 id="调用-import"><a href="#调用-import" class="headerlink" title="调用(import)"></a>调用(import)</h3><figure class="highlight 1c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line">DKHomeViewController</span><br><span class="line">    <span class="string">|-DKLoginViewController</span></span><br><span class="line">        <span class="string">|-DKRegisterViewController</span></span><br><span class="line">        <span class="string">|-DKLoginBaseViewController</span></span><br><span class="line">            <span class="string">|—DKViewController</span></span><br><span class="line">                <span class="string">|_ UIKit</span></span><br></pre></td></tr></table></figure>
       
     </div>
 
@@ -793,75 +793,7 @@
 <li>利用ALAssetsLibrary时候，将得到的<code>ALAsset</code>存到数组里，会出现<code>ALAsset - Type:Unknown, URLs:(null)</code>的问题</li>
 </ul>
 <p>解决方案：初始化ALAssetsLibrary的时候，不要用alloc-init，用一个单例，如下：</p>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><span class="line">+ (ALAssetsLibrary *)defaultAssetsLibrary</span><br><span class="line">&#123;</span><br><span class="line">    static dispatch_once_t pred &#x3D; 0;</span><br><span class="line">    static ALAssetsLibrary *library &#x3D; nil;</span><br><span class="line">    dispatch_once(&amp;pred,</span><br><span class="line">                  ^&#123;</span><br><span class="line">                      library &#x3D; [[ALAssetsLibrary alloc] init];</span><br><span class="line">                  &#125;);</span><br><span class="line">    return library;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
-      
-    </div>
-
-    
-    
-    
-      <footer class="post-footer">
-        <div class="post-eof"></div>
-      </footer>
-  </article>
-  
-  
-  
-
-      
-  
-  
-  <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="zh-Hans">
-    <link itemprop="mainEntityOfPage" href="https://www.arclin.cn/post/cacc49a3.html">
-
-    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
-      <meta itemprop="image" content="https://avatars.githubusercontent.com/u/12107804?v=4">
-      <meta itemprop="name" content="Arclin">
-      <meta itemprop="description" content="Stay hungry,stay foolish">
-    </span>
-
-    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
-      <meta itemprop="name" content="Arclin">
-    </span>
-      <header class="post-header">
-        <h2 class="post-title" itemprop="name headline">
-          
-            <a href="/post/cacc49a3.html" class="post-title-link" itemprop="url">NavigationController的RootViewController和子ViewController的状态栏颜色不一样或者状态栏显示异常</a>
-        </h2>
-
-        <div class="post-meta">
-            <span class="post-meta-item">
-              <span class="post-meta-item-icon">
-                <i class="far fa-calendar"></i>
-              </span>
-              <span class="post-meta-item-text">发表于</span>
-
-              <time title="创建时间：2016-10-17 00:00:00" itemprop="dateCreated datePublished" datetime="2016-10-17T00:00:00+08:00">2016-10-17</time>
-            </span>
-            <span class="post-meta-item">
-              <span class="post-meta-item-icon">
-                <i class="far fa-folder"></i>
-              </span>
-              <span class="post-meta-item-text">分类于</span>
-                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
-                  <a href="/categories/iOS/" itemprop="url" rel="index"><span itemprop="name">iOS</span></a>
-                </span>
-            </span>
-
-          
-
-        </div>
-      </header>
-
-    
-    
-    
-    <div class="post-body" itemprop="articleBody">
-
-      
-          <p>如果NavigationController的状态栏颜色跟子ViewController的状态栏颜色不一样，那么就像下面这么写</p>
-<p>在UINavigationController的子类写这个</p>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">- (UIViewController *)childViewControllerForStatusBarStyle&#123;</span><br><span class="line">    return self.topViewController;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<figure class="highlight dart"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><span class="line">+ (ALAssetsLibrary *)defaultAssetsLibrary</span><br><span class="line">&#123;</span><br><span class="line">    <span class="keyword">static</span> dispatch_once_t pred = <span class="number">0</span>;</span><br><span class="line">    <span class="keyword">static</span> ALAssetsLibrary *<span class="keyword">library</span> = nil;</span><br><span class="line">    dispatch_once(&amp;pred,</span><br><span class="line">                  ^&#123;</span><br><span class="line">                      <span class="keyword">library</span> = [[ALAssetsLibrary alloc] init];</span><br><span class="line">                  &#125;);</span><br><span class="line">    <span class="keyword">return</span> <span class="keyword">library</span>;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
       
     </div>
 
@@ -936,6 +868,74 @@
             </div>
           <!--/noindex-->
         
+      
+    </div>
+
+    
+    
+    
+      <footer class="post-footer">
+        <div class="post-eof"></div>
+      </footer>
+  </article>
+  
+  
+  
+
+      
+  
+  
+  <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="zh-Hans">
+    <link itemprop="mainEntityOfPage" href="https://www.arclin.cn/post/452efb32.html">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="https://avatars.githubusercontent.com/u/12107804?v=4">
+      <meta itemprop="name" content="Arclin">
+      <meta itemprop="description" content="Stay hungry,stay foolish">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="Arclin">
+    </span>
+      <header class="post-header">
+        <h2 class="post-title" itemprop="name headline">
+          
+            <a href="/post/452efb32.html" class="post-title-link" itemprop="url">RAC关于cell上的按钮点击后会重复发送信号的问题</a>
+        </h2>
+
+        <div class="post-meta">
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-calendar"></i>
+              </span>
+              <span class="post-meta-item-text">发表于</span>
+
+              <time title="创建时间：2016-10-17 00:00:00" itemprop="dateCreated datePublished" datetime="2016-10-17T00:00:00+08:00">2016-10-17</time>
+            </span>
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-folder"></i>
+              </span>
+              <span class="post-meta-item-text">分类于</span>
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/iOS/" itemprop="url" rel="index"><span itemprop="name">iOS</span></a>
+                </span>
+            </span>
+
+          
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+          <p>关于cell上的按钮点击后会重复发送信号的问题</p>
+<p>RAC给<code>UITableViewCell</code>提供了一个方法：<code>rac_prepareForReuseSignal</code>，它的作用是当Cell即将要被重用时，告诉Cell。想象Cell上有多个button，Cell在初始化时给每个button都<code>addTarget:action:forControlEvents</code>，被重用时需要先移除这些target，下面这段代码就可以很方便地解决这个问题：</p>
+<figure class="highlight clojure"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line">[[[self.cancelButton</span><br><span class="line">    rac_signalForControlEvents:UIControlEventTouchUpInside]</span><br><span class="line">    takeUntil:self.rac_prepareForReuseSignal]</span><br><span class="line">    subscribeNext:^(<span class="name">UIButton</span> *x) &#123;</span><br><span class="line">    // do other things</span><br><span class="line">&#125;]<span class="comment">;</span></span><br></pre></td></tr></table></figure>
       
     </div>
 

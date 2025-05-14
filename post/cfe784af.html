@@ -29,7 +29,7 @@
 <meta property="og:description" content="Shell 笔记，有机会写就会继续补充">
 <meta property="og:locale">
 <meta property="article:published_time" content="2018-05-17T08:10:25.000Z">
-<meta property="article:modified_time" content="2021-06-06T18:52:24.968Z">
+<meta property="article:modified_time" content="2022-07-12T16:51:57.239Z">
 <meta property="article:author" content="Arclin">
 <meta name="twitter:card" content="summary">
 
@@ -247,13 +247,13 @@
 <li>if语句的中括号要留空格  <code>if空格[空格 判断语句 空格]; then xxx fi</code> </li>
 <li>判断买某个路径是否是文件夹  <code>if [ -d “./xxx” ]; then xxx fi</code></li>
 <li>建立一个数组 <code>check=(&quot;Wechat&quot; &quot;Ali&quot; &quot;Union&quot; &quot;Pay&quot;)</code></li>
-<li>声明一个函数, 并取得第一个参数 <figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">function xxx() &#123;</span><br><span class="line">	dir&#x3D;$1</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure></li>
+<li>声明一个函数, 并取得第一个参数 <figure class="highlight actionscript"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">function</span> <span class="title">xxx</span><span class="params">()</span> </span>&#123;</span><br><span class="line">	dir=$<span class="number">1</span></span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure></li>
 <li>获得某个后缀名的文件 <code>directory=./$&#123;d%.*&#125;&quot;.app&quot;</code></li>
 <li>执行某个命令但不输出到控制台 <code>unzip $xxx &gt; /dev/null 2&gt;&amp;1</code></li>
 <li>声明某个变量为局部变量，使用<code>local</code>关键字 <code>local dir=$1</code></li>
 <li>大写转小写 <code>local file_name_lower=$(echo $file_name | tr &#39;A-Z&#39; &#39;a-z&#39;)</code></li>
 <li>小写转大写 <code>local file_name_lower=$(echo $file_name | tr &#39;a-z&#39; &#39;A-Z&#39;)</code></li>
-<li>遍历数组<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">for item in $&#123;check[@]&#125;; do</span><br><span class="line">    echo $item</span><br><span class="line">done</span><br></pre></td></tr></table></figure></li>
+<li>遍历数组<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">for</span> item <span class="keyword">in</span> <span class="variable">$&#123;check[@]&#125;</span>; <span class="keyword">do</span></span><br><span class="line">    <span class="built_in">echo</span> <span class="variable">$item</span></span><br><span class="line"><span class="keyword">done</span></span><br></pre></td></tr></table></figure></li>
 <li>字符串A是否包含字符串B <code>if[[ $A =~ $B ]]; then xxx fi</code></li>
 </ol>
 
