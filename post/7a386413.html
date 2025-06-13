@@ -1,0 +1,755 @@
+<!DOCTYPE html>
+<html lang="zh-Hans">
+<head>
+  <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=2">
+<meta name="theme-color" content="#222">
+<meta name="generator" content="Hexo 5.4.0">
+<meta name="referrer" content="no-referrer" />
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png">
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32-next.png">
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next.png">
+  <link rel="mask-icon" href="/images/logo.svg" color="#222">
+
+<link rel="stylesheet" href="/css/main.css">
+
+
+<link rel="stylesheet" href="/lib/font-awesome/css/all.min.css">
+  <link rel="stylesheet" href="//cdn.jsdelivr.net/gh/fancyapps/fancybox@3/dist/jquery.fancybox.min.css">
+
+<script id="hexo-configurations">
+    var NexT = window.NexT || {};
+    var CONFIG = {"hostname":"www.arclin.cn","root":"/","scheme":"Muse","version":"7.8.0","exturl":false,"sidebar":{"position":"left","display":"post","padding":18,"offset":12,"onmobile":false},"copycode":{"enable":false,"show_result":false,"style":null},"back2top":{"enable":true,"sidebar":false,"scrollpercent":false},"bookmark":{"enable":false,"color":"#222","save":"auto"},"fancybox":true,"mediumzoom":false,"lazyload":false,"pangu":false,"comments":{"style":"tabs","active":null,"storage":true,"lazyload":false,"nav":null},"algolia":{"appID":"VOFC7668C9","apiKey":"24c644edc8e7353bf2e8d8e31f03a940","indexName":"hexo","hits":{"per_page":10},"labels":{"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}},"localsearch":{"enable":true,"trigger":"auto","top_n_per_article":1,"unescape":false,"preload":false},"motion":{"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},"path":"search.xml"};
+  </script>
+
+  <meta name="description" content="本文简述开发鸿蒙第三方 SDK 的选型以及注意事项">
+<meta property="og:type" content="article">
+<meta property="og:title" content="鸿蒙SDK开发探索">
+<meta property="og:url" content="https://www.arclin.cn/post/7a386413.html">
+<meta property="og:site_name" content="Arclin">
+<meta property="og:description" content="本文简述开发鸿蒙第三方 SDK 的选型以及注意事项">
+<meta property="og:locale">
+<meta property="og:image" content="https://i0.hdslb.com/bfs/openplatform/df530614bf07e94f6aca20b48bae633a34465d51.png">
+<meta property="og:image" content="https://i0.hdslb.com/bfs/openplatform/768ae31eed6c2144fdb79786b08918adc81b10f9.png">
+<meta property="og:image" content="https://i0.hdslb.com/bfs/openplatform/4dc195566511250f482a0507657ce1c69264663b.png">
+<meta property="og:image" content="https://i0.hdslb.com/bfs/openplatform/cb8ea5b70502ad67355ef121aa10fc930c7a8214.png">
+<meta property="og:image" content="https://i0.hdslb.com/bfs/openplatform/99d948d26bfc163895c61202d2cc32819cbf46e7.png">
+<meta property="og:image" content="https://i0.hdslb.com/bfs/openplatform/b00ed0023db56b08d7613d67f9d12df0397e4407.png">
+<meta property="og:image" content="https://i0.hdslb.com/bfs/openplatform/52bf6d8c45f365406088240411e809e5e2fa2e30.png">
+<meta property="og:image" content="https://i0.hdslb.com/bfs/openplatform/84ef769fc7e2610198c90128b85bb6d52b30bd12.png">
+<meta property="og:image" content="https://i0.hdslb.com/bfs/openplatform/92af14699d178e09c703cfa21424d736a4cbd7bc.png">
+<meta property="og:image" content="https://i0.hdslb.com/bfs/openplatform/1b98e87c32cb9b0db2c388a1fd4fe8a85c1a1ff7.png">
+<meta property="og:image" content="https://i0.hdslb.com/bfs/openplatform/26b5680bbf08ae83e6bccc5aca66658dade51f53.png">
+<meta property="og:image" content="https://i0.hdslb.com/bfs/openplatform/a37ef16798ea2b6829a0c92194f49e879ddfd014.png">
+<meta property="og:image" content="https://i0.hdslb.com/bfs/openplatform/c421f89a0a4763f3d83a2d400c3c1d7422eb9b2c.png">
+<meta property="article:published_time" content="2024-07-31T14:05:00.000Z">
+<meta property="article:modified_time" content="2025-06-07T14:30:27.510Z">
+<meta property="article:author" content="Arclin">
+<meta property="article:tag" content="Harmony">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="https://i0.hdslb.com/bfs/openplatform/df530614bf07e94f6aca20b48bae633a34465d51.png">
+
+<link rel="canonical" href="https://www.arclin.cn/post/7a386413.html">
+
+
+<script id="page-configurations">
+  // https://hexo.io/docs/variables.html
+  CONFIG.page = {
+    sidebar: "",
+    isHome : false,
+    isPost : true,
+    lang   : 'zh-Hans'
+  };
+</script>
+
+  <title>鸿蒙SDK开发探索 | Arclin</title>
+  
+
+
+
+
+
+
+  <noscript>
+  <style>
+  .use-motion .brand,
+  .use-motion .menu-item,
+  .sidebar-inner,
+  .use-motion .post-block,
+  .use-motion .pagination,
+  .use-motion .comments,
+  .use-motion .post-header,
+  .use-motion .post-body,
+  .use-motion .collection-header { opacity: initial; }
+
+  .use-motion .site-title,
+  .use-motion .site-subtitle {
+    opacity: initial;
+    top: initial;
+  }
+
+  .use-motion .logo-line-before i { left: initial; }
+  .use-motion .logo-line-after i { right: initial; }
+  </style>
+</noscript>
+
+<link rel="alternate" href="/atom.xml" title="Arclin" type="application/atom+xml">
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage">
+  <div class="container use-motion">
+    <div class="headband"></div>
+
+    <header class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-container">
+  <div class="site-nav-toggle">
+    <div class="toggle" aria-label="切换导航栏">
+      <span class="toggle-line toggle-line-first"></span>
+      <span class="toggle-line toggle-line-middle"></span>
+      <span class="toggle-line toggle-line-last"></span>
+    </div>
+  </div>
+
+  <div class="site-meta">
+
+    <a href="/" class="brand" rel="start">
+      <span class="logo-line-before"><i></i></span>
+      <h1 class="site-title">Arclin</h1>
+      <span class="logo-line-after"><i></i></span>
+    </a>
+      <p class="site-subtitle" itemprop="description">Advocate Technology. Enjoy Technology.</p>
+  </div>
+
+  <div class="site-nav-right">
+    <div class="toggle popup-trigger">
+        <i class="fa fa-search fa-fw fa-lg"></i>
+    </div>
+  </div>
+</div>
+
+
+
+
+<nav class="site-nav">
+  <ul id="menu" class="main-menu menu">
+        <li class="menu-item menu-item-home">
+
+    <a href="/" rel="section"><i class="fa fa-home fa-fw"></i>首页</a>
+
+  </li>
+        <li class="menu-item menu-item-tags">
+
+    <a href="/tags/" rel="section"><i class="fa fa-tags fa-fw"></i>标签</a>
+
+  </li>
+        <li class="menu-item menu-item-categories">
+
+    <a href="/categories/" rel="section"><i class="fa fa-th fa-fw"></i>分类</a>
+
+  </li>
+        <li class="menu-item menu-item-archives">
+
+    <a href="/archives/" rel="section"><i class="fa fa-archive fa-fw"></i>归档</a>
+
+  </li>
+        <li class="menu-item menu-item-about">
+
+    <a href="/about/" rel="section"><i class="fa fa-user fa-fw"></i>关于</a>
+
+  </li>
+      <li class="menu-item menu-item-search">
+        <a role="button" class="popup-trigger"><i class="fa fa-search fa-fw"></i>搜索
+        </a>
+      </li>
+  </ul>
+</nav>
+
+
+
+  <div class="search-pop-overlay">
+    <div class="popup search-popup">
+        <div class="search-header">
+  <span class="search-icon">
+    <i class="fa fa-search"></i>
+  </span>
+  <div class="search-input-container">
+    <input autocomplete="off" autocapitalize="off"
+           placeholder="搜索..." spellcheck="false"
+           type="search" class="search-input">
+  </div>
+  <span class="popup-btn-close">
+    <i class="fa fa-times-circle"></i>
+  </span>
+</div>
+<div id="search-result">
+  <div id="no-result">
+    <i class="fa fa-spinner fa-pulse fa-5x fa-fw"></i>
+  </div>
+</div>
+
+    </div>
+  </div>
+
+</div>
+    </header>
+
+    
+  <div class="back-to-top">
+    <i class="fa fa-arrow-up"></i>
+    <span>0%</span>
+  </div>
+
+
+    <main class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          
+
+          <div class="content post posts-expand">
+            
+
+    
+  
+  
+  <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="zh-Hans">
+    <link itemprop="mainEntityOfPage" href="https://www.arclin.cn/post/7a386413.html">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="https://avatars.githubusercontent.com/u/12107804?v=4">
+      <meta itemprop="name" content="Arclin">
+      <meta itemprop="description" content="Stay hungry,stay foolish">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="Arclin">
+    </span>
+      <header class="post-header">
+        <h1 class="post-title" itemprop="name headline">
+          鸿蒙SDK开发探索
+        </h1>
+
+        <div class="post-meta">
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-calendar"></i>
+              </span>
+              <span class="post-meta-item-text">发表于</span>
+
+              <time title="创建时间：2024-07-31 22:05:00" itemprop="dateCreated datePublished" datetime="2024-07-31T22:05:00+08:00">2024-07-31</time>
+            </span>
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-folder"></i>
+              </span>
+              <span class="post-meta-item-text">分类于</span>
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/Harmony/" itemprop="url" rel="index"><span itemprop="name">Harmony</span></a>
+                </span>
+            </span>
+
+          
+            <span class="post-meta-item" title="阅读次数" id="busuanzi_container_page_pv" style="display: none;">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-eye"></i>
+              </span>
+              <span class="post-meta-item-text">阅读次数：</span>
+              <span id="busuanzi_value_page_pv"></span>
+            </span>
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+        <p>本文简述开发鸿蒙第三方 SDK 的选型以及注意事项</p>
+<span id="more"></span>
+
+<h2 id="HAP"><a href="#HAP" class="headerlink" title="HAP"></a>HAP</h2><p>Harmony Ability Package</p>
+<p>鸿蒙的 App 可以有多个”窗口“，比如微信作为一个窗口，微信小程序作为另一个窗口，不同的窗口之间有独立的 UIAbility，但是需要保证有一个 Entry<br>每个 HAP 虽然也可以创建多个 ability，但是官方并不推荐，因为即便是分了多个 ability， 也会加载所有在 HAP 内的资源，用多 HAP 的方式就可以按需加载。<br>比如视频中同一个应用同时打开了两个窗口，两个窗口各自有各自的生命周期</p>
+<p>官方推荐多 HAP 应用以一个 entry，多 feature 为结构</p>
+<p><img src="https://i0.hdslb.com/bfs/openplatform/df530614bf07e94f6aca20b48bae633a34465d51.png" alt="流程图"></p>
+<h3 id="创建"><a href="#创建" class="headerlink" title="创建"></a>创建</h3><p>对应第一个 Empty Ability</p>
+<p><img src="https://i0.hdslb.com/bfs/openplatform/768ae31eed6c2144fdb79786b08918adc81b10f9.png"></p>
+<p>创建新 HAP 后目录结构与 entry 目录结构基本一致</p>
+<p><img src="https://i0.hdslb.com/bfs/openplatform/4dc195566511250f482a0507657ce1c69264663b.png"></p>
+<h3 id="多-HAP-跳转"><a href="#多-HAP-跳转" class="headerlink" title="多 HAP 跳转"></a>多 HAP 跳转</h3><p>参考如下代码进行跳转<br>entry : 页面 1， 使用 want 创建目标位置，通过 startAbility 方法进行跳转</p>
+<figure class="highlight typescript"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">import</span> &#123; common, Want &#125; <span class="keyword">from</span> <span class="string">&#x27;@kit.AbilityKit&#x27;</span></span><br><span class="line"></span><br><span class="line"><span class="meta">@Entry</span></span><br><span class="line"><span class="meta">@Component</span></span><br><span class="line">struct Index &#123;</span><br><span class="line">  context = getContext(<span class="built_in">this</span>) <span class="keyword">as</span> common.UIAbilityContext</span><br><span class="line">  <span class="function"><span class="title">build</span>(<span class="params"></span>)</span> &#123;</span><br><span class="line">    <span class="function"><span class="title">Column</span>(<span class="params">&#123; space: <span class="number">20</span> &#125;</span>)</span> &#123;</span><br><span class="line">      Blank()</span><br><span class="line">      Text(<span class="string">&quot;Ability&quot;</span>)</span><br><span class="line">        .fontSize(<span class="number">30</span>)</span><br><span class="line">        .fontWeight(FontWeight.Medium)</span><br><span class="line">      Button(<span class="string">&quot;跳转到另一个Ability&quot;</span>)</span><br><span class="line">        .onClick(<span class="function">() =&gt;</span> &#123;</span><br><span class="line">          <span class="keyword">let</span> want: Want = &#123;</span><br><span class="line">            bundleName: <span class="string">&quot;com.example.testsdk&quot;</span>, <span class="comment">// 在项目根目录/AppScope/app.json5可以得到bundleName</span></span><br><span class="line">            abilityName: <span class="string">&quot;SecondEntryAbility&quot;</span> <span class="comment">//在HAP目录/src/main/module.json5中可以得到module.abilities.0.name即为入口abilitiyname</span></span><br><span class="line">          &#125;</span><br><span class="line">          <span class="built_in">this</span>.context.startAbility(want).then(<span class="function">() =&gt;</span> &#123;</span><br><span class="line">            <span class="built_in">console</span>.log(<span class="string">&quot;跳转成功&quot;</span>)</span><br><span class="line">          &#125;).catch(<span class="function">(<span class="params">error: <span class="built_in">Error</span></span>) =&gt;</span> &#123;</span><br><span class="line">            <span class="built_in">console</span>.log(<span class="string">`跳转失败: <span class="subst">$&#123;error.message&#125;</span>`</span>)</span><br><span class="line">          &#125;)</span><br><span class="line">        &#125;)</span><br><span class="line">      Blank()</span><br><span class="line">    &#125;</span><br><span class="line">    .height(<span class="string">&#x27;100%&#x27;</span>)</span><br><span class="line">    .width(<span class="string">&#x27;100%&#x27;</span>)</span><br><span class="line">  &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>feature: 页面 2， 添加一个返回按钮，点击销毁当前 Ability，系统会返回上个 HAP</p>
+<figure class="highlight typescript"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">import</span> &#123; common &#125; <span class="keyword">from</span> <span class="string">&#x27;@kit.AbilityKit&#x27;</span></span><br><span class="line"><span class="keyword">import</span> &#123; BusinessError &#125; <span class="keyword">from</span> <span class="string">&#x27;@kit.BasicServicesKit&#x27;</span></span><br><span class="line"></span><br><span class="line"><span class="meta">@Entry</span></span><br><span class="line"><span class="meta">@Component</span></span><br><span class="line">struct Index &#123;</span><br><span class="line">  context = getContext(<span class="built_in">this</span>) <span class="keyword">as</span> common.UIAbilityContext</span><br><span class="line">  <span class="function"><span class="title">build</span>(<span class="params"></span>)</span> &#123;</span><br><span class="line">    <span class="function"><span class="title">Column</span>(<span class="params">&#123; space: <span class="number">20</span> &#125;</span>)</span> &#123;</span><br><span class="line">      Blank()</span><br><span class="line">      Text(<span class="string">&quot;Second Entry&quot;</span>)</span><br><span class="line">        .fontSize(<span class="number">30</span>)</span><br><span class="line">        .fontWeight(FontWeight.Medium)</span><br><span class="line">      Button(<span class="string">&quot;Back&quot;</span>)</span><br><span class="line">        .onClick(<span class="function">() =&gt;</span> &#123;</span><br><span class="line">          <span class="built_in">this</span>.context.terminateSelf(<span class="function">(<span class="params">error: BusinessError</span>) =&gt;</span> &#123;</span><br><span class="line">            <span class="built_in">console</span>.log(<span class="string">`terminateSelf failed, code is <span class="subst">$&#123;error.code&#125;</span>, message is <span class="subst">$&#123;error.message&#125;</span>`</span>)</span><br><span class="line">            <span class="keyword">return</span></span><br><span class="line">          &#125;)</span><br><span class="line">        &#125;)</span><br><span class="line">      Blank()</span><br><span class="line">    &#125;</span><br><span class="line">    .height(<span class="string">&#x27;100%&#x27;</span>)</span><br><span class="line">    .width(<span class="string">&#x27;100%&#x27;</span>)</span><br><span class="line">  &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>需要配置依赖才可以进行跳转</p>
+<p><img src="https://i0.hdslb.com/bfs/openplatform/cb8ea5b70502ad67355ef121aa10fc930c7a8214.png"></p>
+<p>勾选两个 Module</p>
+<p><img src="https://i0.hdslb.com/bfs/openplatform/99d948d26bfc163895c61202d2cc32819cbf46e7.png"></p>
+<blockquote>
+<p>获取 bundleName</p>
+</blockquote>
+<p><img src="https://i0.hdslb.com/bfs/openplatform/b00ed0023db56b08d7613d67f9d12df0397e4407.png"></p>
+<h3 id="限制"><a href="#限制" class="headerlink" title="限制"></a>限制</h3><p>HAP 不支持导出接口和模块，所以只能作为页面/模块入口来使用</p>
+<h3 id="AppStorage-表现"><a href="#AppStorage-表现" class="headerlink" title="AppStorage 表现"></a>AppStorage 表现</h3><p>AppStorage 是系统提供的应用全局数据共享的单例，使用@StroageLink 或者@StorageProp 可以实现多 Ability 同步，不同 Ability 绑定相同 Key，可以实现实时更新，@StroageLink 则可以实现双向同步</p>
+<h2 id="HAR"><a href="#HAR" class="headerlink" title="HAR"></a>HAR</h2><p>Harmony Archive</p>
+<p>相当于静态库，可以导出接口供其他依赖方使用。按照官方说法，HAR 包会 copy 到各个依赖方，会导致包体有重复内容，内存管理也是独立的，依赖方各自管理各自的 HAR 的内存。</p>
+<h3 id="创建-1"><a href="#创建-1" class="headerlink" title="创建"></a>创建</h3><p>对应 Static Library</p>
+<p><img src="https://i0.hdslb.com/bfs/openplatform/52bf6d8c45f365406088240411e809e5e2fa2e30.png"></p>
+<h3 id="提供接口"><a href="#提供接口" class="headerlink" title="提供接口"></a>提供接口</h3><p>每个 HAR 根目录里面都有一个 index.ets, 可以通过类似如下语法导出接口</p>
+<figure class="highlight routeros"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="builtin-name">export</span> &#123; MainPage &#125; <span class="keyword">from</span> <span class="string">&#x27;./src/main/ets/components/MainPage&#x27;</span></span><br></pre></td></tr></table></figure>
+
+<h3 id="页面跳转"><a href="#页面跳转" class="headerlink" title="页面跳转"></a>页面跳转</h3><h4 id="添加依赖"><a href="#添加依赖" class="headerlink" title="添加依赖"></a>添加依赖</h4><p>如果需要跳转到某个 HAR 的页面，那么需要当前组件添加对该 HAR 的依赖<br>比如被依赖组件名为 HARLibraryA<br>在 oh-package.json5 添加 dependencies</p>
+<figure class="highlight perl"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line"><span class="string">&quot;dependencies&quot;</span>: &#123;</span><br><span class="line">    <span class="string">&quot;@ohos/HARLibraryA&quot;</span>: <span class="string">&quot;file:../HARLibraryA&quot;</span></span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<h4 id="HAP-gt-HAR"><a href="#HAP-gt-HAR" class="headerlink" title="HAP -&gt; HAR"></a>HAP -&gt; HAR</h4><h5 id="通过-NavigationStack"><a href="#通过-NavigationStack" class="headerlink" title="通过 NavigationStack"></a>通过 NavigationStack</h5><ol>
+<li>主页和被依赖的页面都需要添加 Navigation 包装一层</li>
+<li>主页需要添加 navDestination 判断字符串确定要跳转的页面</li>
+</ol>
+<figure class="highlight typescript"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">@Component</span></span><br><span class="line"><span class="keyword">export</span> struct MainPage &#123;</span><br><span class="line">  <span class="meta">@Consume</span>(<span class="string">&#x27;pathStack&#x27;</span>) pathStack: NavPathStack</span><br><span class="line"></span><br><span class="line">  <span class="meta">@State</span> message: <span class="built_in">string</span> = <span class="string">&#x27;This is HAR Library&#x27;</span>;</span><br><span class="line">  </span><br><span class="line">  <span class="comment">/// 接收参数  </span></span><br><span class="line">  aboutToAppear(): <span class="built_in">void</span> &#123;</span><br><span class="line">      <span class="keyword">const</span> params = <span class="built_in">JSON</span>.stringify(<span class="built_in">this</span>.pathStack.getParamByName(<span class="string">&quot;HARLibraryA&quot;</span>))    </span><br><span class="line">      <span class="built_in">console</span>.log(para)  </span><br><span class="line">  &#125;</span><br><span class="line">  </span><br><span class="line">  <span class="function"><span class="title">build</span>(<span class="params"></span>)</span> &#123;</span><br><span class="line">    <span class="function"><span class="title">NavDestination</span>(<span class="params"></span>)</span> &#123;</span><br><span class="line">      <span class="function"><span class="title">Column</span>(<span class="params">&#123;space: <span class="number">20</span>&#125;</span>)</span> &#123;</span><br><span class="line">        Blank()</span><br><span class="line">        Text(<span class="built_in">this</span>.message)</span><br><span class="line">          .fontSize(<span class="number">50</span>)</span><br><span class="line">          .fontWeight(FontWeight.Bold)</span><br><span class="line">        Button(<span class="string">&quot;Back&quot;</span>)</span><br><span class="line">          .onClick(<span class="function">() =&gt;</span> &#123;</span><br><span class="line">             <span class="built_in">this</span>.pathStack.pop()</span><br><span class="line">          &#125;)</span><br><span class="line">        Blank()</span><br><span class="line">      &#125;</span><br><span class="line">    &#125;</span><br><span class="line">  &#125;</span><br><span class="line">&#125;</span><br><span class="line"><span class="keyword">import</span> &#123; MainPage &#125; <span class="keyword">from</span> <span class="string">&#x27;@ohos/HARLibraryA&#x27;</span></span><br><span class="line"></span><br><span class="line"><span class="meta">@Component</span></span><br><span class="line">struct Index &#123;</span><br><span class="line">  <span class="meta">@Provide</span>(<span class="string">&#x27;pathStack&#x27;</span>) pathStack: NavPathStack = <span class="keyword">new</span> NavPathStack()</span><br><span class="line"></span><br><span class="line">  <span class="meta">@Builder</span></span><br><span class="line">  <span class="function"><span class="title">pageMap</span>(<span class="params">name: <span class="built_in">string</span></span>)</span> &#123;</span><br><span class="line">    <span class="keyword">if</span> (name == <span class="string">&quot;HARLibraryA&quot;</span>) &#123;</span><br><span class="line">      MainPage()</span><br><span class="line">    &#125;</span><br><span class="line">  &#125;</span><br><span class="line"></span><br><span class="line">  <span class="function"><span class="title">build</span>(<span class="params"></span>)</span> &#123;</span><br><span class="line">    <span class="function"><span class="title">Navigation</span>(<span class="params"><span class="built_in">this</span>.pathStack</span>)</span> &#123;</span><br><span class="line">      ...</span><br><span class="line">        Button(<span class="string">&quot;跳转到另一个HAR -- 1&quot;</span>)</span><br><span class="line">          .onClick(<span class="function">() =&gt;</span> &#123;</span><br><span class="line">            <span class="keyword">let</span> param = <span class="built_in">JSON</span>.stringify(&#123;</span><br><span class="line">              <span class="string">&quot;data&quot;</span>: <span class="string">&#x27;pass parameters&#x27;</span></span><br><span class="line">            &#125;)</span><br><span class="line">            <span class="keyword">let</span> pathInfo = <span class="keyword">new</span> NavPathInfo(<span class="string">&#x27;HARLibraryA&#x27;</span>, param)</span><br><span class="line">            <span class="built_in">this</span>.pathStack.pushPath(pathInfo, <span class="literal">true</span>)</span><br><span class="line">          &#125;)</span><br><span class="line">       ...</span><br><span class="line">      &#125;</span><br><span class="line">      .height(<span class="string">&#x27;100%&#x27;</span>)</span><br><span class="line">      .width(<span class="string">&#x27;100%&#x27;</span>)</span><br><span class="line">    &#125;</span><br><span class="line">    .navDestination(<span class="built_in">this</span>.pageMap)</span><br><span class="line">  &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<h5 id="通过-Router"><a href="#通过-Router" class="headerlink" title="通过 Router"></a>通过 Router</h5><ol>
+<li>被依赖页面添加<code>@Entry(&#123; routeName: &#39;xxx&#39;&#125;)</code>标记页面名字</li>
+<li>主页直接使用 <code>router.pushNamedRoute()</code>跳转</li>
+</ol>
+<blockquote>
+<p>@Entry 修饰的页面不能用 onPageShow()、onPageHide()监听组件生命周期</p>
+</blockquote>
+<figure class="highlight typescript"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">import</span> &#123; router &#125; <span class="keyword">from</span> <span class="string">&#x27;@kit.ArkUI&#x27;</span>;</span><br><span class="line"></span><br><span class="line"><span class="meta">@Entry</span>(&#123; <span class="attr">routeName</span>: <span class="string">&#x27;HARPage1&#x27;</span>&#125;)</span><br><span class="line"><span class="meta">@Component</span></span><br><span class="line"><span class="keyword">export</span> struct MainPage &#123;</span><br><span class="line"></span><br><span class="line">  <span class="meta">@State</span> message: <span class="built_in">string</span> = <span class="string">&#x27;This is HAR Library&#x27;</span>;</span><br><span class="line">  <span class="comment">/// 接收参数  </span></span><br><span class="line">  aboutToAppear(): <span class="built_in">void</span> &#123; </span><br><span class="line">     <span class="keyword">const</span> params = router.getParams() <span class="keyword">as</span> Record&lt;<span class="built_in">string</span>, <span class="built_in">string</span>&gt;</span><br><span class="line">     <span class="built_in">console</span>.log(<span class="string">`<span class="subst">$&#123;<span class="built_in">JSON</span>.stringify(params)&#125;</span>`</span>)</span><br><span class="line">  &#125;</span><br><span class="line"></span><br><span class="line">  <span class="function"><span class="title">build</span>(<span class="params"></span>)</span> &#123;</span><br><span class="line">    <span class="function"><span class="title">NavDestination</span>(<span class="params"></span>)</span> &#123;</span><br><span class="line">      <span class="function"><span class="title">Column</span>(<span class="params">&#123;space: <span class="number">20</span>&#125;</span>)</span> &#123;</span><br><span class="line">        Blank()</span><br><span class="line">        Text(<span class="built_in">this</span>.message)</span><br><span class="line">          .fontSize(<span class="number">50</span>)</span><br><span class="line">          .fontWeight(FontWeight.Bold)</span><br><span class="line">        Button(<span class="string">&quot;Back&quot;</span>)</span><br><span class="line">          .onClick(<span class="function">() =&gt;</span> &#123;</span><br><span class="line">              router.back()</span><br><span class="line">          &#125;</span><br><span class="line">        Blank()</span><br><span class="line">      &#125;</span><br><span class="line">    &#125;</span><br><span class="line">  &#125;</span><br><span class="line">&#125;</span><br><span class="line"><span class="keyword">import</span> <span class="string">&#x27;@ohos/HARLibraryA/src/main/ets/components/MainPage&#x27;</span></span><br><span class="line"></span><br><span class="line"><span class="meta">@Component</span></span><br><span class="line">struct Index &#123;</span><br><span class="line">  <span class="function"><span class="title">build</span>(<span class="params"></span>)</span> &#123;</span><br><span class="line">      ...</span><br><span class="line">        Button(<span class="string">&quot;跳转到另一个HAR -- 1&quot;</span>)</span><br><span class="line">          .onClick(<span class="function">() =&gt;</span> &#123;</span><br><span class="line">            router.pushNamedRoute(&#123;</span><br><span class="line">              name: <span class="string">&quot;HARPage1&quot;</span>,</span><br><span class="line">              params: &#123;</span><br><span class="line">                <span class="string">&#x27;data&#x27;</span>: <span class="string">&#x27;pass parameters&#x27;</span></span><br><span class="line">              &#125;</span><br><span class="line">            &#125;)</span><br><span class="line">          &#125;)</span><br><span class="line">       ...</span><br><span class="line">    &#125;</span><br><span class="line">  &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<h3 id="使用单例"><a href="#使用单例" class="headerlink" title="使用单例"></a>使用单例</h3><p>目前这块表现比较混乱，原因不明，发帖问了一下看看<br><a target="_blank" rel="noopener" href="https://developer.huawei.com/consumer/cn/forum/topic/0210157387499898499?fid=0102683795438680754">https://developer.huawei.com/consumer/cn/forum/topic/0210157387499898499?fid=0102683795438680754</a></p>
+<h4 id="限制-1"><a href="#限制-1" class="headerlink" title="限制"></a>限制</h4><p>没有 entry 入口， 但是可以有各种 page，可以提供各种页面供入口跳转过来</p>
+<h4 id="引用方式"><a href="#引用方式" class="headerlink" title="引用方式"></a>引用方式</h4><h5 id="静态引用"><a href="#静态引用" class="headerlink" title="静态引用"></a>静态引用</h5><p>如同上面提及的 import { MainPage } from ‘@ohos/HARLibraryA’<br>称之为静态引用，在 oh-package.json5 添加 dependencies 就好</p>
+<h5 id="动态常量引用"><a href="#动态常量引用" class="headerlink" title="动态常量引用"></a>动态常量引用</h5><p>相比起静态引用，好处是可以等到需要的时候再把模块加载到内存中，同样在 oh-package.json5 添加 dependencies 就好</p>
+<figure class="highlight moonscript"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line">Button(<span class="string">&quot;加载HSP&quot;</span>)</span><br><span class="line">  .onClick(<span class="function"><span class="params">()</span> =&gt;</span> &#123;</span><br><span class="line">      <span class="keyword">import</span>(<span class="string">&#x27;@ohos/HARLibraryA&#x27;</span>).<span class="keyword">then</span>(<span class="function"><span class="params">(ns: ESObject)</span> =&gt;</span> &#123;</span><br><span class="line">        this.HARComponent = ns.HARComponent</span><br><span class="line">        console.log(<span class="string">&#x27;DynamicImport addHar2 4 + 5 = &#x27;</span> + ns.addHar2(<span class="number">4</span>, <span class="number">5</span>));</span><br><span class="line">      &#125;).catch(<span class="function"><span class="params">(<span class="built_in">error</span>: BusinessError)</span> =&gt;</span> &#123;</span><br><span class="line">        hilog.<span class="built_in">error</span>(<span class="number">0</span>, TAG,`show component <span class="name">error</span>: $&#123;<span class="built_in">error</span>.code&#125;, message is $&#123;<span class="built_in">error</span>.message&#125;`)</span><br><span class="line">      &#125;)</span><br><span class="line">  &#125;)</span><br></pre></td></tr></table></figure>
+
+<h5 id="动态变量引用"><a href="#动态变量引用" class="headerlink" title="动态变量引用"></a>动态变量引用</h5><p>上文提到的 import(‘@ohos/HARLibraryA’)方式，在编译的时候编译器会自动加入到依赖树中<br>但是如果是通过变量传参，那么编译器就无法自动加入到依赖树中</p>
+<figure class="highlight coffeescript"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line">var <span class="built_in">module</span> = <span class="string">&quot;&quot;</span></span><br><span class="line"><span class="keyword">if</span> (login) &#123;</span><br><span class="line">   <span class="built_in">module</span> = <span class="string">&quot;loginModule&quot;</span></span><br><span class="line">&#125; <span class="keyword">else</span> &#123;</span><br><span class="line">    <span class="built_in">module</span> = <span class="string">&quot;featureModule&quot;</span></span><br><span class="line">&#125;</span><br><span class="line"><span class="keyword">import</span>(<span class="built_in">module</span>).<span class="keyword">then</span>(<span class="function"><span class="params">(ns: ESObject)</span> =&gt;</span> &#123;</span><br><span class="line">    ns.showMainPage()</span><br><span class="line">&#125;)</span><br></pre></td></tr></table></figure>
+
+<p>这时候需要去到 build-profile.json5 添加字段 runtimeOnly，再添加 packages，输入的内容跟 oh-package.json5 里面的 dependencies 名字一致</p>
+<figure class="highlight json"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><span class="line">&#123;</span><br><span class="line">  <span class="attr">&quot;apiType&quot;</span>: <span class="string">&quot;stageMode&quot;</span>,</span><br><span class="line">  <span class="attr">&quot;buildOption&quot;</span>: &#123;</span><br><span class="line">      <span class="attr">&quot;runtimeOnly&quot;</span>: &#123;</span><br><span class="line">           <span class="attr">&quot;packages&quot;</span>:  [</span><br><span class="line">                 <span class="string">&quot;@ohos/HARLibraryA&quot;</span></span><br><span class="line">            ]</span><br><span class="line">       &#125;</span><br><span class="line">  &#125;</span><br><span class="line">  ...</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>动态 import 还可以 import 文件路径，比如</p>
+<figure class="highlight ceylon"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">let</span> filePath = <span class="string">&#x27;./Calc&#x27;</span>;</span><br><span class="line"><span class="keyword">import</span>(filePath).<span class="keyword">then</span>(……);</span><br></pre></td></tr></table></figure>
+
+<p>如果是这种的话，build-profile.json5 的配置就加上 sources</p>
+<figure class="highlight prolog"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line"><span class="string">&quot;runtimeOnly&quot;</span>: &#123;</span><br><span class="line">    <span class="string">&quot;packages&quot;</span>:  [</span><br><span class="line">         <span class="string">&quot;@ohos/HARLibraryA&quot;</span></span><br><span class="line">      ],</span><br><span class="line">    <span class="string">&quot;sources&quot;</span>: [</span><br><span class="line">        <span class="string">&quot;./Calc&quot;</span></span><br><span class="line">    ]</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<h4 id="循环依赖"><a href="#循环依赖" class="headerlink" title="循环依赖"></a>循环依赖</h4><p>有时候会出现循环依赖的情况，按照以往我们会添加中间层解耦</p>
+<p><img src="https://i0.hdslb.com/bfs/openplatform/84ef769fc7e2610198c90128b85bb6d52b30bd12.png"></p>
+<p>现在官方提供了一种新的方案（仅适用于HAR和HAP之间的依赖 与   HSP与HAR之间的依赖）</p>
+<p><img src="https://i0.hdslb.com/bfs/openplatform/92af14699d178e09c703cfa21424d736a4cbd7bc.png"></p>
+<p>这种方案的好处是，即便HAR1和HAR2中的dependencies里面没有对HAR2和HAR1的依赖配置，也可以通过动态import依赖到。<br>相当于：<br>HAR1和HAR2的依赖转移到了HAP</p>
+<p>另外我们也可把HAR的的依赖转移到HSP，如下图，但是HAR3和HAR4和HSP的依赖不能转移到HAP</p>
+<p><img src="https://i0.hdslb.com/bfs/openplatform/1b98e87c32cb9b0db2c388a1fd4fe8a85c1a1ff7.png"></p>
+<p>下面解释如何操作：</p>
+<p>需要再HAP的oh-package.json5的dependencies和build-profile.json5的runtimeOnly里面同时配置两个HAR模块的依赖</p>
+<figure class="highlight 1c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">/// oh-package.json5</span></span><br><span class="line"><span class="string">&quot;dependencies&quot;</span>: &#123;</span><br><span class="line">    <span class="string">&quot;@ohos/HARLibraryA&quot;</span>: <span class="string">&quot;file:../HARLibraryA&quot;</span>,</span><br><span class="line">    <span class="string">&quot;@ohos/HARLibraryB&quot;</span>: <span class="string">&quot;file:../HARLibraryB&quot;</span></span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="comment">/// build-profile.json5</span></span><br><span class="line"><span class="string">&quot;runtimeOnly&quot;</span>: &#123;</span><br><span class="line">  <span class="string">&quot;packages&quot;</span>:  [</span><br><span class="line">    <span class="string">&quot;@ohos/HARLibraryA&quot;</span>,</span><br><span class="line">    <span class="string">&quot;@ohos/HARLibraryB&quot;</span></span><br><span class="line">  ]</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>首先在HAP里面调用HAR1的方法</p>
+<figure class="highlight moonscript"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line">Button(<span class="string">&quot;调用HAR的方法&quot;</span>)</span><br><span class="line">  .onClick(<span class="function"><span class="params">()</span> =&gt;</span> &#123;</span><br><span class="line">      let har1 = <span class="string">&#x27;@ohos/HARLibraryA&#x27;</span></span><br><span class="line">      <span class="keyword">import</span>(har1).<span class="keyword">then</span>(<span class="function"><span class="params">(ns: ESObject)</span> =&gt;</span> &#123;</span><br><span class="line">        hilog.info(<span class="number">0</span>, TAG, `$&#123;ns.addHar1(<span class="number">1</span>, <span class="number">2</span>)&#125;`)</span><br><span class="line">      &#125;).catch(<span class="function"><span class="params">(<span class="built_in">error</span>: BusinessError)</span> =&gt;</span> &#123;</span><br><span class="line">        hilog.<span class="built_in">error</span>(<span class="number">0</span>, TAG,`show component <span class="name">error</span>: $&#123;<span class="built_in">error</span>.code&#125;, message is $&#123;<span class="built_in">error</span>.message&#125;`)</span><br><span class="line">      &#125;)</span><br><span class="line">  &#125;)</span><br></pre></td></tr></table></figure>
+
+<p>HAR1调用HAR2的方法，这里必须使用动态变量import，不可以<code>import(&#39;@ohos/HARLibraryB&#39;)</code></p>
+<figure class="highlight typescript"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">export</span> <span class="function"><span class="keyword">function</span> <span class="title">addHar1</span>(<span class="params">a:<span class="built_in">number</span>, b:<span class="built_in">number</span></span>):<span class="title">number</span> </span>&#123;</span><br><span class="line">  <span class="keyword">let</span> c = a + b;</span><br><span class="line">  hilog.info(<span class="number">0</span>, TAG, <span class="string">&#x27;DynamicImport I am har1, %d + %d = %d&#x27;</span>, a, b, c);</span><br><span class="line"></span><br><span class="line">  <span class="keyword">let</span> harName = <span class="string">&#x27;@ohos/HARLibraryB&#x27;</span>;</span><br><span class="line">  <span class="keyword">import</span>(harName).then(<span class="function">(<span class="params">ns:ESObject</span>) =&gt;</span> &#123;</span><br><span class="line">    hilog.info(<span class="number">0</span>, TAG, <span class="string">&#x27;DynamicImport addHar2 4 + 5 = &#x27;</span> + ns.addHar2(<span class="number">4</span>, <span class="number">5</span>));</span><br><span class="line">  &#125;).catch(<span class="function">(<span class="params">error: BusinessError</span>) =&gt;</span> &#123;</span><br><span class="line">    hilog.error(<span class="number">0</span>, TAG,<span class="string">`har1 error: <span class="subst">$&#123;error.code&#125;</span>, message is <span class="subst">$&#123;error.message&#125;</span>`</span>)</span><br><span class="line">  &#125;)</span><br><span class="line">  <span class="keyword">return</span> c;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>HAR2实现addHar2方法并且export</p>
+<figure class="highlight typescript"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">export</span> <span class="function"><span class="keyword">function</span> <span class="title">addHar2</span>(<span class="params">a:<span class="built_in">number</span>, b:<span class="built_in">number</span></span>):<span class="title">number</span> </span>&#123;</span><br><span class="line">  <span class="keyword">let</span> c = a + b;</span><br><span class="line">  hilog.info(<span class="number">0</span>, <span class="string">&quot;INDEX_TAG&quot;</span>, <span class="string">&#x27;DynamicImport I am har2, %d + %d = %d&#x27;</span>, a, b, c);</span><br><span class="line"></span><br><span class="line">  <span class="keyword">return</span> c;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>效果达成，并且要注意Promise是异步的</p>
+<p><img src="https://i0.hdslb.com/bfs/openplatform/26b5680bbf08ae83e6bccc5aca66658dade51f53.png"></p>
+<h2 id="HSP"><a href="#HSP" class="headerlink" title="HSP"></a>HSP</h2><p>Harmony Shared Package<br>类似于动态库，内存共享，按需下载</p>
+<h3 id="创建-2"><a href="#创建-2" class="headerlink" title="创建"></a>创建</h3><p>对应 SharedLibrary</p>
+<p><img src="https://i0.hdslb.com/bfs/openplatform/a37ef16798ea2b6829a0c92194f49e879ddfd014.png"></p>
+<h3 id="提供接口-1"><a href="#提供接口-1" class="headerlink" title="提供接口"></a>提供接口</h3><p>方式同 HAR</p>
+<h3 id="页面跳转-1"><a href="#页面跳转-1" class="headerlink" title="页面跳转"></a>页面跳转</h3><h4 id="本地引用"><a href="#本地引用" class="headerlink" title="本地引用"></a>本地引用</h4><p>本地引用可以利用 HSP 的内存复用能力，但是不能使用动态下载能力，即下载到用户手机的包体还是会增大</p>
+<h5 id="使用-Navigation"><a href="#使用-Navigation" class="headerlink" title="使用 Navigation"></a>使用 Navigation</h5><p>主页</p>
+<figure class="highlight typescript"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">import</span> &#123; SharedMainPage &#125; <span class="keyword">from</span> <span class="string">&quot;@ohos/SharedLibrary&quot;</span></span><br><span class="line"></span><br><span class="line"><span class="meta">@Entry</span></span><br><span class="line"><span class="meta">@Component</span></span><br><span class="line">struct Index &#123;</span><br><span class="line">  <span class="meta">@Provide</span>(<span class="string">&quot;pathStack&quot;</span>) pathStack: NavPathStack = <span class="keyword">new</span> NavPathStack()</span><br><span class="line"></span><br><span class="line">  <span class="meta">@Builder</span></span><br><span class="line">  <span class="function"><span class="title">pageMap</span>(<span class="params">name: <span class="built_in">string</span></span>)</span> &#123;</span><br><span class="line">    <span class="keyword">if</span> (name == <span class="string">&#x27;hps&#x27;</span>) &#123;</span><br><span class="line">      SharedMainPage()</span><br><span class="line">    &#125;</span><br><span class="line">  &#125;</span><br><span class="line"></span><br><span class="line">  <span class="function"><span class="title">build</span>(<span class="params"></span>)</span> &#123;</span><br><span class="line">    <span class="function"><span class="title">Navigation</span>(<span class="params"><span class="built_in">this</span>.pathStack</span>)</span> &#123;</span><br><span class="line">      <span class="function"><span class="title">Column</span>(<span class="params">&#123; space: <span class="number">20</span> &#125;</span>)</span> &#123;</span><br><span class="line">        Blank()</span><br><span class="line">        Text(<span class="string">&quot;Ability&quot;</span>)</span><br><span class="line">          .fontSize(<span class="number">30</span>)</span><br><span class="line">          .fontWeight(FontWeight.Medium)</span><br><span class="line">        Button(<span class="string">&quot;Jump To HSP&quot;</span>)</span><br><span class="line">          .onClick(<span class="function">() =&gt;</span> &#123;</span><br><span class="line">            <span class="keyword">const</span> info = <span class="keyword">new</span> NavPathInfo(<span class="string">&quot;hps&quot;</span>, <span class="string">&quot;params&quot;</span>)</span><br><span class="line">            <span class="built_in">this</span>.pathStack.pushPath(info,<span class="literal">true</span>)</span><br><span class="line">          &#125;)</span><br><span class="line">      &#125;</span><br><span class="line">    &#125;</span><br><span class="line">    .navDestination(<span class="built_in">this</span>.pageMap)</span><br><span class="line">    .height(<span class="string">&#x27;100%&#x27;</span>)</span><br><span class="line">    .width(<span class="string">&#x27;100%&#x27;</span>)</span><br><span class="line">  &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>HSP 页面</p>
+<figure class="highlight typescript"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">import</span> &#123; router &#125; <span class="keyword">from</span> <span class="string">&#x27;@kit.ArkUI&#x27;</span>;</span><br><span class="line"></span><br><span class="line"><span class="meta">@Entry</span></span><br><span class="line"><span class="meta">@Component</span></span><br><span class="line"><span class="keyword">export</span> struct SharedMainPage &#123;</span><br><span class="line">  <span class="meta">@State</span> message: <span class="built_in">string</span> = <span class="string">&#x27;Shared MainPage&#x27;</span>;</span><br><span class="line"></span><br><span class="line">  <span class="meta">@Consume</span>(<span class="string">&quot;pathStack&quot;</span>) navStack: NavPathStack</span><br><span class="line"></span><br><span class="line">  <span class="function"><span class="title">build</span>(<span class="params"></span>)</span> &#123;</span><br><span class="line">    <span class="function"><span class="title">NavDestination</span>(<span class="params"></span>)</span> &#123;</span><br><span class="line">      <span class="function"><span class="title">Row</span>(<span class="params"></span>)</span> &#123;</span><br><span class="line">        <span class="function"><span class="title">Column</span>(<span class="params"></span>)</span> &#123;</span><br><span class="line">          Text(<span class="built_in">this</span>.message)</span><br><span class="line">            .fontSize(<span class="number">50</span>)</span><br><span class="line">            .fontWeight(FontWeight.Bold)</span><br><span class="line">          Button(<span class="string">&quot;跳转到HAR&quot;</span>)</span><br><span class="line">            .onClick(<span class="function">() =&gt;</span> &#123;</span><br><span class="line">              router.pushNamedRoute(&#123;</span><br><span class="line">                name: <span class="string">&quot;HARPage1&quot;</span></span><br><span class="line">              &#125;)</span><br><span class="line">            &#125;)</span><br><span class="line">        &#125;</span><br><span class="line">        .width(<span class="string">&#x27;100%&#x27;</span>)</span><br><span class="line">      &#125;</span><br><span class="line">    &#125;</span><br><span class="line">    .height(<span class="string">&#x27;100%&#x27;</span>)</span><br><span class="line">  &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<h4 id="使用-Router"><a href="#使用-Router" class="headerlink" title="使用 Router"></a>使用 Router</h4><p>主页</p>
+<figure class="highlight typescript"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">import</span> &#123; SharedMainPage &#125; <span class="keyword">from</span> <span class="string">&quot;@ohos/SharedLibrary&quot;</span></span><br><span class="line"><span class="keyword">import</span> &#123; router &#125; <span class="keyword">from</span> <span class="string">&#x27;@kit.ArkUI&#x27;</span></span><br><span class="line"><span class="keyword">import</span> <span class="string">&#x27;@ohos/SharedLibraryB/src/main/ets/pages/Index&#x27;</span></span><br><span class="line"></span><br><span class="line"><span class="meta">@Entry</span></span><br><span class="line"><span class="meta">@Component</span></span><br><span class="line">struct Index &#123;</span><br><span class="line">  <span class="function"><span class="title">build</span>(<span class="params"></span>)</span> &#123;</span><br><span class="line">      <span class="function"><span class="title">Column</span>(<span class="params">&#123; space: <span class="number">20</span> &#125;</span>)</span> &#123;</span><br><span class="line">        Blank()</span><br><span class="line">        Text(<span class="string">&quot;Ability&quot;</span>)</span><br><span class="line">          .fontSize(<span class="number">30</span>)</span><br><span class="line">          .fontWeight(FontWeight.Medium)</span><br><span class="line">        Button(<span class="string">&quot;Jump To HSP 2&quot;</span>)</span><br><span class="line">          .onClick(<span class="function">() =&gt;</span> &#123;</span><br><span class="line">            router.pushNamedRoute(&#123;</span><br><span class="line">              name: <span class="string">&quot;SharedMainPageB&quot;</span></span><br><span class="line">            &#125;)</span><br><span class="line">          &#125;)</span><br><span class="line">      &#125;</span><br><span class="line">    .height(<span class="string">&#x27;100%&#x27;</span>)</span><br><span class="line">    .width(<span class="string">&#x27;100%&#x27;</span>)</span><br><span class="line">  &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>HSP 页面</p>
+<figure class="highlight typescript"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">import</span> &#123; router &#125; <span class="keyword">from</span> <span class="string">&#x27;@kit.ArkUI&#x27;</span>;</span><br><span class="line"></span><br><span class="line"><span class="meta">@Entry</span>(&#123;<span class="attr">routeName</span>: <span class="string">&quot;SharedMainPageB&quot;</span>&#125;)</span><br><span class="line"><span class="meta">@Component</span></span><br><span class="line"><span class="keyword">export</span> struct SharedMainPageB &#123;</span><br><span class="line">  <span class="meta">@State</span> message: <span class="built_in">string</span> = <span class="string">&#x27;Shared MainPage B&#x27;</span>;</span><br><span class="line"></span><br><span class="line">  <span class="function"><span class="title">build</span>(<span class="params"></span>)</span> &#123;</span><br><span class="line">    <span class="function"><span class="title">Row</span>(<span class="params"></span>)</span> &#123;</span><br><span class="line">      <span class="function"><span class="title">Column</span>(<span class="params">&#123;space: <span class="number">20</span>&#125;</span>)</span> &#123;</span><br><span class="line">        Text(<span class="built_in">this</span>.message)</span><br><span class="line">          .fontSize(<span class="number">50</span>)</span><br><span class="line">          .fontWeight(FontWeight.Bold)</span><br><span class="line">        Button(<span class="string">&quot;跳转到HAR&quot;</span>)</span><br><span class="line">          .onClick(<span class="function">() =&gt;</span> &#123;</span><br><span class="line">            router.pushNamedRoute(&#123;</span><br><span class="line">              name: <span class="string">&quot;HARPage1&quot;</span></span><br><span class="line">            &#125;)</span><br><span class="line">          &#125;)</span><br><span class="line">      &#125;</span><br><span class="line">      .width(<span class="string">&#x27;100%&#x27;</span>)</span><br><span class="line">    &#125;</span><br><span class="line">    .height(<span class="string">&#x27;100%&#x27;</span>)</span><br><span class="line">  &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<h4 id="动态引用"><a href="#动态引用" class="headerlink" title="动态引用"></a>动态引用</h4><p>动态引用既可以利用 HSP 的内存复用能力，又可以利用 HSP 的下载能力，前提是配置依赖需要配置到 dynamicDependencies 而不是 dependencies<br>HSP 不支持独立发布，而是跟随宿主包上传，应用市场控制安装时只下载 HAP、HAR 到用户本地，HSP 下载时机由开发者自行控制。<br>参考：<a href="">https://developer.huawei.com/consumer/cn/doc/harmonyos-guides-V5/store-moduleinstall-V5</a><br>示例：点击按钮展示动态模块</p>
+<figure class="highlight typescript"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">@Entry</span></span><br><span class="line"><span class="meta">@Component</span></span><br><span class="line">struct Index &#123;</span><br><span class="line">    <span class="meta">@BuilderParam</span> SharedModuleComponent: <span class="built_in">Function</span></span><br><span class="line">    <span class="meta">@State</span> isShow: <span class="built_in">boolean</span> = <span class="literal">false</span></span><br><span class="line">    </span><br><span class="line">    <span class="function"><span class="title">build</span>(<span class="params"></span>)</span> &#123;</span><br><span class="line">    <span class="function"><span class="title">Row</span>(<span class="params"></span>)</span> &#123;</span><br><span class="line">      <span class="function"><span class="title">Column</span>(<span class="params">&#123; space: <span class="number">20</span> &#125;</span>)</span> &#123;</span><br><span class="line">        Blank()</span><br><span class="line">        Button(<span class="string">&quot;加载HSP&quot;</span>)</span><br><span class="line">          .onClick(<span class="function">() =&gt;</span> &#123;</span><br><span class="line">            <span class="built_in">this</span>.initSharedModule(<span class="string">&#x27;SharedLibrary&#x27;</span>, <span class="function">() =&gt;</span> &#123;</span><br><span class="line">              <span class="keyword">import</span>(<span class="string">&#x27;SharedLibrary&#x27;</span>).then(<span class="function">(<span class="params">ns: ESObject</span>) =&gt;</span> &#123;</span><br><span class="line">                <span class="built_in">this</span>.SharedModuleComponent = ns.showSharedComponent</span><br><span class="line">                <span class="built_in">this</span>.isShow = <span class="literal">true</span></span><br><span class="line">              &#125;).catch(<span class="function">(<span class="params">error: BusinessError</span>) =&gt;</span> &#123;</span><br><span class="line">                hilog.error(<span class="number">0</span>, TAG,<span class="string">`show component error: <span class="subst">$&#123;error.code&#125;</span>, message is <span class="subst">$&#123;error.message&#125;</span>`</span>)</span><br><span class="line">              &#125;)</span><br><span class="line">            &#125;)</span><br><span class="line">          &#125;)</span><br><span class="line">        <span class="keyword">if</span> (<span class="built_in">this</span>.isShow) &#123;</span><br><span class="line">          <span class="built_in">this</span>.SharedModuleComponent()</span><br><span class="line">        &#125;</span><br><span class="line">      &#125;</span><br><span class="line">      .width(<span class="string">&#x27;100%&#x27;</span>)</span><br><span class="line">    &#125;</span><br><span class="line">    .height(<span class="string">&#x27;100%&#x27;</span>)</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>配置依赖：给入口的 oh-package.json5 添加 dynamicDependencies 字段</p>
+<figure class="highlight json"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><span class="line">&#123;</span><br><span class="line">  <span class="attr">&quot;name&quot;</span>: <span class="string">&quot;entry&quot;</span>,</span><br><span class="line">  <span class="attr">&quot;version&quot;</span>: <span class="string">&quot;1.0.0&quot;</span>,</span><br><span class="line">  <span class="attr">&quot;description&quot;</span>: <span class="string">&quot;Please describe the basic information.&quot;</span>,</span><br><span class="line">  <span class="attr">&quot;main&quot;</span>: <span class="string">&quot;&quot;</span>,</span><br><span class="line">  <span class="attr">&quot;author&quot;</span>: <span class="string">&quot;&quot;</span>,</span><br><span class="line">  <span class="attr">&quot;license&quot;</span>: <span class="string">&quot;&quot;</span>,</span><br><span class="line">  <span class="attr">&quot;dynamicDependencies&quot;</span>: &#123;</span><br><span class="line">    <span class="attr">&quot;SharedLibrary&quot;</span>: <span class="string">&quot;file:../SharedLibrary&quot;</span></span><br><span class="line">  &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+
+<p>动态引用分为三步</p>
+<ol>
+<li>判断是否已经安装到本地，这个方法实现了判断是否加载并且调用下载功能</li>
+</ol>
+<figure class="highlight aspectj"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">/// 检查SharedModule是否已经加载</span></span><br><span class="line"><span class="keyword">private</span> initSharedModule(name: string, successCallback: Callback&lt;<span class="keyword">void</span>&gt;): <span class="keyword">void</span> &#123;</span><br><span class="line">  <span class="keyword">try</span> &#123;</span><br><span class="line">    <span class="keyword">const</span> result: moduleInstallManager.InstalledModule = moduleInstallManager.getInstalledModule(name)</span><br><span class="line">    <span class="keyword">if</span> (result?.installStatus === moduleInstallManager.InstallStatus.INSTALLED) &#123;</span><br><span class="line">      hilog.info(<span class="number">0</span>, TAG, <span class="string">&#x27;SharedLibrary is Installed&#x27;</span>)</span><br><span class="line">      successCallback &amp;&amp; successCallback()</span><br><span class="line">    &#125; <span class="keyword">else</span> &#123;</span><br><span class="line">      hilog.info(<span class="number">0</span>, TAG, <span class="string">&#x27;SharedLibrary not installed&#x27;</span>)</span><br><span class="line">      <span class="keyword">this</span>.fetchModule(name, successCallback)</span><br><span class="line">    &#125;</span><br><span class="line">  &#125; <span class="keyword">catch</span> (<span class="keyword">error</span>) &#123;</span><br><span class="line">    hilog.<span class="keyword">error</span>(<span class="number">0</span>, TAG, `get install module <span class="keyword">error</span>.code is $&#123;<span class="keyword">error</span>.code&#125;, message is $&#123;<span class="keyword">error</span>.message&#125;`)</span><br><span class="line">  &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<ol start="2">
+<li>如果安装了则直接展示</li>
+</ol>
+<figure class="highlight less"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line"><span class="selector-tag">if</span> (result?.installStatus === moduleInstallManager.InstallStatus.INSTALLED) &#123;</span><br><span class="line">  <span class="selector-tag">hilog</span><span class="selector-class">.info</span>(<span class="number">0</span>, TAG, <span class="string">&#x27;SharedLibrary is Installed&#x27;</span>)</span><br><span class="line">  <span class="selector-tag">successCallback</span> <span class="selector-tag">&amp;</span><span class="selector-tag">&amp;</span> <span class="selector-tag">successCallback</span>()</span><br><span class="line">&#125; </span><br></pre></td></tr></table></figure>
+
+<ol start="3">
+<li>如果没安装则下载后展示，这个方法实现了下载后回调 callback 的功能</li>
+</ol>
+<figure class="highlight typescript"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">private</span> <span class="function"><span class="title">fetchModule</span>(<span class="params">moduleName: <span class="built_in">string</span>, successCallback: Callback&lt;<span class="built_in">void</span>&gt;</span>)</span> &#123;</span><br><span class="line">    <span class="keyword">try</span> &#123;</span><br><span class="line">      hilog.info(<span class="number">0</span>, TAG, <span class="string">&#x27;handle fetch modules start&#x27;</span>)</span><br><span class="line">      <span class="keyword">const</span> context = getContext(<span class="built_in">this</span>) <span class="keyword">as</span> common.UIAbilityContext;</span><br><span class="line">      <span class="keyword">const</span> moduleInstallProvider: moduleInstallManager.ModuleInstallProvider = <span class="keyword">new</span> moduleInstallManager.ModuleInstallProvider()</span><br><span class="line">      <span class="keyword">const</span> moduleInstallRequest: moduleInstallManager.ModuleInstallRequest = moduleInstallProvider.createModuleInstallRequest(context)</span><br><span class="line">      <span class="keyword">if</span> (!moduleInstallRequest) &#123;</span><br><span class="line">        hilog.warn(<span class="number">0</span>, TAG, <span class="string">&#x27;moduleInstallRequest is empty&#x27;</span>);</span><br><span class="line">        <span class="keyword">return</span>;</span><br><span class="line">      &#125;</span><br><span class="line">      moduleInstallRequest.addModule(moduleName)</span><br><span class="line">      moduleInstallManager.fetchModules(moduleInstallRequest).then(<span class="function">(<span class="params">data: moduleInstallManager.ModuleInstallSessionState</span>) =&gt;</span> &#123;</span><br><span class="line">        hilog.info(<span class="number">0</span>,TAG, <span class="string">&#x27;succeed in fetching modules result&#x27;</span>)</span><br><span class="line">        <span class="keyword">if</span> (data.code === moduleInstallManager.RequestErrorCode.SUCCESS) &#123;</span><br><span class="line">          <span class="built_in">this</span>.onListenEvents(successCallback)</span><br><span class="line">        &#125; <span class="keyword">else</span> &#123;</span><br><span class="line">          hilog.info(<span class="number">0</span>, TAG, <span class="string">`fetch modules failure <span class="subst">$&#123;data.code&#125;</span> reason <span class="subst">$&#123;data.desc&#125;</span>`</span>)</span><br><span class="line">        &#125;</span><br><span class="line">      &#125;).catch(<span class="function">(<span class="params">error: <span class="built_in">Error</span></span>) =&gt;</span> &#123;</span><br><span class="line">        hilog.error(<span class="number">0</span>, TAG, <span class="string">`fetchmodules onError.code is <span class="subst">$&#123;error.name&#125;</span>, message is <span class="subst">$&#123;error.message&#125;</span>`</span>);</span><br><span class="line">      &#125;)</span><br><span class="line">    &#125; <span class="keyword">catch</span> (error) &#123;</span><br><span class="line">        hilog.error(<span class="number">0</span>, TAG, <span class="string">`fetchmodules onError.code is <span class="subst">$&#123;error.code&#125;</span>, message is <span class="subst">$&#123;error.message&#125;</span>`</span>);</span><br><span class="line">    &#125;</span><br><span class="line">  &#125;</span><br></pre></td></tr></table></figure>
+
+<h2 id="总结"><a href="#总结" class="headerlink" title="总结"></a>总结</h2><p>关于包的选型，建议如下结构</p>
+<p><img src="https://i0.hdslb.com/bfs/openplatform/c421f89a0a4763f3d83a2d400c3c1d7422eb9b2c.png"></p>
+<p>关于HAR和HSP<br>如果需要，共享内存或者动态下载，使用HSP，否则使用HAR；如果存在单例，使用HSP。</p>
+<p>HAP、HAR、HSP三者的功能和使用场景总结对比如下：</p>
+<table>
+<thead>
+<tr>
+<th>模块类型</th>
+<th>包类型</th>
+<th>说明</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>Ability</td>
+<td>HAP</td>
+<td>应用的功能模块，可以独立安装和运行，必须包含一个entry类型的HAP，可选包含一个或多个feature类型的HAP。</td>
+</tr>
+<tr>
+<td>Static Library</td>
+<td>HAR</td>
+<td>静态共享包，编译态复用。<br>- 支持应用内共享，也可以发布后供其他应用使用<br>- 作为二方库，发布到OHPM私仓，供公司内部其他应用使用<br>- 作为三方库，发布到OHPM中心仓，供其他应用使用<br>- 多包（HAP/HSP）引用相同的HAR时，会造成多包间代码和资源的重复拷贝，从而导致应用包膨大<br>- 注意：编译HAR时，建议开启混淆能力，保护代码资产</td>
+</tr>
+<tr>
+<td>Shared Library</td>
+<td>HSP</td>
+<td>动态共享包，运行时复用。<br>- 当前仅支持应用内共享<br>- 当多包（HAP/HSP）同时引用同一个共享包时，采用HSP替代HAR，可以避免HAR造成的多包间代码和资源的重复拷贝，从而减小应用包大小</td>
+</tr>
+</tbody></table>
+<p>HAP、HSP、HAR支持的规格对比如下，其中“√”表示是，“×”表示否。</p>
+<table>
+<thead>
+<tr>
+<th>规格</th>
+<th>HAP</th>
+<th>HAR</th>
+<th>HSP</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>支持在配置文件中声明UIAbility组件与ExtensionAbility组件</td>
+<td>√</td>
+<td>×</td>
+<td>×</td>
+</tr>
+<tr>
+<td>支持在配置文件中声明pages页面</td>
+<td>√</td>
+<td>×</td>
+<td>√</td>
+</tr>
+<tr>
+<td>支持包含资源文件与.so文件</td>
+<td>√</td>
+<td>√</td>
+<td>√</td>
+</tr>
+<tr>
+<td>支持依赖其他HAR文件</td>
+<td>√</td>
+<td>√</td>
+<td>√</td>
+</tr>
+<tr>
+<td>支持依赖其他HSP文件</td>
+<td>√</td>
+<td>√</td>
+<td>√</td>
+</tr>
+<tr>
+<td>支持在设备上独立安装运行</td>
+<td>√</td>
+<td>×</td>
+<td>×</td>
+</tr>
+</tbody></table>
+
+    </div>
+
+    
+    
+    
+
+      <footer class="post-footer">
+          <div class="post-tags">
+              <a href="/tags/Harmony/" rel="tag"># Harmony</a>
+          </div>
+
+        
+
+
+        
+    <div class="post-nav">
+      <div class="post-nav-item">
+    <a href="/post/4b595590.html" rel="prev" title="鸿蒙状态管理装饰器V2">
+      <i class="fa fa-chevron-left"></i> 鸿蒙状态管理装饰器V2
+    </a></div>
+      <div class="post-nav-item">
+    <a href="/post/8af9107c.html" rel="next" title="纯Swift热修方案">
+      纯Swift热修方案 <i class="fa fa-chevron-right"></i>
+    </a></div>
+    </div>
+      </footer>
+    
+  </article>
+  
+  
+  
+
+
+
+          </div>
+          
+    <div class="comments" id="gitalk-container"></div>
+
+<script>
+  window.addEventListener('tabs:register', () => {
+    let { activeClass } = CONFIG.comments;
+    if (CONFIG.comments.storage) {
+      activeClass = localStorage.getItem('comments_active') || activeClass;
+    }
+    if (activeClass) {
+      let activeTab = document.querySelector(`a[href="#comment-${activeClass}"]`);
+      if (activeTab) {
+        activeTab.click();
+      }
+    }
+  });
+  if (CONFIG.comments.storage) {
+    window.addEventListener('tabs:click', event => {
+      if (!event.target.matches('.tabs-comment .tab-content .tab-pane')) return;
+      let commentClass = event.target.classList[1];
+      localStorage.setItem('comments_active', commentClass);
+    });
+  }
+</script>
+
+        </div>
+          
+  
+  <div class="toggle sidebar-toggle">
+    <span class="toggle-line toggle-line-first"></span>
+    <span class="toggle-line toggle-line-middle"></span>
+    <span class="toggle-line toggle-line-last"></span>
+  </div>
+
+  <aside class="sidebar">
+    <div class="sidebar-inner">
+
+      <ul class="sidebar-nav motion-element">
+        <li class="sidebar-nav-toc">
+          文章目录
+        </li>
+        <li class="sidebar-nav-overview">
+          站点概览
+        </li>
+      </ul>
+
+      <!--noindex-->
+      <div class="post-toc-wrap sidebar-panel">
+          <div class="post-toc motion-element"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#HAP"><span class="nav-number">1.</span> <span class="nav-text">HAP</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#%E5%88%9B%E5%BB%BA"><span class="nav-number">1.1.</span> <span class="nav-text">创建</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E5%A4%9A-HAP-%E8%B7%B3%E8%BD%AC"><span class="nav-number">1.2.</span> <span class="nav-text">多 HAP 跳转</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E9%99%90%E5%88%B6"><span class="nav-number">1.3.</span> <span class="nav-text">限制</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#AppStorage-%E8%A1%A8%E7%8E%B0"><span class="nav-number">1.4.</span> <span class="nav-text">AppStorage 表现</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#HAR"><span class="nav-number">2.</span> <span class="nav-text">HAR</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#%E5%88%9B%E5%BB%BA-1"><span class="nav-number">2.1.</span> <span class="nav-text">创建</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E6%8F%90%E4%BE%9B%E6%8E%A5%E5%8F%A3"><span class="nav-number">2.2.</span> <span class="nav-text">提供接口</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E9%A1%B5%E9%9D%A2%E8%B7%B3%E8%BD%AC"><span class="nav-number">2.3.</span> <span class="nav-text">页面跳转</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#%E6%B7%BB%E5%8A%A0%E4%BE%9D%E8%B5%96"><span class="nav-number">2.3.1.</span> <span class="nav-text">添加依赖</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#HAP-gt-HAR"><span class="nav-number">2.3.2.</span> <span class="nav-text">HAP -&gt; HAR</span></a><ol class="nav-child"><li class="nav-item nav-level-5"><a class="nav-link" href="#%E9%80%9A%E8%BF%87-NavigationStack"><span class="nav-number">2.3.2.1.</span> <span class="nav-text">通过 NavigationStack</span></a></li><li class="nav-item nav-level-5"><a class="nav-link" href="#%E9%80%9A%E8%BF%87-Router"><span class="nav-number">2.3.2.2.</span> <span class="nav-text">通过 Router</span></a></li></ol></li></ol></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E4%BD%BF%E7%94%A8%E5%8D%95%E4%BE%8B"><span class="nav-number">2.4.</span> <span class="nav-text">使用单例</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#%E9%99%90%E5%88%B6-1"><span class="nav-number">2.4.1.</span> <span class="nav-text">限制</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#%E5%BC%95%E7%94%A8%E6%96%B9%E5%BC%8F"><span class="nav-number">2.4.2.</span> <span class="nav-text">引用方式</span></a><ol class="nav-child"><li class="nav-item nav-level-5"><a class="nav-link" href="#%E9%9D%99%E6%80%81%E5%BC%95%E7%94%A8"><span class="nav-number">2.4.2.1.</span> <span class="nav-text">静态引用</span></a></li><li class="nav-item nav-level-5"><a class="nav-link" href="#%E5%8A%A8%E6%80%81%E5%B8%B8%E9%87%8F%E5%BC%95%E7%94%A8"><span class="nav-number">2.4.2.2.</span> <span class="nav-text">动态常量引用</span></a></li><li class="nav-item nav-level-5"><a class="nav-link" href="#%E5%8A%A8%E6%80%81%E5%8F%98%E9%87%8F%E5%BC%95%E7%94%A8"><span class="nav-number">2.4.2.3.</span> <span class="nav-text">动态变量引用</span></a></li></ol></li><li class="nav-item nav-level-4"><a class="nav-link" href="#%E5%BE%AA%E7%8E%AF%E4%BE%9D%E8%B5%96"><span class="nav-number">2.4.3.</span> <span class="nav-text">循环依赖</span></a></li></ol></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#HSP"><span class="nav-number">3.</span> <span class="nav-text">HSP</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#%E5%88%9B%E5%BB%BA-2"><span class="nav-number">3.1.</span> <span class="nav-text">创建</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E6%8F%90%E4%BE%9B%E6%8E%A5%E5%8F%A3-1"><span class="nav-number">3.2.</span> <span class="nav-text">提供接口</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E9%A1%B5%E9%9D%A2%E8%B7%B3%E8%BD%AC-1"><span class="nav-number">3.3.</span> <span class="nav-text">页面跳转</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#%E6%9C%AC%E5%9C%B0%E5%BC%95%E7%94%A8"><span class="nav-number">3.3.1.</span> <span class="nav-text">本地引用</span></a><ol class="nav-child"><li class="nav-item nav-level-5"><a class="nav-link" href="#%E4%BD%BF%E7%94%A8-Navigation"><span class="nav-number">3.3.1.1.</span> <span class="nav-text">使用 Navigation</span></a></li></ol></li><li class="nav-item nav-level-4"><a class="nav-link" href="#%E4%BD%BF%E7%94%A8-Router"><span class="nav-number">3.3.2.</span> <span class="nav-text">使用 Router</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#%E5%8A%A8%E6%80%81%E5%BC%95%E7%94%A8"><span class="nav-number">3.3.3.</span> <span class="nav-text">动态引用</span></a></li></ol></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E6%80%BB%E7%BB%93"><span class="nav-number">4.</span> <span class="nav-text">总结</span></a></li></ol></div>
+      </div>
+      <!--/noindex-->
+
+      <div class="site-overview-wrap sidebar-panel">
+        <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+    <img class="site-author-image" itemprop="image" alt="Arclin"
+      src="https://avatars.githubusercontent.com/u/12107804?v=4">
+  <p class="site-author-name" itemprop="name">Arclin</p>
+  <div class="site-description" itemprop="description">Stay hungry,stay foolish</div>
+</div>
+<div class="site-state-wrap motion-element">
+  <nav class="site-state">
+      <div class="site-state-item site-state-posts">
+          <a href="/archives/">
+        
+          <span class="site-state-item-count">105</span>
+          <span class="site-state-item-name">日志</span>
+        </a>
+      </div>
+      <div class="site-state-item site-state-categories">
+            <a href="/categories/">
+          
+        <span class="site-state-item-count">13</span>
+        <span class="site-state-item-name">分类</span></a>
+      </div>
+      <div class="site-state-item site-state-tags">
+            <a href="/tags/">
+          
+        <span class="site-state-item-count">40</span>
+        <span class="site-state-item-name">标签</span></a>
+      </div>
+  </nav>
+</div>
+  <div class="links-of-author motion-element">
+      <span class="links-of-author-item">
+        <a href="https://github.com/Arc-lin" title="GitHub → https://github.com/Arc-lin" rel="noopener" target="_blank"><i class="fab fa-github fa-fw"></i>GitHub</a>
+      </span>
+      <span class="links-of-author-item">
+        <a href="mailto:arclin325@gmail.com" title="E-Mail → mailto:arclin325@gmail.com" rel="noopener" target="_blank"><i class="fa fa-envelope fa-fw"></i>E-Mail</a>
+      </span>
+  </div>
+
+
+
+      </div>
+
+    </div>
+  </aside>
+  <div id="sidebar-dimmer"></div>
+
+
+      </div>
+    </main>
+
+    <footer class="footer">
+      <div class="footer-inner">
+        
+
+        
+
+<div class="copyright">
+  
+  &copy; 
+  <span itemprop="copyrightYear">2025</span>
+  <span class="with-love">
+    <i class="fa fa-heart"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">Arclin</span>
+</div>
+  <div class="powered-by">由 <a href="https://hexo.io" class="theme-link" rel="noopener" target="_blank">Hexo</a> & <a href="https://muse.theme-next.org" class="theme-link" rel="noopener" target="_blank">NexT.Muse</a> 强力驱动
+  </div>
+
+        
+<div class="busuanzi-count">
+  <script async src="https://busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js"></script>
+    <span class="post-meta-item" id="busuanzi_container_site_uv" style="display: none;">
+      <span class="post-meta-item-icon">
+        <i class="fa fa-user"></i>
+      </span>
+      <span class="site-uv" title="总访客量">
+        <span id="busuanzi_value_site_uv"></span>
+      </span>
+    </span>
+    <span class="post-meta-divider">|</span>
+    <span class="post-meta-item" id="busuanzi_container_site_pv" style="display: none;">
+      <span class="post-meta-item-icon">
+        <i class="fa fa-eye"></i>
+      </span>
+      <span class="site-pv" title="总访问量">
+        <span id="busuanzi_value_site_pv"></span>
+      </span>
+    </span>
+</div>
+
+
+
+
+
+
+
+
+      </div>
+    </footer>
+  </div>
+
+  
+  <script src="/lib/anime.min.js"></script>
+  <script src="//cdn.jsdelivr.net/npm/jquery@3/dist/jquery.min.js"></script>
+  <script src="//cdn.jsdelivr.net/gh/fancyapps/fancybox@3/dist/jquery.fancybox.min.js"></script>
+  <script src="/lib/velocity/velocity.min.js"></script>
+  <script src="/lib/velocity/velocity.ui.min.js"></script>
+
+<script src="/js/utils.js"></script>
+
+<script src="/js/motion.js"></script>
+
+
+<script src="/js/schemes/muse.js"></script>
+
+
+<script src="/js/next-boot.js"></script>
+
+
+
+
+  
+  <script>
+    (function(){
+      var canonicalURL, curProtocol;
+      //Get the <link> tag
+      var x=document.getElementsByTagName("link");
+		//Find the last canonical URL
+		if(x.length > 0){
+			for (i=0;i<x.length;i++){
+				if(x[i].rel.toLowerCase() == 'canonical' && x[i].href){
+					canonicalURL=x[i].href;
+				}
+			}
+		}
+    //Get protocol
+	    if (!canonicalURL){
+	    	curProtocol = window.location.protocol.split(':')[0];
+	    }
+	    else{
+	    	curProtocol = canonicalURL.split(':')[0];
+	    }
+      //Get current URL if the canonical URL does not exist
+	    if (!canonicalURL) canonicalURL = window.location.href;
+	    //Assign script content. Replace current URL with the canonical URL
+      !function(){var e=/([http|https]:\/\/[a-zA-Z0-9\_\.]+\.baidu\.com)/gi,r=canonicalURL,t=document.referrer;if(!e.test(r)){var n=(String(curProtocol).toLowerCase() === 'https')?"https://sp0.baidu.com/9_Q4simg2RQJ8t7jm9iCKT-xh_/s.gif":"//api.share.baidu.com/s.gif";t?(n+="?r="+encodeURIComponent(document.referrer),r&&(n+="&l="+r)):r&&(n+="?l="+r);var i=new Image;i.src=n}}(window);})();
+  </script>
+
+
+
+
+  
+<script src="/js/local-search.js"></script>
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+  
+
+<link rel="stylesheet" href="//cdn.jsdelivr.net/npm/gitalk@1/dist/gitalk.min.css">
+
+<script>
+NexT.utils.loadComments(document.querySelector('#gitalk-container'), () => {
+  NexT.utils.getScript('//cdn.jsdelivr.net/npm/gitalk@1/dist/gitalk.min.js', () => {
+    var gitalk = new Gitalk({
+      clientID    : 'df6d1f33bb4a66f5fa60',
+      clientSecret: '5fcc9fb756ac9d4b16381288da7b29f691b45e0a',
+      repo        : 'arc-lin.github.io',
+      owner       : 'Arc-lin',
+      admin       : ['Arc-lin'],
+      id          : 'c53ee83d9486bb21d682bb17171feb39',
+        language: 'zh-CN',
+      distractionFreeMode: false
+    });
+    gitalk.render('gitalk-container');
+  }, window.Gitalk);
+});
+</script>
+
+</body>
+</html>
