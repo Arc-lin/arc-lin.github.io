@@ -194,7 +194,7 @@
   
   
   <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="zh-Hans">
-    <link itemprop="mainEntityOfPage" href="https://www.arclin.cn/post/f0080c3e.html">
+    <link itemprop="mainEntityOfPage" href="https://www.arclin.cn/post/50c5f6e6.html">
 
     <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
       <meta itemprop="image" content="https://avatars.githubusercontent.com/u/12107804?v=4">
@@ -208,7 +208,7 @@
       <header class="post-header">
         <h2 class="post-title" itemprop="name headline">
           
-            <a href="/post/f0080c3e.html" class="post-title-link" itemprop="url">ipad和iphone使用UIAlertViewController</a>
+            <a href="/post/50c5f6e6.html" class="post-title-link" itemprop="url">pop后强制竖屏</a>
         </h2>
 
         <div class="post-meta">
@@ -241,8 +241,15 @@
     <div class="post-body" itemprop="articleBody">
 
       
-          <p>ipad和iphone使用UIAlertViewController</p>
-<figure class="highlight objectivec"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">id</span> aController;</span><br><span class="line">    <span class="keyword">if</span>(DKDeviceiPad)&#123;</span><br><span class="line">    alertC.modalPresentationStyle = <span class="built_in">UIModalPresentationPopover</span>;</span><br><span class="line">    <span class="built_in">UIPopoverPresentationController</span> *popPc = alertC.popoverPresentationController;</span><br><span class="line">    popPc.barButtonItem = <span class="keyword">self</span>.downloadItem;</span><br><span class="line">    popPc.permittedArrowDirections = <span class="built_in">UIPopoverArrowDirectionAny</span>;</span><br><span class="line">    aController = alertC;</span><br><span class="line">&#125;<span class="keyword">else</span>&#123;</span><br><span class="line">    aController = alertC;</span><br><span class="line">&#125;</span><br><span class="line">[window.rootViewController presentViewController:aController animated:<span class="literal">YES</span> completion:<span class="literal">nil</span>];</span><br></pre></td></tr></table></figure>
+          <p>pop之后强制竖屏</p>
+          <!--noindex-->
+            <div class="post-button">
+              <a class="btn" href="/post/50c5f6e6.html#more" rel="contents">
+                阅读全文 &raquo;
+              </a>
+            </div>
+          <!--/noindex-->
+        
       
     </div>
 
