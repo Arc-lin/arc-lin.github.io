@@ -37,7 +37,7 @@
 <meta property="og:image" content="https://i0.hdslb.com/bfs/openplatform/3bfebb3f119177eaf3f37e59cdf7850a7b00e98a.png">
 <meta property="og:image" content="https://i0.hdslb.com/bfs/openplatform/8d2b6adc8f3255f44ba9911f717ec88bc9ca22be.png">
 <meta property="article:published_time" content="2025-06-08T06:01:21.000Z">
-<meta property="article:modified_time" content="2025-06-14T08:04:36.475Z">
+<meta property="article:modified_time" content="2025-06-14T08:23:53.751Z">
 <meta property="article:author" content="Arclin">
 <meta property="article:tag" content="iOS">
 <meta property="article:tag" content="测试">
@@ -283,7 +283,7 @@
 <figure class="highlight reasonml"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">let</span> name = <span class="string">&quot;\(moduleName).profraw&quot;</span></span><br><span class="line"><span class="keyword">let</span> fileManager = <span class="module-access"><span class="module"><span class="identifier">FileManager</span>.</span></span>default</span><br><span class="line"><span class="keyword">do</span> &#123;</span><br><span class="line">    <span class="keyword">let</span> documentDirectory = <span class="keyword">try</span> fileManager.url(<span class="keyword">for</span>: .documentDirectory, <span class="keyword">in</span>: .userDomainMask, appropriateFor:nil, create:<span class="literal">false</span>)</span><br><span class="line">    <span class="keyword">let</span> filePath: NSString = documentDirectory.appending<span class="constructor">PathComponent(<span class="params">name</span>)</span>.path <span class="keyword">as</span> NSString</span><br><span class="line">    <span class="constructor">__llvm_profile_set_filename(<span class="params">filePath</span>.<span class="params">utf8String</span>)</span></span><br><span class="line">&#125; catch &#123;</span><br><span class="line">    print(error)</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
 
 <p>3.在合适的时机调用<code>__llvm_profile_write_file()</code>写入覆盖率数据，如切后台，退出app时等。</p>
-<figure class="highlight erlang"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">- <span class="params">(void)</span>sceneDidEnterBackground:<span class="params">(UIScene *)</span>scene &#123;</span><br><span class="line">    __llvm_profile_write_file<span class="params">()</span></span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<figure class="highlight erlang"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">- <span class="params">(void)</span>sceneDidEnterBackground:<span class="params">(UIScene *)</span>scene &#123;</span><br><span class="line">    __llvm_profile_write_file<span class="params">()</span>;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
 
 <h1 id="生成测试覆盖率报告"><a href="#生成测试覆盖率报告" class="headerlink" title="生成测试覆盖率报告"></a>生成测试覆盖率报告</h1><p>测试app:</p>
 <p>启动app, 进行操作，然后进入后台。</p>
@@ -373,7 +373,10 @@
     <a href="/post/8af9107c.html" rel="prev" title="纯Swift热修方案">
       <i class="fa fa-chevron-left"></i> 纯Swift热修方案
     </a></div>
-      <div class="post-nav-item"></div>
+      <div class="post-nav-item">
+    <a href="/post/38d1c8c3.html" rel="next" title="What's new in Swift6.2">
+      What's new in Swift6.2 <i class="fa fa-chevron-right"></i>
+    </a></div>
     </div>
       </footer>
     
@@ -449,7 +452,7 @@
       <div class="site-state-item site-state-posts">
           <a href="/archives/">
         
-          <span class="site-state-item-count">105</span>
+          <span class="site-state-item-count">106</span>
           <span class="site-state-item-name">日志</span>
         </a>
       </div>

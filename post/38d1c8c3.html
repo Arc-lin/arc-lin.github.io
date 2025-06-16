@@ -1,0 +1,635 @@
+<!DOCTYPE html>
+<html lang="zh-Hans">
+<head>
+  <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=2">
+<meta name="theme-color" content="#222">
+<meta name="generator" content="Hexo 5.4.0">
+<meta name="referrer" content="no-referrer" />
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png">
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32-next.png">
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next.png">
+  <link rel="mask-icon" href="/images/logo.svg" color="#222">
+
+<link rel="stylesheet" href="/css/main.css">
+
+
+<link rel="stylesheet" href="/lib/font-awesome/css/all.min.css">
+  <link rel="stylesheet" href="//cdn.jsdelivr.net/gh/fancyapps/fancybox@3/dist/jquery.fancybox.min.css">
+
+<script id="hexo-configurations">
+    var NexT = window.NexT || {};
+    var CONFIG = {"hostname":"www.arclin.cn","root":"/","scheme":"Muse","version":"7.8.0","exturl":false,"sidebar":{"position":"left","display":"post","padding":18,"offset":12,"onmobile":false},"copycode":{"enable":false,"show_result":false,"style":null},"back2top":{"enable":true,"sidebar":false,"scrollpercent":false},"bookmark":{"enable":false,"color":"#222","save":"auto"},"fancybox":true,"mediumzoom":false,"lazyload":false,"pangu":false,"comments":{"style":"tabs","active":null,"storage":true,"lazyload":false,"nav":null},"algolia":{"appID":"VOFC7668C9","apiKey":"24c644edc8e7353bf2e8d8e31f03a940","indexName":"hexo","hits":{"per_page":10},"labels":{"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}},"localsearch":{"enable":true,"trigger":"auto","top_n_per_article":1,"unescape":false,"preload":false},"motion":{"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},"path":"search.xml"};
+  </script>
+
+  <meta name="description" content="本文总结自WWDC 25 – What’s new in Swift">
+<meta property="og:type" content="article">
+<meta property="og:title" content="What&#39;s new in Swift6.2">
+<meta property="og:url" content="https://www.arclin.cn/post/38d1c8c3.html">
+<meta property="og:site_name" content="Arclin">
+<meta property="og:description" content="本文总结自WWDC 25 – What’s new in Swift">
+<meta property="og:locale">
+<meta property="og:image" content="https://i0.hdslb.com/bfs/openplatform/06c093ce07a373949afd8379176fd08c8cb28810.png">
+<meta property="og:image" content="https://i0.hdslb.com/bfs/openplatform/bbd14716f92f8940982238a0ed412970c0357a4c.png">
+<meta property="og:image" content="https://i0.hdslb.com/bfs/openplatform/00a1adc25ac9302068b1999acf43b697ae3805c0.png">
+<meta property="og:image" content="https://i0.hdslb.com/bfs/openplatform/d2e40edaf7721f973f65a4b14a87cd9cc95ce1f9.png">
+<meta property="og:image" content="https://i0.hdslb.com/bfs/openplatform/a098b2e3dff33335830fca48fe910599ad88f6a2.png">
+<meta property="og:image" content="https://i0.hdslb.com/bfs/openplatform/4e0cf2f2fc8b74e26555707e5bd8c9f7897e7037.png">
+<meta property="og:image" content="https://i0.hdslb.com/bfs/openplatform/0bdb5e0a47dcb1786fc84217e893d86ec0c5784f.png">
+<meta property="og:image" content="https://i0.hdslb.com/bfs/openplatform/93a5e54dd38f9edd78bbbc8a3a446fdadeee244d.png">
+<meta property="og:image" content="https://i0.hdslb.com/bfs/openplatform/6aca43955aefee63532f5f9d9e2e1c7d45b94555.png">
+<meta property="og:image" content="https://i0.hdslb.com/bfs/openplatform/2f39a72b356580bd6de187c3a637d7f9de0b5689.png">
+<meta property="article:published_time" content="2025-06-15T15:38:07.000Z">
+<meta property="article:modified_time" content="2025-06-16T15:05:45.910Z">
+<meta property="article:author" content="Arclin">
+<meta property="article:tag" content="iOS">
+<meta property="article:tag" content="Swift">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="https://i0.hdslb.com/bfs/openplatform/06c093ce07a373949afd8379176fd08c8cb28810.png">
+
+<link rel="canonical" href="https://www.arclin.cn/post/38d1c8c3.html">
+
+
+<script id="page-configurations">
+  // https://hexo.io/docs/variables.html
+  CONFIG.page = {
+    sidebar: "",
+    isHome : false,
+    isPost : true,
+    lang   : 'zh-Hans'
+  };
+</script>
+
+  <title>What's new in Swift6.2 | Arclin</title>
+  
+
+
+
+
+
+
+  <noscript>
+  <style>
+  .use-motion .brand,
+  .use-motion .menu-item,
+  .sidebar-inner,
+  .use-motion .post-block,
+  .use-motion .pagination,
+  .use-motion .comments,
+  .use-motion .post-header,
+  .use-motion .post-body,
+  .use-motion .collection-header { opacity: initial; }
+
+  .use-motion .site-title,
+  .use-motion .site-subtitle {
+    opacity: initial;
+    top: initial;
+  }
+
+  .use-motion .logo-line-before i { left: initial; }
+  .use-motion .logo-line-after i { right: initial; }
+  </style>
+</noscript>
+
+<link rel="alternate" href="/atom.xml" title="Arclin" type="application/atom+xml">
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage">
+  <div class="container use-motion">
+    <div class="headband"></div>
+
+    <header class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-container">
+  <div class="site-nav-toggle">
+    <div class="toggle" aria-label="切换导航栏">
+      <span class="toggle-line toggle-line-first"></span>
+      <span class="toggle-line toggle-line-middle"></span>
+      <span class="toggle-line toggle-line-last"></span>
+    </div>
+  </div>
+
+  <div class="site-meta">
+
+    <a href="/" class="brand" rel="start">
+      <span class="logo-line-before"><i></i></span>
+      <h1 class="site-title">Arclin</h1>
+      <span class="logo-line-after"><i></i></span>
+    </a>
+      <p class="site-subtitle" itemprop="description">Advocate Technology. Enjoy Technology.</p>
+  </div>
+
+  <div class="site-nav-right">
+    <div class="toggle popup-trigger">
+        <i class="fa fa-search fa-fw fa-lg"></i>
+    </div>
+  </div>
+</div>
+
+
+
+
+<nav class="site-nav">
+  <ul id="menu" class="main-menu menu">
+        <li class="menu-item menu-item-home">
+
+    <a href="/" rel="section"><i class="fa fa-home fa-fw"></i>首页</a>
+
+  </li>
+        <li class="menu-item menu-item-tags">
+
+    <a href="/tags/" rel="section"><i class="fa fa-tags fa-fw"></i>标签</a>
+
+  </li>
+        <li class="menu-item menu-item-categories">
+
+    <a href="/categories/" rel="section"><i class="fa fa-th fa-fw"></i>分类</a>
+
+  </li>
+        <li class="menu-item menu-item-archives">
+
+    <a href="/archives/" rel="section"><i class="fa fa-archive fa-fw"></i>归档</a>
+
+  </li>
+        <li class="menu-item menu-item-about">
+
+    <a href="/about/" rel="section"><i class="fa fa-user fa-fw"></i>关于</a>
+
+  </li>
+      <li class="menu-item menu-item-search">
+        <a role="button" class="popup-trigger"><i class="fa fa-search fa-fw"></i>搜索
+        </a>
+      </li>
+  </ul>
+</nav>
+
+
+
+  <div class="search-pop-overlay">
+    <div class="popup search-popup">
+        <div class="search-header">
+  <span class="search-icon">
+    <i class="fa fa-search"></i>
+  </span>
+  <div class="search-input-container">
+    <input autocomplete="off" autocapitalize="off"
+           placeholder="搜索..." spellcheck="false"
+           type="search" class="search-input">
+  </div>
+  <span class="popup-btn-close">
+    <i class="fa fa-times-circle"></i>
+  </span>
+</div>
+<div id="search-result">
+  <div id="no-result">
+    <i class="fa fa-spinner fa-pulse fa-5x fa-fw"></i>
+  </div>
+</div>
+
+    </div>
+  </div>
+
+</div>
+    </header>
+
+    
+  <div class="back-to-top">
+    <i class="fa fa-arrow-up"></i>
+    <span>0%</span>
+  </div>
+
+
+    <main class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          
+
+          <div class="content post posts-expand">
+            
+
+    
+  
+  
+  <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="zh-Hans">
+    <link itemprop="mainEntityOfPage" href="https://www.arclin.cn/post/38d1c8c3.html">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="https://avatars.githubusercontent.com/u/12107804?v=4">
+      <meta itemprop="name" content="Arclin">
+      <meta itemprop="description" content="Stay hungry,stay foolish">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="Arclin">
+    </span>
+      <header class="post-header">
+        <h1 class="post-title" itemprop="name headline">
+          What's new in Swift6.2
+        </h1>
+
+        <div class="post-meta">
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-calendar"></i>
+              </span>
+              <span class="post-meta-item-text">发表于</span>
+
+              <time title="创建时间：2025-06-15 23:38:07" itemprop="dateCreated datePublished" datetime="2025-06-15T23:38:07+08:00">2025-06-15</time>
+            </span>
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-folder"></i>
+              </span>
+              <span class="post-meta-item-text">分类于</span>
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/iOS/" itemprop="url" rel="index"><span itemprop="name">iOS</span></a>
+                </span>
+            </span>
+
+          
+            <span class="post-meta-item" title="阅读次数" id="busuanzi_container_page_pv" style="display: none;">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-eye"></i>
+              </span>
+              <span class="post-meta-item-text">阅读次数：</span>
+              <span id="busuanzi_value_page_pv"></span>
+            </span>
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+        <p>本文总结自WWDC 25 – <a target="_blank" rel="noopener" href="https://developer.apple.com/cn/videos/play/wwdc2025/245/?time=291">What’s new in Swift</a></p>
+<span id="more"></span>
+
+<h1 id="Swift-Subprocess"><a href="#Swift-Subprocess" class="headerlink" title="Swift-Subprocess"></a>Swift-Subprocess</h1><p>新增的Subprocess库可以更方便地执行命令（启动一个子进程）</p>
+<figure class="highlight nim"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">import</span> <span class="type">Subprocess</span></span><br><span class="line"></span><br><span class="line"><span class="keyword">let</span> swiftPath = <span class="type">FilePath</span>(<span class="string">&quot;/usr/bin/swift&quot;</span>)</span><br><span class="line"><span class="keyword">let</span> <span class="literal">result</span> = <span class="keyword">try</span> await run(</span><br><span class="line">  .path(swiftPath),</span><br><span class="line">  arguments: [<span class="string">&quot;--version&quot;</span>]</span><br><span class="line">)</span><br><span class="line"></span><br><span class="line"><span class="keyword">let</span> swiftVersion = <span class="literal">result</span>.standardOutput</span><br></pre></td></tr></table></figure>
+
+<h1 id="NotificationCenter"><a href="#NotificationCenter" class="headerlink" title="NotificationCenter"></a>NotificationCenter</h1><p>NotificationCenter进行了一些安全性更新 </p>
+<p>以前监听一个键盘出现事件，会有类似以下代码</p>
+<figure class="highlight swift"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">import</span> UIKit</span><br><span class="line"></span><br><span class="line"><span class="meta">@MainActor</span> </span><br><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">KeyboardObserver</span> </span>&#123;</span><br><span class="line"> <span class="function"><span class="keyword">func</span> <span class="title">registerObserver</span>(<span class="params">screen</span>: <span class="type">UIScreen</span>)</span> &#123;</span><br><span class="line">    <span class="keyword">let</span> center <span class="operator">=</span> <span class="type">NotificationCenter</span>.default</span><br><span class="line">    <span class="keyword">let</span> token <span class="operator">=</span> center.addObserver(</span><br><span class="line">      forName: <span class="type">UIResponder</span>.keyboardWillShowNotification,</span><br><span class="line">      object: screen,</span><br><span class="line">      queue: .main</span><br><span class="line">    ) &#123; notification <span class="keyword">in</span></span><br><span class="line">      <span class="keyword">guard</span> <span class="keyword">let</span> userInfo <span class="operator">=</span> notification.userInfo <span class="keyword">else</span> &#123; <span class="keyword">return</span> &#125;</span><br><span class="line">      <span class="keyword">let</span> startFrame <span class="operator">=</span> userInfo[<span class="type">UIResponder</span>.keyboardFrameBeginUserInfoKey] <span class="keyword">as?</span> <span class="type">CGRect</span></span><br><span class="line">      <span class="keyword">let</span> endFrame <span class="operator">=</span> userInfo[<span class="type">UIResponder</span>.keyboardFrameEndUserInfoKey] <span class="keyword">as?</span> <span class="type">CGRect</span></span><br><span class="line"></span><br><span class="line">      <span class="keyword">guard</span> <span class="keyword">let</span> startFrame, <span class="keyword">let</span> endFrame <span class="keyword">else</span> &#123; <span class="keyword">return</span> &#125;</span><br><span class="line"></span><br><span class="line">      <span class="keyword">self</span>.keyboardWillShow(startFrame: startFrame, endFrame: endFrame)</span><br><span class="line">    &#125;</span><br><span class="line">  &#125;</span><br><span class="line">  </span><br><span class="line">  <span class="function"><span class="keyword">func</span> <span class="title">keyboardWillShow</span>(<span class="params">startFrame</span>: <span class="type">CGRect</span>, <span class="params">endFrame</span>: <span class="type">CGRect</span>)</span> &#123;&#125;</span><br><span class="line">&#125;</span><br><span class="line"></span><br></pre></td></tr></table></figure>
+
+<p>以上代码会有几个问题：</p>
+<ol>
+<li>通知名需要打对，不然永远不会执行通知回调，特别是有些通知名比较长又长得比较类似的时候容易补全选错。</li>
+<li>与通知有关的信息储存在 非类型化的字典中（userInfo） 这要求你使用正确的键手动进行下标访问 并将所得结果动态转换为正确的类型</li>
+<li>即使能保证通知回调闭包在主线程访问，但是在调用 Main Actor API (keyboardWillShow) 时 仍会收到并发错误 (Swift6下才会报错)。因为闭包默认不是Main actor 隔离的，而在一个非隔离的同步上下文中不能调用 Main actor 隔离的方法.要不就只能像下面这么改.</li>
+</ol>
+<figure class="highlight reasonml"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">// 使用 MainActor.run 确保在main actor 上下文中执行</span></span><br><span class="line"><span class="module-access"><span class="module"><span class="identifier">MainActor</span>.</span></span>run &#123; <span class="literal">[<span class="identifier">weak</span> <span class="identifier">self</span>]</span> <span class="keyword">in</span></span><br><span class="line">    self?.keyboard<span class="constructor">WillShow(<span class="params">startFrame</span>: <span class="params">startFrame</span>, <span class="params">endFrame</span>: <span class="params">endFrame</span>)</span></span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>Swift6.2有新的方案</p>
+<figure class="highlight swift"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">import</span> UIKit</span><br><span class="line"></span><br><span class="line"><span class="meta">@MainActor</span></span><br><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">KeyboardObserver</span> </span>&#123;</span><br><span class="line">  <span class="function"><span class="keyword">func</span> <span class="title">registerObserver</span>(<span class="params">screen</span>: <span class="type">UIScreen</span>)</span> &#123;</span><br><span class="line">    <span class="keyword">let</span> center <span class="operator">=</span> <span class="type">NotificationCenter</span>.default</span><br><span class="line">    <span class="keyword">let</span> token <span class="operator">=</span> center.addObserver(</span><br><span class="line">      of: screen,</span><br><span class="line">      for: .keyboardWillShow</span><br><span class="line">    ) &#123; keyboardState <span class="keyword">in</span></span><br><span class="line">      <span class="keyword">let</span> startFrame <span class="operator">=</span> keyboardState.startFrame</span><br><span class="line">      <span class="keyword">let</span> endFrame <span class="operator">=</span> keyboardState.endFrame</span><br><span class="line"></span><br><span class="line">      <span class="keyword">self</span>.keyboardWillShow(startFrame: startFrame, endFrame: endFrame) </span><br><span class="line">    &#125;</span><br><span class="line">  &#125;</span><br><span class="line">  </span><br><span class="line">  <span class="function"><span class="keyword">func</span> <span class="title">keyboardWillShow</span>(<span class="params">startFrame</span>: <span class="type">CGRect</span>, <span class="params">endFrame</span>: <span class="type">CGRect</span>)</span> &#123;&#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>通知变成了具体类型，这样子编译器可以直接检查订阅通知时数据内容和类型</p>
+<p>定义通知的时候可以通过<code>MainActorMessage</code>定义该通知是在主线程发出的，<code>AsyncMessage</code>表示可能在任意线程发出</p>
+<figure class="highlight swift"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line"><span class="class"><span class="keyword">extension</span> <span class="title">UIResponder</span> </span>&#123; </span><br><span class="line">  <span class="keyword">public</span> <span class="class"><span class="keyword">struct</span> <span class="title">KeyboardWillShowMessage</span>: <span class="title">NotificationCenter</span>.<span class="title">MainActorMessage</span></span></span><br><span class="line"><span class="class">&#125;</span></span><br><span class="line"><span class="class"></span></span><br><span class="line"><span class="class"><span class="title">extension</span> <span class="title">HTTPCookieStorage</span> </span>&#123;</span><br><span class="line">  <span class="keyword">public</span> <span class="class"><span class="keyword">struct</span> <span class="title">CookiesChangedMessage</span>: <span class="title">NotificationCenter</span>.<span class="title">AsyncMessage</span></span></span><br><span class="line"><span class="class">&#125;</span></span><br></pre></td></tr></table></figure>
+
+<h1 id="Observation"><a href="#Observation" class="headerlink" title="Observation"></a>Observation</h1><p>装饰器<code>@Observable</code>修饰的类可以用<code>Observation</code>类方法来进行监听数据变化，如：</p>
+<figure class="highlight swift"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">import</span> Observation</span><br><span class="line"></span><br><span class="line"><span class="class"><span class="keyword">enum</span> <span class="title">Item</span> </span>&#123;</span><br><span class="line">  <span class="keyword">case</span> none</span><br><span class="line">  <span class="keyword">case</span> banana</span><br><span class="line">  <span class="keyword">case</span> star</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="meta">@Observable</span></span><br><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">Player</span> </span>&#123;</span><br><span class="line">  <span class="keyword">let</span> name: <span class="type">String</span></span><br><span class="line">  <span class="keyword">var</span> score: <span class="type">Int</span> <span class="operator">=</span> <span class="number">0</span></span><br><span class="line">  <span class="keyword">var</span> item: <span class="type">Item</span> <span class="operator">=</span> .none</span><br><span class="line"></span><br><span class="line">  <span class="function"><span class="keyword">init</span>(<span class="params">name</span>: <span class="type">String</span>)</span> &#123;</span><br><span class="line">    <span class="keyword">self</span>.name <span class="operator">=</span> name</span><br><span class="line">  &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>监听多个Player的属性的变化可以这么做</p>
+<figure class="highlight xquery"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">let</span> player = Player<span class="built_in">(name</span>: <span class="string">&quot;Holly&quot;</span>)</span><br><span class="line"><span class="keyword">let</span> values = Observations &#123;</span><br><span class="line">  <span class="keyword">let</span> score = <span class="string">&quot;\(player.score) points&quot;</span></span><br><span class="line">  <span class="keyword">let</span> <span class="type">item</span> =</span><br><span class="line">    <span class="keyword">switch</span> player.<span class="type">item</span> &#123;</span><br><span class="line">    <span class="keyword">case</span> .none: <span class="string">&quot;no item&quot;</span></span><br><span class="line">    <span class="keyword">case</span> .banana: <span class="string">&quot;a banana&quot;</span></span><br><span class="line">    <span class="keyword">case</span> .star: <span class="string">&quot;a star&quot;</span></span><br><span class="line">    &#125;</span><br><span class="line">  <span class="keyword">return</span> <span class="string">&quot;\(score) and \(item)&quot;</span></span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"></span><br><span class="line">player.score += <span class="number">2</span></span><br><span class="line">player.<span class="type">item</span> = .banana</span><br></pre></td></tr></table></figure>
+
+<p><img src="https://i0.hdslb.com/bfs/openplatform/06c093ce07a373949afd8379176fd08c8cb28810.png"></p>
+<p>当闭包中任一可观察属性的 willSet 被调用时将开始追踪更新，追踪进程将在代码暂停的下一个 await处结束，更新后的值将包含针对这两个代码点之间的所有同步更改，这可以确保针对多个属性进行的同步更新不会在对象处于不一致状态时引发观察更新</p>
+<p><img src="https://i0.hdslb.com/bfs/openplatform/bbd14716f92f8940982238a0ed412970c0357a4c.png"></p>
+<p>观察结果类型遵从 AsyncSequence 因此 你可以使用 for-await 循环 来迭代更新后的值 </p>
+<figure class="highlight coffeescript"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">for</span> <span class="keyword">await</span> value <span class="keyword">in</span> values &#123; <span class="built_in">print</span>(value) &#125;</span><br></pre></td></tr></table></figure>
+
+<h1 id="InlineArray"><a href="#InlineArray" class="headerlink" title="InlineArray"></a>InlineArray</h1><p>以前使用Array的时候会在堆空间开辟一块内存用于数组缓冲区，当数组数量超过阈值的时候会再堆空间里面开辟新的空间然后copy旧数据放入新空间再添加内容，最后再销毁旧空间。则会导致一些内存分配和引用计数的开销（除非你的数组数量永远不变）。</p>
+<p><img src="https://i0.hdslb.com/bfs/openplatform/00a1adc25ac9302068b1999acf43b697ae3805c0.png"></p>
+<p>InlineArray 是一个固定大小的新数组类型。它通过内联存储来存储元素大小是类型的一部分并且在尖括号中位于元素类型之前</p>
+<figure class="highlight csharp"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">public</span> <span class="keyword">struct</span> InlineArray&lt;<span class="keyword">let</span> count: Int, Element: ~Copyable&gt;: ~Copyable</span><br></pre></td></tr></table></figure>
+
+<p><img src="https://i0.hdslb.com/bfs/openplatform/d2e40edaf7721f973f65a4b14a87cd9cc95ce1f9.png"></p>
+<p>InlineArray不会开辟堆空间，直接在栈空间存储数据</p>
+<p>当数组确定的时候，数组容量会内联到InlineArray的泛型类型中去</p>
+<p><img src="https://i0.hdslb.com/bfs/openplatform/a098b2e3dff33335830fca48fe910599ad88f6a2.png"></p>
+<p>这种做法可以更加安全地使用下标访问数组元素，这样子编译期间就可以预知到数组越界的情况</p>
+<h1 id="Span"><a href="#Span" class="headerlink" title="Span"></a>Span</h1><p>在数组操作中的常见问题是遍历过程中数组被修改导致内存异常。原因是访问连续内存使用的指针是不安全指针，不保证访问时内存存在。</p>
+<p><img src="https://i0.hdslb.com/bfs/openplatform/4e0cf2f2fc8b74e26555707e5bd8c9f7897e7037.png"></p>
+<p>标准库为所有将连续存储容器 (包括 Array、ArraySlice、 InlineArray 等) 提供了 span 属性，用于维护内存安全。</p>
+<p><img src="https://i0.hdslb.com/bfs/openplatform/0bdb5e0a47dcb1786fc84217e893d86ec0c5784f.png"></p>
+<p>Span 维护内存安全的方法是，确保在你使用 Span 时 使连续内存保持有效状态。这样的保障机制消除了指针固有的内存安全问题，包括释放后使用和重叠的修改，这些问题会在编译时进行检查，而不会产生运行时开销，例如：修改原始容器(比如给数组添加元素)会阻止随后访问span， span修改后你将无法再次访问span变量。</p>
+<p><img src="https://i0.hdslb.com/bfs/openplatform/93a5e54dd38f9edd78bbbc8a3a446fdadeee244d.png"></p>
+<p>另外span的生命周期无法超过原始容器，这被称为生命周期依赖。</p>
+<p>关于Span的详细信息，可以参考: <a target="_blank" rel="noopener" href="https://developer.apple.com/documentation/swift/span?changes=la">https://developer.apple.com/documentation/swift/span?changes=la</a></p>
+<h1 id="并发编程"><a href="#并发编程" class="headerlink" title="并发编程"></a>并发编程</h1><p>在旧版本Swift, 在Main Actor内调用异步方法（被标记为async的方法），会报错这种调用方式可能存在数据争用问题。</p>
+<p><img src="https://i0.hdslb.com/bfs/openplatform/6aca43955aefee63532f5f9d9e2e1c7d45b94555.png"></p>
+<p>因为PhotoProcessor类是不隔离的，MainActor是隔离的，编译器没办法保证线程安全。</p>
+<p>一般来说可以这么改，添加一个非隔离上下文再调用</p>
+<figure class="highlight swift"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">@MainActor</span></span><br><span class="line"><span class="keyword">final</span> <span class="class"><span class="keyword">class</span> <span class="title">StickerModel</span> </span>&#123;</span><br><span class="line">    <span class="keyword">let</span> photoProcessor <span class="operator">=</span> <span class="type">PhotoProcessor</span>()</span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="keyword">func</span> <span class="title">extractSticker</span>(<span class="keyword">_</span> <span class="params">item</span>: <span class="type">PhotosPickerItem</span>)</span> <span class="keyword">async</span> <span class="keyword">throws</span> -&gt; <span class="type">Sticker</span>? &#123;</span><br><span class="line">        <span class="keyword">guard</span> <span class="keyword">let</span> data <span class="operator">=</span> <span class="keyword">try</span> <span class="keyword">await</span> item.loadTransferable(type: <span class="type">Data</span>.<span class="keyword">self</span>) <span class="keyword">else</span> &#123;</span><br><span class="line">            <span class="keyword">return</span> <span class="literal">nil</span></span><br><span class="line">        &#125;</span><br><span class="line"></span><br><span class="line">        <span class="comment">// 显式切换到非隔离上下文</span></span><br><span class="line">        <span class="keyword">return</span> <span class="keyword">await</span> <span class="type">MainActor</span>.assumeIsolated &#123;</span><br><span class="line">            <span class="keyword">await</span> photoProcessor.extractSticker(data: data, with: item.itemIdentifier)</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>或者说方法标记为非隔离方法，自己在方法实现的时候保证线程安全</p>
+<figure class="highlight swift"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">PhotoProcessor</span> </span>&#123;</span><br><span class="line">    nonisolated <span class="function"><span class="keyword">func</span> <span class="title">extractSticker</span>(<span class="params">data</span>: <span class="type">Data</span>, <span class="params">with</span> <span class="params">id</span>: <span class="type">String</span>?)</span> <span class="keyword">async</span> -&gt; <span class="type">Sticker</span>? &#123;</span><br><span class="line">        <span class="comment">// 实现代码</span></span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>在Swift6.2之后不会报错， 数据争用安全保障机制会提供保护，首先， 对于那些未与特定 Actor 绑定的 async 函数，Swift不会立即转移它们，而是让函数在其被调用的 Actor （Main Actor）上继续运行，因为传递到 async 函数的值永远不会在 Actor 之外发送，Async 函数仍可以在自身的实现中转移工作，但客户端不必担心它们的可变状态。</p>
+<p>一致性支持，新增自动推断Main Actor模式，也就是默认都会加上@MainActor, 以方便开发者构建单线程应用。（这种模式是可选的）</p>
+<p><img src="https://i0.hdslb.com/bfs/openplatform/2f39a72b356580bd6de187c3a637d7f9de0b5689.png"></p>
+<p>当你需要某个方法始终在并发线程池运行，可以给这个方法标记为@concurrent</p>
+<figure class="highlight swift"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">// Explicitly offloading async work</span></span><br><span class="line"></span><br><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">PhotoProcessor</span> </span>&#123;</span><br><span class="line">  <span class="keyword">var</span> cachedStickers: [<span class="type">String</span>: <span class="type">Sticker</span>]</span><br><span class="line"></span><br><span class="line">  <span class="function"><span class="keyword">func</span> <span class="title">extractSticker</span>(<span class="params">data</span>: <span class="type">Data</span>, <span class="params">with</span> <span class="params">id</span>: <span class="type">String</span>)</span> <span class="keyword">async</span> -&gt; <span class="type">Sticker</span> &#123;</span><br><span class="line">      <span class="keyword">if</span> <span class="keyword">let</span> sticker <span class="operator">=</span> cachedStickers[id] &#123;</span><br><span class="line">        <span class="keyword">return</span> sticker</span><br><span class="line">      &#125;</span><br><span class="line"></span><br><span class="line">      <span class="keyword">let</span> sticker <span class="operator">=</span> <span class="keyword">await</span> <span class="keyword">Self</span>.extractSubject(from: data)</span><br><span class="line">      cachedStickers[id] <span class="operator">=</span> sticker</span><br><span class="line">      <span class="keyword">return</span> sticker</span><br><span class="line">  &#125;</span><br><span class="line"></span><br><span class="line">  <span class="meta">@concurrent</span></span><br><span class="line">  <span class="keyword">static</span> <span class="function"><span class="keyword">func</span> <span class="title">extractSubject</span>(<span class="params">from</span> <span class="params">data</span>: <span class="type">Data</span>)</span> <span class="keyword">async</span> -&gt; <span class="type">Sticker</span> &#123;&#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+
+
+
+<h1 id="其他"><a href="#其他" class="headerlink" title="其他"></a>其他</h1><ul>
+<li><p>VS Code 支持 Swift插件</p>
+</li>
+<li><p>Xcode 26 以及最新版本的SPM 预编译了Swift-syntax，将加快Swift宏的构建速度</p>
+</li>
+<li><p>Xcode 优化LLDB调试，首次执行p和po命令速度会变快</p>
+</li>
+<li><p>LLDB新增一系列新命令，如<code>language swift task info</code>获取当前异步任务的详细信息，例如任务的优先级以及其子任务信息</p>
+</li>
+<li><p>编写单元测试的时候可以调用 <code>Attachment.record</code> 方法将附加功能添加到测试, 便于诊断测试失败的原因</p>
+</li>
+<li><p>Embedded Swift 嵌入式Swift进行了一些更新，性能更高，编译更快，用Swift写的后台服务器服务的吞吐量提升了 40% 而硬件要求则降低了一半。</p>
+</li>
+<li><p>Swift gRPC 2发布。</p>
+</li>
+<li><p>Swift-Java 发布，支持Swift和java互相调用。</p>
+</li>
+</ul>
+
+    </div>
+
+    
+    
+    
+
+      <footer class="post-footer">
+          <div class="post-tags">
+              <a href="/tags/iOS/" rel="tag"># iOS</a>
+              <a href="/tags/Swift/" rel="tag"># Swift</a>
+          </div>
+
+        
+
+
+        
+    <div class="post-nav">
+      <div class="post-nav-item">
+    <a href="/post/afcee0be.html" rel="prev" title="iOS测试覆盖率方案">
+      <i class="fa fa-chevron-left"></i> iOS测试覆盖率方案
+    </a></div>
+      <div class="post-nav-item"></div>
+    </div>
+      </footer>
+    
+  </article>
+  
+  
+  
+
+
+
+          </div>
+          
+    <div class="comments" id="gitalk-container"></div>
+
+<script>
+  window.addEventListener('tabs:register', () => {
+    let { activeClass } = CONFIG.comments;
+    if (CONFIG.comments.storage) {
+      activeClass = localStorage.getItem('comments_active') || activeClass;
+    }
+    if (activeClass) {
+      let activeTab = document.querySelector(`a[href="#comment-${activeClass}"]`);
+      if (activeTab) {
+        activeTab.click();
+      }
+    }
+  });
+  if (CONFIG.comments.storage) {
+    window.addEventListener('tabs:click', event => {
+      if (!event.target.matches('.tabs-comment .tab-content .tab-pane')) return;
+      let commentClass = event.target.classList[1];
+      localStorage.setItem('comments_active', commentClass);
+    });
+  }
+</script>
+
+        </div>
+          
+  
+  <div class="toggle sidebar-toggle">
+    <span class="toggle-line toggle-line-first"></span>
+    <span class="toggle-line toggle-line-middle"></span>
+    <span class="toggle-line toggle-line-last"></span>
+  </div>
+
+  <aside class="sidebar">
+    <div class="sidebar-inner">
+
+      <ul class="sidebar-nav motion-element">
+        <li class="sidebar-nav-toc">
+          文章目录
+        </li>
+        <li class="sidebar-nav-overview">
+          站点概览
+        </li>
+      </ul>
+
+      <!--noindex-->
+      <div class="post-toc-wrap sidebar-panel">
+          <div class="post-toc motion-element"><ol class="nav"><li class="nav-item nav-level-1"><a class="nav-link" href="#Swift-Subprocess"><span class="nav-number">1.</span> <span class="nav-text">Swift-Subprocess</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#NotificationCenter"><span class="nav-number">2.</span> <span class="nav-text">NotificationCenter</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#Observation"><span class="nav-number">3.</span> <span class="nav-text">Observation</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#InlineArray"><span class="nav-number">4.</span> <span class="nav-text">InlineArray</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#Span"><span class="nav-number">5.</span> <span class="nav-text">Span</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#%E5%B9%B6%E5%8F%91%E7%BC%96%E7%A8%8B"><span class="nav-number">6.</span> <span class="nav-text">并发编程</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#%E5%85%B6%E4%BB%96"><span class="nav-number">7.</span> <span class="nav-text">其他</span></a></li></ol></div>
+      </div>
+      <!--/noindex-->
+
+      <div class="site-overview-wrap sidebar-panel">
+        <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+    <img class="site-author-image" itemprop="image" alt="Arclin"
+      src="https://avatars.githubusercontent.com/u/12107804?v=4">
+  <p class="site-author-name" itemprop="name">Arclin</p>
+  <div class="site-description" itemprop="description">Stay hungry,stay foolish</div>
+</div>
+<div class="site-state-wrap motion-element">
+  <nav class="site-state">
+      <div class="site-state-item site-state-posts">
+          <a href="/archives/">
+        
+          <span class="site-state-item-count">106</span>
+          <span class="site-state-item-name">日志</span>
+        </a>
+      </div>
+      <div class="site-state-item site-state-categories">
+            <a href="/categories/">
+          
+        <span class="site-state-item-count">13</span>
+        <span class="site-state-item-name">分类</span></a>
+      </div>
+      <div class="site-state-item site-state-tags">
+            <a href="/tags/">
+          
+        <span class="site-state-item-count">40</span>
+        <span class="site-state-item-name">标签</span></a>
+      </div>
+  </nav>
+</div>
+  <div class="links-of-author motion-element">
+      <span class="links-of-author-item">
+        <a href="https://github.com/Arc-lin" title="GitHub → https://github.com/Arc-lin" rel="noopener" target="_blank"><i class="fab fa-github fa-fw"></i>GitHub</a>
+      </span>
+      <span class="links-of-author-item">
+        <a href="mailto:arclin325@gmail.com" title="E-Mail → mailto:arclin325@gmail.com" rel="noopener" target="_blank"><i class="fa fa-envelope fa-fw"></i>E-Mail</a>
+      </span>
+  </div>
+
+
+
+      </div>
+
+    </div>
+  </aside>
+  <div id="sidebar-dimmer"></div>
+
+
+      </div>
+    </main>
+
+    <footer class="footer">
+      <div class="footer-inner">
+        
+
+        
+
+<div class="copyright">
+  
+  &copy; 
+  <span itemprop="copyrightYear">2025</span>
+  <span class="with-love">
+    <i class="fa fa-heart"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">Arclin</span>
+</div>
+  <div class="powered-by">由 <a href="https://hexo.io" class="theme-link" rel="noopener" target="_blank">Hexo</a> & <a href="https://muse.theme-next.org" class="theme-link" rel="noopener" target="_blank">NexT.Muse</a> 强力驱动
+  </div>
+
+        
+<div class="busuanzi-count">
+  <script async src="https://busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js"></script>
+    <span class="post-meta-item" id="busuanzi_container_site_uv" style="display: none;">
+      <span class="post-meta-item-icon">
+        <i class="fa fa-user"></i>
+      </span>
+      <span class="site-uv" title="总访客量">
+        <span id="busuanzi_value_site_uv"></span>
+      </span>
+    </span>
+    <span class="post-meta-divider">|</span>
+    <span class="post-meta-item" id="busuanzi_container_site_pv" style="display: none;">
+      <span class="post-meta-item-icon">
+        <i class="fa fa-eye"></i>
+      </span>
+      <span class="site-pv" title="总访问量">
+        <span id="busuanzi_value_site_pv"></span>
+      </span>
+    </span>
+</div>
+
+
+
+
+
+
+
+
+      </div>
+    </footer>
+  </div>
+
+  
+  <script src="/lib/anime.min.js"></script>
+  <script src="//cdn.jsdelivr.net/npm/jquery@3/dist/jquery.min.js"></script>
+  <script src="//cdn.jsdelivr.net/gh/fancyapps/fancybox@3/dist/jquery.fancybox.min.js"></script>
+  <script src="/lib/velocity/velocity.min.js"></script>
+  <script src="/lib/velocity/velocity.ui.min.js"></script>
+
+<script src="/js/utils.js"></script>
+
+<script src="/js/motion.js"></script>
+
+
+<script src="/js/schemes/muse.js"></script>
+
+
+<script src="/js/next-boot.js"></script>
+
+
+
+
+  
+  <script>
+    (function(){
+      var canonicalURL, curProtocol;
+      //Get the <link> tag
+      var x=document.getElementsByTagName("link");
+		//Find the last canonical URL
+		if(x.length > 0){
+			for (i=0;i<x.length;i++){
+				if(x[i].rel.toLowerCase() == 'canonical' && x[i].href){
+					canonicalURL=x[i].href;
+				}
+			}
+		}
+    //Get protocol
+	    if (!canonicalURL){
+	    	curProtocol = window.location.protocol.split(':')[0];
+	    }
+	    else{
+	    	curProtocol = canonicalURL.split(':')[0];
+	    }
+      //Get current URL if the canonical URL does not exist
+	    if (!canonicalURL) canonicalURL = window.location.href;
+	    //Assign script content. Replace current URL with the canonical URL
+      !function(){var e=/([http|https]:\/\/[a-zA-Z0-9\_\.]+\.baidu\.com)/gi,r=canonicalURL,t=document.referrer;if(!e.test(r)){var n=(String(curProtocol).toLowerCase() === 'https')?"https://sp0.baidu.com/9_Q4simg2RQJ8t7jm9iCKT-xh_/s.gif":"//api.share.baidu.com/s.gif";t?(n+="?r="+encodeURIComponent(document.referrer),r&&(n+="&l="+r)):r&&(n+="?l="+r);var i=new Image;i.src=n}}(window);})();
+  </script>
+
+
+
+
+  
+<script src="/js/local-search.js"></script>
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+  
+
+<link rel="stylesheet" href="//cdn.jsdelivr.net/npm/gitalk@1/dist/gitalk.min.css">
+
+<script>
+NexT.utils.loadComments(document.querySelector('#gitalk-container'), () => {
+  NexT.utils.getScript('//cdn.jsdelivr.net/npm/gitalk@1/dist/gitalk.min.js', () => {
+    var gitalk = new Gitalk({
+      clientID    : 'df6d1f33bb4a66f5fa60',
+      clientSecret: '5fcc9fb756ac9d4b16381288da7b29f691b45e0a',
+      repo        : 'arc-lin.github.io',
+      owner       : 'Arc-lin',
+      admin       : ['Arc-lin'],
+      id          : '4bb560f8a512507169120d3f36447a4f',
+        language: 'zh-CN',
+      distractionFreeMode: false
+    });
+    gitalk.render('gitalk-container');
+  }, window.Gitalk);
+});
+</script>
+
+</body>
+</html>
