@@ -262,3 +262,106 @@ Todo: 考虑结合MongoFix动态下发解释能力，实现热修复能力
 以上方案均无法过审，只能本地调试使用
 1. 插桩方案可以结合JSPatch实现原理进行替换
 2. 虚表地址替换方案可以结合MongoFix能力进行实现
+
+## 其他
+
+调研一些其他的Swift动态替换方案，为热修方案实现思路
+
+### @_dynamicReplacement
+Swift5新增的方法交换装饰器， 前提是被替换方法需要被标记为dynamic
+
+```
+class Person: NSObject {
+    var name: String
+    
+    init(name: String) {
+        self.name = name
+    }
+    
+    dynamic func sleep() -> String {
+        return "sleep"
+    }
+}
+ 
+extension Person {
+    @_dynamicReplacement(for: sleep())
+    func _replaceRunSomething() -> String {
+        "replaced"
+    }
+}
+
+let person = Person(name: "Mike")
+let string = person.sleep()
+print(string)
+```
+
+以上代码可以打印出被替换的代码
+
+![](https://i0.hdslb.com/bfs/openplatform/b644d149489ff652f104561bc1cd435d10308336.png)
+
+本质是使用了虚函数表派发，通过替换表内函数指针实现替换
+
+![](https://i0.hdslb.com/bfs/openplatform/e19ced831727c223fb2e03fe18f7f7685311125a.png)
+
+对应解释如下：
+
+* `movq (%r13), %rax`：加载对象的类型信息（指向元类型的指针）。
+* `movq 0x12c8f(%rip), %rcx`：获取`swift_isaMask`（用于掩码操作）。
+* `andq (%rcx), %rax`：应用掩码得到真正的元类型地址。
+* `callq *0x80(%rax)`：从虚表中偏移0x80处取出函数指针并调用。
+
+### 值类型的方法替换
+
+Swift里面的值类型，会有一个隐含的super class, 最终都是继承自NSObject，可以通过如下代码打印出来
+
+![](https://i0.hdslb.com/bfs/openplatform/57d416273ba7787d12efed0f70360526124702aa.png)
+
+所以可以通过给这些值类型添加objc运行时方法，有了运行时方法就能进行方法替换
+
+![](https://i0.hdslb.com/bfs/openplatform/ff26c62f5d23a697d96f28d25ffc6e0f540b8b2b.png)
+
+### Method_override
+
+参考[https://github.com/rentzsch/mach_override]()的实现方案，具体思路是在原始函数的汇编里面加个jmp指令，jmp指令会跳到指定函数
+执行完再跳回来。
+
+示例代码：
+
+```
+class TestClass {
+    func original() {
+        print("original class function");
+    }
+    
+    func exchanged() {
+        print("exchanged class function");
+    }
+}
+
+let a = TestClass()
+a.original()
+```
+
+hook代码
+
+```
+void override_instance_method(void)
+{
+    void (*landing)(void * par);
+    void (*originalFunctionAddress)(void * par);
+    const void (*overrideFunctionAddress)(void * par);
+    
+    *(void **) (&originalFunctionAddress) = dlsym(RTLD_DEFAULT,"$s11DynamicDemo9TestClassC8originalyyF");
+    *(void **) (&overrideFunctionAddress) = dlsym(RTLD_DEFAULT,"$s11DynamicDemo9TestClassC9exchangedyyF");
+    
+    mach_override_ptr(originalFunctionAddress, overrideFunctionAddress, (void**)&landing);
+}
+```
+
+mach_override_ptr 的三个参数：
+
+1. 要覆盖函数的指针；
+2. 去覆盖函数的指针；
+3. 可以设置为原函数的指针地址，待mach_override_ptr返回成功，就可以调原函数。
+
+![](https://i0.hdslb.com/bfs/openplatform/c09dd83cb81fecce08439553a44ed853a61ae972.png)

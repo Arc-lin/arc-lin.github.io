@@ -7959,6 +7959,39 @@
 <li>插桩方案可以结合JSPatch实现原理进行替换</li>
 <li>虚表地址替换方案可以结合MongoFix能力进行实现</li>
 </ol>
+<h2 id="其他"><a href="#其他" class="headerlink" title="其他"></a>其他</h2><p>调研一些其他的Swift动态替换方案，为热修方案实现思路</p>
+<h3 id="dynamicReplacement"><a href="#dynamicReplacement" class="headerlink" title="@_dynamicReplacement"></a>@_dynamicReplacement</h3><p>Swift5新增的方法交换装饰器， 前提是被替换方法需要被标记为dynamic</p>
+<figure class="highlight swift"><table><tr><td class="code"><pre><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">Person</span>: <span class="title">NSObject</span> </span>&#123;</span><br><span class="line">    <span class="keyword">var</span> name: <span class="type">String</span></span><br><span class="line">    </span><br><span class="line">    <span class="function"><span class="keyword">init</span>(<span class="params">name</span>: <span class="type">String</span>)</span> &#123;</span><br><span class="line">        <span class="keyword">self</span>.name <span class="operator">=</span> name</span><br><span class="line">    &#125;</span><br><span class="line">    </span><br><span class="line">    <span class="keyword">dynamic</span> <span class="function"><span class="keyword">func</span> <span class="title">sleep</span>()</span> -&gt; <span class="type">String</span> &#123;</span><br><span class="line">        <span class="keyword">return</span> <span class="string">&quot;sleep&quot;</span></span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br><span class="line"> </span><br><span class="line"><span class="class"><span class="keyword">extension</span> <span class="title">Person</span> </span>&#123;</span><br><span class="line">    <span class="meta">@_dynamicReplacement</span>(for: sleep())</span><br><span class="line">    <span class="function"><span class="keyword">func</span> <span class="title">_replaceRunSomething</span>()</span> -&gt; <span class="type">String</span> &#123;</span><br><span class="line">        <span class="string">&quot;replaced&quot;</span></span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="keyword">let</span> person <span class="operator">=</span> <span class="type">Person</span>(name: <span class="string">&quot;Mike&quot;</span>)</span><br><span class="line"><span class="keyword">let</span> string <span class="operator">=</span> person.sleep()</span><br><span class="line"><span class="built_in">print</span>(string)</span><br></pre></td></tr></table></figure>
+
+<p>以上代码可以打印出被替换的代码</p>
+<p><img src="https://i0.hdslb.com/bfs/openplatform/b644d149489ff652f104561bc1cd435d10308336.png"></p>
+<p>本质是使用了虚函数表派发，通过替换表内函数指针实现替换</p>
+<p><img src="https://i0.hdslb.com/bfs/openplatform/e19ced831727c223fb2e03fe18f7f7685311125a.png"></p>
+<p>对应解释如下：</p>
+<ul>
+<li><code>movq (%r13), %rax</code>：加载对象的类型信息（指向元类型的指针）。</li>
+<li><code>movq 0x12c8f(%rip), %rcx</code>：获取<code>swift_isaMask</code>（用于掩码操作）。</li>
+<li><code>andq (%rcx), %rax</code>：应用掩码得到真正的元类型地址。</li>
+<li><code>callq *0x80(%rax)</code>：从虚表中偏移0x80处取出函数指针并调用。</li>
+</ul>
+<h3 id="值类型的方法替换"><a href="#值类型的方法替换" class="headerlink" title="值类型的方法替换"></a>值类型的方法替换</h3><p>Swift里面的值类型，会有一个隐含的super class, 最终都是继承自NSObject，可以通过如下代码打印出来</p>
+<p><img src="https://i0.hdslb.com/bfs/openplatform/57d416273ba7787d12efed0f70360526124702aa.png"></p>
+<p>所以可以通过给这些值类型添加objc运行时方法，有了运行时方法就能进行方法替换</p>
+<p><img src="https://i0.hdslb.com/bfs/openplatform/ff26c62f5d23a697d96f28d25ffc6e0f540b8b2b.png"></p>
+<h3 id="Method-override"><a href="#Method-override" class="headerlink" title="Method_override"></a>Method_override</h3><p>参考<a href="">https://github.com/rentzsch/mach_override</a>的实现方案，具体思路是在原始函数的汇编里面加个jmp指令，jmp指令会跳到指定函数<br>执行完再跳回来。</p>
+<p>示例代码：</p>
+<figure class="highlight swift"><table><tr><td class="code"><pre><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">TestClass</span> </span>&#123;</span><br><span class="line">    <span class="function"><span class="keyword">func</span> <span class="title">original</span>()</span> &#123;</span><br><span class="line">        <span class="built_in">print</span>(<span class="string">&quot;original class function&quot;</span>);</span><br><span class="line">    &#125;</span><br><span class="line">    </span><br><span class="line">    <span class="function"><span class="keyword">func</span> <span class="title">exchanged</span>()</span> &#123;</span><br><span class="line">        <span class="built_in">print</span>(<span class="string">&quot;exchanged class function&quot;</span>);</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="keyword">let</span> a <span class="operator">=</span> <span class="type">TestClass</span>()</span><br><span class="line">a.original()</span><br></pre></td></tr></table></figure>
+
+<p>hook代码</p>
+<figure class="highlight dart"><table><tr><td class="code"><pre><span class="line"><span class="keyword">void</span> override_instance_method(<span class="keyword">void</span>)</span><br><span class="line">&#123;</span><br><span class="line">    <span class="keyword">void</span> (*landing)(<span class="keyword">void</span> * par);</span><br><span class="line">    <span class="keyword">void</span> (*originalFunctionAddress)(<span class="keyword">void</span> * par);</span><br><span class="line">    <span class="keyword">const</span> <span class="keyword">void</span> (*overrideFunctionAddress)(<span class="keyword">void</span> * par);</span><br><span class="line">    </span><br><span class="line">    *(<span class="keyword">void</span> **) (&amp;originalFunctionAddress) = dlsym(RTLD_DEFAULT,<span class="string">&quot;<span class="subst">$s11DynamicDemo9TestClassC8originalyyF</span>&quot;</span>);</span><br><span class="line">    *(<span class="keyword">void</span> **) (&amp;overrideFunctionAddress) = dlsym(RTLD_DEFAULT,<span class="string">&quot;<span class="subst">$s11DynamicDemo9TestClassC9exchangedyyF</span>&quot;</span>);</span><br><span class="line">    </span><br><span class="line">    mach_override_ptr(originalFunctionAddress, overrideFunctionAddress, (<span class="keyword">void</span>**)&amp;landing);</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>mach_override_ptr 的三个参数：</p>
+<ol>
+<li>要覆盖函数的指针；</li>
+<li>去覆盖函数的指针；</li>
+<li>可以设置为原函数的指针地址，待mach_override_ptr返回成功，就可以调原函数。</li>
+</ol>
+<p><img src="https://i0.hdslb.com/bfs/openplatform/c09dd83cb81fecce08439553a44ed853a61ae972.png"></p>
 ]]></content>
       <categories>
         <category>iOS</category>
@@ -7966,6 +7999,532 @@
       <tags>
         <tag>iOS</tag>
         <tag>Swift</tag>
+      </tags>
+  </entry>
+  <entry>
+    <title>Harness Engineering 实践篇 — 手把手搭建你的第一个 AI Agent 脚手架</title>
+    <url>/post/21de888a.html</url>
+    <content><![CDATA[<blockquote>
+<p><strong>前置阅读</strong>：建议先阅读<a href="/post/harness-engineering-theory.html">理论篇</a>，理解 Harness 五大子系统。</p>
+</blockquote>
+<span id="more"></span>
+
+<h2 id="0-前置准备"><a href="#0-前置准备" class="headerlink" title="0. 前置准备"></a>0. 前置准备</h2><h3 id="环境要求"><a href="#环境要求" class="headerlink" title="环境要求"></a>环境要求</h3><ul>
+<li>一个 Git 仓库（任何项目均可）</li>
+<li>已安装 Claude Code 或兼容的 AI Agent CLI</li>
+<li>基本的 shell 脚本能力</li>
+</ul>
+<h3 id="最小-Harness：4-个文件"><a href="#最小-Harness：4-个文件" class="headerlink" title="最小 Harness：4 个文件"></a>最小 Harness：4 个文件</h3><figure class="highlight stylus"><table><tr><td class="code"><pre><span class="line">YOUR PROJECT ROOT</span><br><span class="line">├── AGENTS<span class="selector-class">.md</span>              ← Agent 操作手册（指令层）</span><br><span class="line">├── init<span class="selector-class">.sh</span>                ← 标准启动脚本（生命周期层）</span><br><span class="line">├── feature_list<span class="selector-class">.json</span>      ← 功能清单（范围层 + 状态层）</span><br><span class="line">└── claude-progress<span class="selector-class">.md</span>     ← 会话进度日志（状态层）</span><br></pre></td></tr></table></figure>
+
+<p>这四个文件是 Harness 的最小可行单元（MVP），覆盖了五大子系统中的四个（验证层通过 init.sh 中的测试命令实现）。</p>
+<hr>
+<h2 id="1-核心文件详解与模板"><a href="#1-核心文件详解与模板" class="headerlink" title="1. 核心文件详解与模板"></a>1. 核心文件详解与模板</h2><h3 id="1-1-AGENTS-md-——-Agent-的工作手册"><a href="#1-1-AGENTS-md-——-Agent-的工作手册" class="headerlink" title="1.1 AGENTS.md —— Agent 的工作手册"></a>1.1 AGENTS.md —— Agent 的工作手册</h3><p>这是 Agent 每次会话读取的第一个文件，决定了它如何工作。</p>
+<p><strong>设计原则</strong>：短小精悍（2页以内），包含不可违反的核心规则（3-5条），通过路由表指向专项文档。</p>
+<p><strong>最小版本模板</strong>：</p>
+<figure class="highlight markdown"><table><tr><td class="code"><pre><span class="line"><span class="section"># AGENTS.md</span></span><br><span class="line"></span><br><span class="line"><span class="section">## 启动流程（每次会话必须执行）</span></span><br><span class="line"><span class="bullet">1.</span> 读取本文件，了解工作规则</span><br><span class="line"><span class="bullet">2.</span> 运行 <span class="code">`./init.sh`</span>，验证环境正常</span><br><span class="line"><span class="bullet">3.</span> 读取 <span class="code">`claude-progress.md`</span>，了解历史进展</span><br><span class="line"><span class="bullet">4.</span> 读取 <span class="code">`feature_list.json`</span>，了解功能状态</span><br><span class="line"><span class="bullet">5.</span> 检查 <span class="code">`git log --oneline -10`</span>，了解最近变更</span><br><span class="line"></span><br><span class="line"><span class="section">## 核心规则（不可违反）</span></span><br><span class="line"><span class="bullet">1.</span> <span class="strong">**一次只做一个功能**</span>，从 feature<span class="emphasis">_list.json 中选择优先级最高的 not_</span>started 功能</span><br><span class="line"><span class="bullet">2.</span> <span class="strong">**功能必须经过验证才能标记为 passing**</span>，不得仅凭&quot;代码写完了&quot;就标记完成</span><br><span class="line"><span class="bullet">3.</span> <span class="strong">**每次会话结束时必须更新**</span> claude-progress.md 和 feature<span class="emphasis">_list.json</span></span><br><span class="line"><span class="emphasis">4. <span class="strong">**不得修改已标记为 passing 的功能**</span>，除非明确被指派修复</span></span><br><span class="line"><span class="emphasis"></span></span><br><span class="line"><span class="emphasis">## 验证命令</span></span><br><span class="line"><span class="emphasis">npm test           # 运行单元测试</span></span><br><span class="line"><span class="emphasis">npm run check      # 类型检查</span></span><br><span class="line"><span class="emphasis">npm run dev        # 启动应用（冒烟测试）</span></span><br><span class="line"><span class="emphasis"></span></span><br><span class="line"><span class="emphasis">## 会话结束检查清单</span></span><br><span class="line"><span class="emphasis">- [ ] claude-progress.md 已更新</span></span><br><span class="line"><span class="emphasis">- [ ] feature_</span>list.json 反映真实状态</span><br><span class="line"><span class="bullet">-</span> [ ] 所有变更已 git commit</span><br><span class="line"><span class="bullet">-</span> [ ] 下一步行动已记录</span><br></pre></td></tr></table></figure>
+
+<h3 id="1-2-init-sh-——-标准启动脚本"><a href="#1-2-init-sh-——-标准启动脚本" class="headerlink" title="1.2 init.sh —— 标准启动脚本"></a>1.2 init.sh —— 标准启动脚本</h3><p><strong>作用</strong>：确保每次会话开始时，环境处于可工作的已知状态。</p>
+<figure class="highlight bash"><table><tr><td class="code"><pre><span class="line"><span class="meta">#!/usr/bin/env bash</span></span><br><span class="line"><span class="built_in">set</span> -euo pipefail</span><br><span class="line"></span><br><span class="line"><span class="built_in">echo</span> <span class="string">&quot;=== Harness Init ===&quot;</span></span><br><span class="line"><span class="built_in">echo</span> <span class="string">&quot;[1/3] 安装依赖...&quot;</span></span><br><span class="line">npm install</span><br><span class="line"></span><br><span class="line"><span class="built_in">echo</span> <span class="string">&quot;[2/3] 运行基线验证...&quot;</span></span><br><span class="line">npm run check &amp;&amp; npm <span class="built_in">test</span></span><br><span class="line"></span><br><span class="line"><span class="built_in">echo</span> <span class="string">&quot;[3/3] 环境就绪。&quot;</span></span><br><span class="line"><span class="built_in">echo</span> <span class="string">&quot;运行 npm run dev 以启动应用。&quot;</span></span><br></pre></td></tr></table></figure>
+
+<p><strong>设计要点</strong>：</p>
+<ul>
+<li><code>set -euo pipefail</code>：任何步骤失败立即退出，不静默吞掉错误</li>
+<li>验证步骤失败 = 环境不健康 = Agent 应停止工作并报告问题，而非继续往下走</li>
+<li>脚本本身就是”环境健康”的可执行定义</li>
+</ul>
+<h3 id="1-3-feature-list-json-——-功能清单"><a href="#1-3-feature-list-json-——-功能清单" class="headerlink" title="1.3 feature_list.json —— 功能清单"></a>1.3 feature_list.json —— 功能清单</h3><p>这是整个 Harness 中最关键的状态文件，定义了”什么是工作，工作到什么程度算完成”。</p>
+<figure class="highlight json"><table><tr><td class="code"><pre><span class="line">&#123;</span><br><span class="line">  <span class="attr">&quot;rules&quot;</span>: &#123;</span><br><span class="line">    <span class="attr">&quot;single_active_feature&quot;</span>: <span class="literal">true</span>,</span><br><span class="line">    <span class="attr">&quot;passing_requires_evidence&quot;</span>: <span class="literal">true</span>,</span><br><span class="line">    <span class="attr">&quot;do_not_skip_verification&quot;</span>: <span class="literal">true</span></span><br><span class="line">  &#125;,</span><br><span class="line">  <span class="attr">&quot;status_legend&quot;</span>: &#123;</span><br><span class="line">    <span class="attr">&quot;not_started&quot;</span>: <span class="string">&quot;尚未开始&quot;</span>,</span><br><span class="line">    <span class="attr">&quot;in_progress&quot;</span>: <span class="string">&quot;当前会话正在处理（同时只能有一个）&quot;</span>,</span><br><span class="line">    <span class="attr">&quot;blocked&quot;</span>: <span class="string">&quot;有阻塞项，记录在 notes 中&quot;</span>,</span><br><span class="line">    <span class="attr">&quot;passing&quot;</span>: <span class="string">&quot;已通过验证，有证据记录&quot;</span></span><br><span class="line">  &#125;,</span><br><span class="line">  <span class="attr">&quot;features&quot;</span>: [</span><br><span class="line">    &#123;</span><br><span class="line">      <span class="attr">&quot;id&quot;</span>: <span class="string">&quot;F001&quot;</span>,</span><br><span class="line">      <span class="attr">&quot;priority&quot;</span>: <span class="number">1</span>,</span><br><span class="line">      <span class="attr">&quot;area&quot;</span>: <span class="string">&quot;core&quot;</span>,</span><br><span class="line">      <span class="attr">&quot;title&quot;</span>: <span class="string">&quot;用户登录功能&quot;</span>,</span><br><span class="line">      <span class="attr">&quot;user_visible_behavior&quot;</span>: <span class="string">&quot;用户可以输入用户名和密码登录，登录失败时显示错误提示&quot;</span>,</span><br><span class="line">      <span class="attr">&quot;status&quot;</span>: <span class="string">&quot;not_started&quot;</span>,</span><br><span class="line">      <span class="attr">&quot;verification&quot;</span>: [</span><br><span class="line">        <span class="string">&quot;npm test -- --testPathPattern=auth 通过&quot;</span>,</span><br><span class="line">        <span class="string">&quot;手动登录成功后跳转到主页&quot;</span>,</span><br><span class="line">        <span class="string">&quot;密码错误时显示用户名或密码错误&quot;</span></span><br><span class="line">      ],</span><br><span class="line">      <span class="attr">&quot;evidence&quot;</span>: [],</span><br><span class="line">      <span class="attr">&quot;notes&quot;</span>: <span class="string">&quot;&quot;</span></span><br><span class="line">    &#125;</span><br><span class="line">  ]</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<table>
+<thead>
+<tr>
+<th>字段</th>
+<th>含义</th>
+<th>重要性</th>
+</tr>
+</thead>
+<tbody><tr>
+<td><code>user_visible_behavior</code></td>
+<td>从用户角度描述功能，而非技术实现</td>
+<td>高：防止 Agent 过度工程化</td>
+</tr>
+<tr>
+<td><code>verification</code></td>
+<td>验证步骤清单（必须可执行）</td>
+<td>高：定义完成标准</td>
+</tr>
+<tr>
+<td><code>evidence</code></td>
+<td>验证通过的证据（测试输出、日志等）</td>
+<td>高：防止自我宣告完成</td>
+</tr>
+<tr>
+<td><code>status</code></td>
+<td>当前状态，只能由验证结果驱动</td>
+<td>高：是状态层的核心</td>
+</tr>
+</tbody></table>
+<h3 id="1-4-claude-progress-md-——-会话进度日志"><a href="#1-4-claude-progress-md-——-会话进度日志" class="headerlink" title="1.4 claude-progress.md —— 会话进度日志"></a>1.4 claude-progress.md —— 会话进度日志</h3><figure class="highlight markdown"><table><tr><td class="code"><pre><span class="line"><span class="section"># Claude Progress Log</span></span><br><span class="line"></span><br><span class="line"><span class="section">## 会话记录（最新在前）</span></span><br><span class="line"></span><br><span class="line"><span class="section">### [2026-04-01] 会话摘要</span></span><br><span class="line"><span class="strong">**已完成**</span>：实现了 F001（用户登录功能），测试通过，有证据记录</span><br><span class="line"><span class="strong">**本次变更**</span>：新增 src/auth/login.ts，修改 src/routes/index.ts</span><br><span class="line"><span class="strong">**已知问题**</span>：F002（用户注册）尚未开始</span><br><span class="line"><span class="strong">**下一步**</span>：继续 F002（用户注册）</span><br></pre></td></tr></table></figure>
+
+<hr>
+<h2 id="2-功能清单的设计哲学"><a href="#2-功能清单的设计哲学" class="headerlink" title="2. 功能清单的设计哲学"></a>2. 功能清单的设计哲学</h2><h3 id="2-1-“用户可见行为”原则"><a href="#2-1-“用户可见行为”原则" class="headerlink" title="2.1 “用户可见行为”原则"></a>2.1 “用户可见行为”原则</h3><p>每个功能的描述应从<strong>用户角度</strong>出发：</p>
+<figure class="highlight 1c"><table><tr><td class="code"><pre><span class="line">❌ 错误：技术描述</span><br><span class="line"><span class="string">&quot;title&quot;</span>: <span class="string">&quot;实现 JWT 认证中间件&quot;</span></span><br><span class="line"></span><br><span class="line">✓ 正确：用户行为描述</span><br><span class="line"><span class="string">&quot;user_visible_behavior&quot;</span>: <span class="string">&quot;用户输入邮箱密码后可以登录，会话持续24小时&quot;</span></span><br></pre></td></tr></table></figure>
+
+<p>这样做的原因：防止 Agent 过度工程化（实现了技术但忽略了用户体验）；验证步骤自然地变成”用户能做到 X 吗？”。</p>
+<h3 id="2-2-验证的三个层次"><a href="#2-2-验证的三个层次" class="headerlink" title="2.2 验证的三个层次"></a>2.2 验证的三个层次</h3><figure class="highlight pgsql"><table><tr><td class="code"><pre><span class="line"><span class="keyword">Level</span> <span class="number">1</span>: 自动化验证（最快）</span><br><span class="line">  单元测试：npm test</span><br><span class="line">  类型检查：tsc <span class="comment">--noEmit</span></span><br><span class="line">  Lint：eslint src/</span><br><span class="line"></span><br><span class="line"><span class="keyword">Level</span> <span class="number">2</span>: 集成验证（中速）</span><br><span class="line">  API 端到端测试</span><br><span class="line">  数据库集成测试</span><br><span class="line"></span><br><span class="line"><span class="keyword">Level</span> <span class="number">3</span>: 行为验证（最可靠）</span><br><span class="line">  Smoke test：关键路径手动走一遍</span><br><span class="line">  E2E 测试：Playwright 浏览器自动化</span><br></pre></td></tr></table></figure>
+
+<p>最小 Harness 至少需要 Level 1，理想情况包含 Level 3。</p>
+<hr>
+<h2 id="3-Session-Handoff：跨会话连续性"><a href="#3-Session-Handoff：跨会话连续性" class="headerlink" title="3. Session Handoff：跨会话连续性"></a>3. Session Handoff：跨会话连续性</h2><p><code>claude-progress.md</code> 记录”发生了什么”，<code>session-handoff.md</code> 则回答”下一步怎么做”。前者是历史，后者是指导。</p>
+<h3 id="session-handoff-md-模板"><a href="#session-handoff-md-模板" class="headerlink" title="session-handoff.md 模板"></a>session-handoff.md 模板</h3><figure class="highlight markdown"><table><tr><td class="code"><pre><span class="line"><span class="section"># Session Handoff — 2026-04-01</span></span><br><span class="line"></span><br><span class="line"><span class="section">## 当前可用（Verified Now）</span></span><br><span class="line"><span class="bullet">-</span> 用户登录功能（F001）可用：npm test 通过，手动验证通过</span><br><span class="line"><span class="bullet">-</span> 基础路由框架正常</span><br><span class="line"></span><br><span class="line"><span class="section">## 本次变更（Changed This Session）</span></span><br><span class="line"><span class="bullet">-</span> 新增 src/auth/login.ts（JWT 认证逻辑）</span><br><span class="line"><span class="bullet">-</span> 修改 package.json 添加 jsonwebtoken 依赖</span><br><span class="line"></span><br><span class="line"><span class="section">## 已知损坏或未验证（Broken Or Unverified）</span></span><br><span class="line"><span class="bullet">-</span> src/auth/refresh.ts 已创建但未测试（占位符代码）</span><br><span class="line"></span><br><span class="line"><span class="section">## 下一步最佳行动（Next Best Step）</span></span><br><span class="line"><span class="bullet">-</span> 开始 F002（用户注册功能）</span><br><span class="line"></span><br><span class="line"><span class="section">## 关键命令（Commands）</span></span><br><span class="line">./init.sh       # 环境验证</span><br><span class="line">npm run dev     # 启动应用（localhost:3000）</span><br><span class="line">npm test        # 运行所有测试</span><br></pre></td></tr></table></figure>
+
+<h3 id="clean-state-checklist"><a href="#clean-state-checklist" class="headerlink" title="clean-state checklist"></a>clean-state checklist</h3><p>每次会话结束前必须通过以下检查：</p>
+<ul>
+<li><input disabled="" type="checkbox"> 标准启动路径仍然有效（./init.sh 可以成功运行）</li>
+<li><input disabled="" type="checkbox"> 标准验证路径仍然运行（npm test 通过）</li>
+<li><input disabled="" type="checkbox"> 当前进度已记录在 claude-progress.md</li>
+<li><input disabled="" type="checkbox"> feature_list.json 反映真实通过状态（非未验证的乐观状态）</li>
+<li><input disabled="" type="checkbox"> 没有未记录的半完成步骤</li>
+<li><input disabled="" type="checkbox"> 已知问题已在 session-handoff.md 中列出</li>
+<li><input disabled="" type="checkbox"> 下一次会话无需手动修复即可继续</li>
+</ul>
+<hr>
+<h2 id="4-验证闭环：防止”自我宣告完成”"><a href="#4-验证闭环：防止”自我宣告完成”" class="headerlink" title="4. 验证闭环：防止”自我宣告完成”"></a>4. 验证闭环：防止”自我宣告完成”</h2><h3 id="4-1-evaluator-rubric-md：质量评估量表"><a href="#4-1-evaluator-rubric-md：质量评估量表" class="headerlink" title="4.1 evaluator-rubric.md：质量评估量表"></a>4.1 evaluator-rubric.md：质量评估量表</h3><table>
+<thead>
+<tr>
+<th>评估维度</th>
+<th>检查问题</th>
+<th>评分（0-2）</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>正确性（Correctness）</td>
+<td>实现行为是否匹配需求描述？</td>
+<td></td>
+</tr>
+<tr>
+<td>验证充分性（Verification）</td>
+<td>验证是否实际运行并有输出证据？</td>
+<td></td>
+</tr>
+<tr>
+<td>范围纪律（Scope Discipline）</td>
+<td>会话是否保持在一个功能范围内？</td>
+<td></td>
+</tr>
+<tr>
+<td>可靠性（Reliability）</td>
+<td>结果能否在重启后无需修复而存活？</td>
+<td></td>
+</tr>
+<tr>
+<td>可维护性（Maintainability）</td>
+<td>代码和文档是否清晰？</td>
+<td></td>
+</tr>
+<tr>
+<td>交接就绪（Handoff Readiness）</td>
+<td>全新会话能否仅从仓库文件继续工作？</td>
+<td></td>
+</tr>
+</tbody></table>
+<h3 id="4-2-Generator-Evaluator-分离架构（进阶）"><a href="#4-2-Generator-Evaluator-分离架构（进阶）" class="headerlink" title="4.2 Generator-Evaluator 分离架构（进阶）"></a>4.2 Generator-Evaluator 分离架构（进阶）</h3><p>来自 Anthropic 的核心创新——将”做工作的 Agent”与”判断工作的 Agent”分离：</p>
+<figure class="highlight angelscript"><table><tr><td class="code"><pre><span class="line"><span class="string">[Generator]</span> → 实现代码</span><br><span class="line">    ↓</span><br><span class="line"><span class="string">[Evaluator]</span> 用 Playwright 真实点击应用，发现 bug</span><br><span class="line">    ↓ 具体 bug 报告</span><br><span class="line"><span class="string">[Generator]</span> 修复，再次提交评估</span><br><span class="line">    ↑_______↑ 迭代直到所有标准通过</span><br></pre></td></tr></table></figure>
+
+<p>在 Anthropic 的实验中，评估 Agent 在第一轮就发现了诸如”点击保存按钮无反应”、”API 返回 undefined”等真实 bug，而这些在代码审查中很容易被遗漏。</p>
+<hr>
+<h2 id="5-可观测性：让-Agent-能看到自己在做什么"><a href="#5-可观测性：让-Agent-能看到自己在做什么" class="headerlink" title="5. 可观测性：让 Agent 能看到自己在做什么"></a>5. 可观测性：让 Agent 能看到自己在做什么</h2><p><strong>如果 Agent 看不到运行时反馈，它只能靠猜。</strong></p>
+<h3 id="5-1-可观测性配置建议"><a href="#5-1-可观测性配置建议" class="headerlink" title="5.1 可观测性配置建议"></a>5.1 可观测性配置建议</h3><p><strong>结构化日志</strong>（方便 Agent 解析）：</p>
+<figure class="highlight typescript"><table><tr><td class="code"><pre><span class="line"><span class="comment">// 推荐：结构化日志</span></span><br><span class="line"><span class="built_in">console</span>.log(<span class="built_in">JSON</span>.stringify(&#123;</span><br><span class="line">  level: <span class="string">&quot;info&quot;</span>,</span><br><span class="line">  event: <span class="string">&quot;user_login&quot;</span>,</span><br><span class="line">  userId: user.id,</span><br><span class="line">  timestamp: <span class="keyword">new</span> <span class="built_in">Date</span>().toISOString()</span><br><span class="line">&#125;));</span><br></pre></td></tr></table></figure>
+
+<p><strong>在 AGENTS.md 中列出 Agent 可用的调试命令</strong>：</p>
+<figure class="highlight bash"><table><tr><td class="code"><pre><span class="line">tail -f logs/app.log                          <span class="comment"># 查看应用日志</span></span><br><span class="line">grep -i <span class="string">&quot;error&quot;</span> logs/app.log | tail -20       <span class="comment"># 查看最近错误</span></span><br><span class="line">npm <span class="built_in">test</span> -- --testPathPattern=auth --verbose  <span class="comment"># 运行单个测试（调试）</span></span><br></pre></td></tr></table></figure>
+
+<h3 id="5-2-OpenAI-的高级可观测性实践"><a href="#5-2-OpenAI-的高级可观测性实践" class="headerlink" title="5.2 OpenAI 的高级可观测性实践"></a>5.2 OpenAI 的高级可观测性实践</h3><p>OpenAI 团队将 Chrome DevTools 协议接入 Agent 运行时，让 Agent 能够：</p>
+<ul>
+<li>通过 DOM 快照和截图直接推理 UI 行为</li>
+<li>复现 bug、验证修复</li>
+<li>使用 LogQL 查询日志，PromQL 查询指标</li>
+</ul>
+<p>每个 Codex 任务都在独立的 git worktree 上运行，任务完成后连同所有日志、指标一起清理，保持环境隔离。</p>
+<hr>
+<h2 id="6-分层领域架构（进阶）"><a href="#6-分层领域架构（进阶）" class="headerlink" title="6. 分层领域架构（进阶）"></a>6. 分层领域架构（进阶）</h2><h3 id="何时需要进阶-Harness？"><a href="#何时需要进阶-Harness？" class="headerlink" title="何时需要进阶 Harness？"></a>何时需要进阶 Harness？</h3><p>触发信号：AGENTS.md 超过 3 页、不同领域的规则相互干扰、Agent 经常因为”不知道这里的规范”而犯错。</p>
+<h3 id="高级版-AGENTS-md-路由设计"><a href="#高级版-AGENTS-md-路由设计" class="headerlink" title="高级版 AGENTS.md 路由设计"></a>高级版 AGENTS.md 路由设计</h3><figure class="highlight markdown"><table><tr><td class="code"><pre><span class="line"><span class="section">## 路由地图（Routing Map）</span></span><br><span class="line"></span><br><span class="line">| 任务类型 | 参考文档 |</span><br><span class="line">|---------|---------|</span><br><span class="line">| 理解整体架构 | ARCHITECTURE.md |</span><br><span class="line">| 提交代码或创建 PR | docs/QUALITY<span class="emphasis">_SCORE.md |</span></span><br><span class="line"><span class="emphasis">| 处理 Secret 或外部 API | docs/SECURITY.md |</span></span><br><span class="line"><span class="emphasis">| 修改前端组件 | docs/FRONTEND.md |</span></span><br><span class="line"><span class="emphasis">| 查看或创建执行计划 | docs/PLANS.md |</span></span><br><span class="line"><span class="emphasis">| 了解系统健康标准 | docs/RELIABILITY.md |</span></span><br></pre></td></tr></table></figure>
+
+<h3 id="OpenAI-的分层架构实践"><a href="#OpenAI-的分层架构实践" class="headerlink" title="OpenAI 的分层架构实践"></a>OpenAI 的分层架构实践</h3><p>每个业务域强制执行依赖方向（只能”向前”）：</p>
+<figure class="highlight routeros"><table><tr><td class="code"><pre><span class="line">Types →<span class="built_in"> Config </span>→ Repo →<span class="built_in"> Service </span>→ Runtime → UI</span><br><span class="line">横切关注点只能通过单一接口 Providers 进入</span><br></pre></td></tr></table></figure>
+
+<p>通过自定义 Linter 机械强制执行，Lint 错误消息中直接包含修复指令，让 Agent 在违规时立即知道如何修复。</p>
+<hr>
+<h2 id="7-渐进式实战路径"><a href="#7-渐进式实战路径" class="headerlink" title="7. 渐进式实战路径"></a>7. 渐进式实战路径</h2><p>基于 <a href="https://github.com/walkinglabs/learn-harness-engineering">walkinglabs/learn-harness-engineering</a> 课程体系：</p>
+<table>
+<thead>
+<tr>
+<th>阶段</th>
+<th>训练重点</th>
+<th>目标</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>P01：最小 Harness</td>
+<td>AGENTS.md + init.sh + feature_list.json（4 文件）</td>
+<td>理解有无 Harness 的结果差异</td>
+</tr>
+<tr>
+<td>P02：Agent 可读工作区</td>
+<td>持久化状态文件 + 仓库即事实来源</td>
+<td>跨会话不丢失上下文</td>
+</tr>
+<tr>
+<td>P03：多会话连续性</td>
+<td>progress log + session handoff</td>
+<td>新会话 3 分钟内恢复工作上下文</td>
+</tr>
+<tr>
+<td>P04：增量开发 + 运行时反馈</td>
+<td>Scope 控制 + 可观测性基础</td>
+<td>每次会话产出可用增量</td>
+</tr>
+<tr>
+<td>P05：基于证据的验证</td>
+<td>evaluator-rubric + E2E 测试</td>
+<td>消除”自我宣告完成”问题</td>
+</tr>
+<tr>
+<td>P06：完整 Harness（毕业项目）</td>
+<td>所有机制 + 分层架构 + 消融实验</td>
+<td>生产级 Harness</td>
+</tr>
+</tbody></table>
+<p><strong>消融实验</strong>（P06 核心练习）：故意移除 Harness 的某个组件，观察 Agent 行为如何降级。这是验证你是否真正理解每个组件价值的最佳方法。</p>
+<hr>
+<h2 id="8-常见反模式与规避"><a href="#8-常见反模式与规避" class="headerlink" title="8. 常见反模式与规避"></a>8. 常见反模式与规避</h2><table>
+<thead>
+<tr>
+<th>反模式</th>
+<th>表现</th>
+<th>解决方案</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>巨型 AGENTS.md</td>
+<td>单文件超过 500 行</td>
+<td>分层文档路由</td>
+</tr>
+<tr>
+<td>乐观状态</td>
+<td>功能标记 passing 但实际未验证</td>
+<td><code>passing_requires_evidence: true</code> 规则</td>
+</tr>
+<tr>
+<td>范围蔓延</td>
+<td>一次会话修改了多个功能区域</td>
+<td><code>single_active_feature: true</code> 规则</td>
+</tr>
+<tr>
+<td>脆弱的 init.sh</td>
+<td>部分步骤失败但脚本继续执行</td>
+<td><code>set -euo pipefail</code></td>
+</tr>
+<tr>
+<td>空的 evidence</td>
+<td>evidence 字段为空就标 passing</td>
+<td>Evaluator 检查，空 evidence 不得标记</td>
+</tr>
+<tr>
+<td>遗忘的交接</td>
+<td>会话结束后 session-handoff.md 未更新</td>
+<td>clean-state checklist 强制检查</td>
+</tr>
+<tr>
+<td>外部状态依赖</td>
+<td>关键信息只存在于 Jira/Notion</td>
+<td>将所有 Agent 需要的信息编码进仓库</td>
+</tr>
+</tbody></table>
+<hr>
+<h2 id="总结"><a href="#总结" class="headerlink" title="总结"></a>总结</h2><p>Harness Engineering 的价值不在于某一个文件或技巧，而在于将这些机制<strong>系统性地组合</strong>，构建一个让 AI Agent 能够可靠、持续地完成真实工程任务的环境。</p>
+<blockquote>
+<p><strong>搭建 Harness 的成本，远低于不搭 Harness 的失败成本。</strong></p>
+</blockquote>
+<hr>
+<p><strong>参考资料</strong></p>
+<ul>
+<li><a href="https://github.com/walkinglabs/learn-harness-engineering">walkinglabs/learn-harness-engineering</a></li>
+<li><a href="https://openai.com/zh-Hans-CN/index/harness-engineering/">OpenAI: 工程技术——在智能体优先的世界中利用 Codex</a></li>
+<li><a href="https://www.anthropic.com/engineering/harness-design-long-running-apps">Anthropic: Harness design for long-running application development</a></li>
+</ul>
+]]></content>
+      <categories>
+        <category>AI 工程</category>
+      </categories>
+      <tags>
+        <tag>AI Engineering</tag>
+        <tag>Harness Engineering</tag>
+        <tag>Agent</tag>
+      </tags>
+  </entry>
+  <entry>
+    <title>Harness Engineering 理论篇 — 为什么强大的 AI 还需要&quot;脚手架&quot;？</title>
+    <url>/post/d48d135e.html</url>
+    <content><![CDATA[<blockquote>
+<p>适读人群：希望用 AI Agent 完成真实软件工程任务的开发者和架构师。</p>
+</blockquote>
+<span id="more"></span>
+
+<h2 id="0-两个震撼的真实实验"><a href="#0-两个震撼的真实实验" class="headerlink" title="0. 两个震撼的真实实验"></a>0. 两个震撼的真实实验</h2><h3 id="实验一：Anthropic-的受控对照实验"><a href="#实验一：Anthropic-的受控对照实验" class="headerlink" title="实验一：Anthropic 的受控对照实验"></a>实验一：Anthropic 的受控对照实验</h3><p>Anthropic 的工程师用 Claude Sonnet 4.5 做了一组对照实验，相同的模型、相同的任务（构建一个可运行的游戏），只改变 Harness 配置：</p>
+<table>
+<thead>
+<tr>
+<th>条件</th>
+<th>耗时</th>
+<th>花费</th>
+<th>结果</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>无 Harness（单 Agent）</td>
+<td>短</td>
+<td>$9</td>
+<td>核心玩法功能不可运行（物理引擎接线断裂，输入无响应）</td>
+</tr>
+<tr>
+<td>完整 Harness（planner + generator + evaluator）</td>
+<td>6 小时</td>
+<td>$200</td>
+<td>游戏可以实际运行，16个功能完整实现</td>
+</tr>
+</tbody></table>
+<p><strong>模型没有变，Harness 变了。差距超过 20 倍。</strong></p>
+<h3 id="实验二：OpenAI-的五个月生产实践"><a href="#实验二：OpenAI-的五个月生产实践" class="headerlink" title="实验二：OpenAI 的五个月生产实践"></a>实验二：OpenAI 的五个月生产实践</h3><p>OpenAI 内部有一个三人工程师团队，用五个月时间构建了一款有真实用户的内部产品，设立了一条铁律：<strong>没有一行代码由人类编写</strong>。</p>
+<p>五个月后：</p>
+<ul>
+<li>代码库约 <strong>100 万行代码</strong></li>
+<li>约 <strong>1,500 个 PR</strong> 被打开并合并</li>
+<li>平均每位工程师每天处理 <strong>3.5 个 PR</strong>（随团队扩展到 7 人后吞吐量还在增长）</li>
+<li>产品已有数百名内测用户，包括每日活跃的深度用户</li>
+</ul>
+<p>他们的结论是：</p>
+<blockquote>
+<p>“工程师的工作从编写代码，转变为设计环境、明确意图、构建反馈回路。”</p>
+</blockquote>
+<p>这两个实验共同指向同一个结论：<strong>模型提供能力，Harness 提供可靠性。</strong></p>
+<hr>
+<h2 id="1-什么是-Harness-Engineering？"><a href="#1-什么是-Harness-Engineering？" class="headerlink" title="1. 什么是 Harness Engineering？"></a>1. 什么是 Harness Engineering？</h2><h3 id="1-1-核心定义"><a href="#1-1-核心定义" class="headerlink" title="1.1 核心定义"></a>1.1 核心定义</h3><blockquote>
+<p><strong>为 AI Agent 构建的、用于指导、约束、验证和延续其工作的完整运行环境。</strong></p>
+</blockquote>
+<p>“Harness”原意是”马具”或”安全带”——它本身不产生动力，但让力量得以被安全、可控地使用。</p>
+<p>在软件工程中，test harness（测试框架）早已是成熟概念：包裹待测代码的基础设施，负责初始化环境、提供数据、收集结果。<strong>Harness Engineering</strong> 将这一思想延伸到 AI Agent 的整个工作流。</p>
+<h3 id="1-2-直观类比：赛车工程团队"><a href="#1-2-直观类比：赛车工程团队" class="headerlink" title="1.2 直观类比：赛车工程团队"></a>1.2 直观类比：赛车工程团队</h3><table>
+<thead>
+<tr>
+<th>赛车要素</th>
+<th>AI Agent 对应</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>驾驶员技术</td>
+<td>模型能力（Claude / GPT 的智能水平）</td>
+</tr>
+<tr>
+<td>赛前策略简报</td>
+<td>Instructions（AGENTS.md、架构文档）</td>
+</tr>
+<tr>
+<td>实时遥测数据</td>
+<td>State（progress.md、feature_list）</td>
+</tr>
+<tr>
+<td>进站检验</td>
+<td>Verification（测试、lint、E2E）</td>
+</tr>
+<tr>
+<td>明确的圈次目标</td>
+<td>Scope（一次一个功能）</td>
+</tr>
+<tr>
+<td>赛后技术分析</td>
+<td>Session Lifecycle（handoff、clean-state）</td>
+</tr>
+</tbody></table>
+<p>没有工程团队，顶级驾驶员也会跑偏、跑没油、跑完不知道发生了什么。</p>
+<hr>
+<h2 id="2-AI-Agent-在真实任务上失败的三大根源"><a href="#2-AI-Agent-在真实任务上失败的三大根源" class="headerlink" title="2. AI Agent 在真实任务上失败的三大根源"></a>2. AI Agent 在真实任务上失败的三大根源</h2><h3 id="2-1-上下文遗忘（Context-Loss）"><a href="#2-1-上下文遗忘（Context-Loss）" class="headerlink" title="2.1 上下文遗忘（Context Loss）"></a>2.1 上下文遗忘（Context Loss）</h3><p>AI 模型没有跨会话的持久记忆，<strong>上下文窗口有限且会清零</strong>。一个需要 6 小时完成的任务，如果没有状态持久化：</p>
+<ul>
+<li>Agent 会重新实现已完成的功能</li>
+<li>不知道哪些部分处于损坏状态</li>
+<li>在”模糊记忆”的基础上做决策，产生错误积累</li>
+</ul>
+<p>Anthropic 的工程师还发现了一个更微妙的问题——**”上下文焦虑”（Context Anxiety）**：</p>
+<blockquote>
+<p>当模型接近它认为的上下文限制时，会开始提前收尾工作，草草了事，即便实际上还有足够的空间。Claude Sonnet 4.5 表现出这一倾向，单靠压缩（Compaction）不足以解决，必须通过”上下文重置（Context Reset）”——清空上下文并用结构化交接文档重新启动——才能解决。</p>
+</blockquote>
+<h3 id="2-2-验证差距（Verification-Gap）"><a href="#2-2-验证差距（Verification-Gap）" class="headerlink" title="2.2 验证差距（Verification Gap）"></a>2.2 验证差距（Verification Gap）</h3><p>Agent 有强烈的”完成偏见”——它倾向于相信自己写的代码是正确的：</p>
+<blockquote>
+<p>“当被要求评估自己的工作时，Agent 倾向于自信地称赞它——即使在人类观察者看来质量明显平庸。”<br>—— Anthropic 工程博客</p>
+</blockquote>
+<p>在 Anthropic 的早期实验中，评估 Agent 会发现合法的问题，然后自我说服认为”其实没那么严重”，最终批准了有缺陷的工作。这不是模型缺陷，而是<strong>在没有外部验证机制时的系统性偏差</strong>。</p>
+<h3 id="2-3-越界失控（Overreach）与范围蔓延"><a href="#2-3-越界失控（Overreach）与范围蔓延" class="headerlink" title="2.3 越界失控（Overreach）与范围蔓延"></a>2.3 越界失控（Overreach）与范围蔓延</h3><p>没有明确的 Scope 约束，Agent 会：</p>
+<ul>
+<li>修复 bug A 时顺手重构模块 B</li>
+<li>实现功能 X 时预先为功能 Y 搭骨架</li>
+<li>最终每个功能都 70% 完成，没有一个完全可用</li>
+</ul>
+<p>OpenAI 的团队描述为：<strong>当环境规范不够明确时，Agent 缺乏实现高级目标所需的工具、抽象层和内部结构，无法取得可靠进展。</strong></p>
+<blockquote>
+<p>解决方案从来不是”让它再努力一点”，而是追问：”还需要什么样的能力，如何让它对 Agent 既清晰可读又可强制执行？”</p>
+</blockquote>
+<hr>
+<h2 id="3-Harness-的五大子系统"><a href="#3-Harness-的五大子系统" class="headerlink" title="3. Harness 的五大子系统"></a>3. Harness 的五大子系统</h2><p>Harness 由五层构成，每层解决一类核心问题：</p>
+<p><strong>Instructions（指令层）</strong></p>
+<ul>
+<li>AGENTS.md（路由入口，约100行）</li>
+<li>ARCHITECTURE.md / QUALITY_SCORE.md / SECURITY.md / FRONTEND.md / PLANS.md</li>
+</ul>
+<p><strong>State（状态层）</strong></p>
+<ul>
+<li>progress.md / feature_list.json</li>
+<li>git log / session-handoff.md</li>
+<li>自动生成的 db-schema.md 等</li>
+</ul>
+<p><strong>Verification（验证层）</strong></p>
+<ul>
+<li>单元测试 / 类型检查 / Lint</li>
+<li>Playwright E2E（用户行为验证）</li>
+<li>Sprint 合约 / 评估量表</li>
+</ul>
+<p><strong>Scope（范围层）</strong></p>
+<ul>
+<li>一次一个功能 / Sprint 划分</li>
+<li>Definition of Done（完成定义）</li>
+</ul>
+<p><strong>Session Lifecycle（生命周期层）</strong></p>
+<ul>
+<li>init.sh（启动阶段）</li>
+<li>context-reset / handoff（中间交接）</li>
+<li>clean-state checklist（结束阶段）</li>
+</ul>
+<hr>
+<h2 id="4-仓库即唯一事实来源"><a href="#4-仓库即唯一事实来源" class="headerlink" title="4. 仓库即唯一事实来源"></a>4. 仓库即唯一事实来源</h2><p>这是 OpenAI 和 Anthropic 两篇文章最一致强调的原则：</p>
+<blockquote>
+<p>“从 Agent 的角度来看，它在运行时无法在上下文中访问的任何内容都是不存在的。存储在 Google Docs、聊天记录或人们头脑中的知识都无法被系统访问。”<br>—— OpenAI 工程博客</p>
+</blockquote>
+<h3 id="知识编码的四个层次"><a href="#知识编码的四个层次" class="headerlink" title="知识编码的四个层次"></a>知识编码的四个层次</h3><ul>
+<li><strong>层次 1：基础规范</strong>（持续有效）：AGENTS.md / ARCHITECTURE.md / SECURITY.md</li>
+<li><strong>层次 2：当前状态</strong>（随项目演进）：feature_list.json / progress.md / 自动生成的 db-schema.md</li>
+<li><strong>层次 3：执行计划</strong>（任务粒度）：docs/exec-plans/active/ 和 docs/exec-plans/completed/</li>
+<li><strong>层次 4：参考文档</strong>（工具和库文档）：docs/references/framework-llms.txt</li>
+</ul>
+<h3 id="知识腐烂防治"><a href="#知识腐烂防治" class="headerlink" title="知识腐烂防治"></a>知识腐烂防治</h3><p>OpenAI 的实践中，有一个<strong>持续运行的”doc-gardening” Agent</strong>，专门扫描那些不再反映真实代码行为的过时文档，并自动发起修复 PR。同时有专门的 CI 作业验证知识库的更新状况、交叉链接和结构正确性。</p>
+<hr>
+<h2 id="5-渐进式指令披露：从百科全书到路由器"><a href="#5-渐进式指令披露：从百科全书到路由器" class="headerlink" title="5. 渐进式指令披露：从百科全书到路由器"></a>5. 渐进式指令披露：从百科全书到路由器</h2><h3 id="5-1-单一大文件的四大失败原因"><a href="#5-1-单一大文件的四大失败原因" class="headerlink" title="5.1 单一大文件的四大失败原因"></a>5.1 单一大文件的四大失败原因</h3><p>OpenAI 团队亲身验证了这一点：</p>
+<ol>
+<li><strong>上下文是稀缺资源</strong>：巨型文件挤掉了任务本身、相关代码和关键文档</li>
+<li><strong>过多指导反而无效</strong>：当一切都”重要”时，一切都不重要</li>
+<li><strong>立即腐烂</strong>：庞杂的手册变成陈旧规则的坟场，Agent 无法判断哪些信息仍然有效</li>
+<li><strong>难以验证</strong>：单一 blob 不适合机械检查（覆盖率、新鲜度、所有权、交叉链接）</li>
+</ol>
+<h3 id="5-2-文档路由模式"><a href="#5-2-文档路由模式" class="headerlink" title="5.2 文档路由模式"></a>5.2 文档路由模式</h3><figure class="highlight reasonml"><table><tr><td class="code"><pre><span class="line"><span class="module-access"><span class="module"><span class="identifier">AGENTS</span>.</span></span>md（约<span class="number">100</span>行，作为目录）</span><br><span class="line">├── 启动流程（强制执行）</span><br><span class="line">├── 核心规则（<span class="number">3</span>-<span class="number">5</span>条不可违反的约束）</span><br><span class="line">└── 路由地图：</span><br><span class="line">    ├── 架构问题      → <span class="module-access"><span class="module"><span class="identifier">ARCHITECTURE</span>.</span></span>md</span><br><span class="line">    ├── 质量评分追踪  → docs/<span class="module-access"><span class="module"><span class="identifier">QUALITY_SCORE</span>.</span></span>md</span><br><span class="line">    ├── 安全规则      → docs/<span class="module-access"><span class="module"><span class="identifier">SECURITY</span>.</span></span>md</span><br><span class="line">    ├── 前端规范      → docs/<span class="module-access"><span class="module"><span class="identifier">FRONTEND</span>.</span></span>md</span><br><span class="line">    ├── 执行计划      → docs/<span class="module-access"><span class="module"><span class="identifier">PLANS</span>.</span></span>md<span class="operator"> / </span>exec-plans/</span><br><span class="line">    └── 可靠性标准    → docs/<span class="module-access"><span class="module"><span class="identifier">RELIABILITY</span>.</span></span>md</span><br></pre></td></tr></table></figure>
+
+<p><strong>QUALITY_SCORE.md</strong> 是一个特别有价值的文档：它按产品域和架构层（A/B/C/D）追踪仓库随时间变强或变弱的趋势，让 Agent 能直接了解代码库的健康状态。</p>
+<hr>
+<h2 id="6-多-Agent-架构：Generator-Evaluator-模式"><a href="#6-多-Agent-架构：Generator-Evaluator-模式" class="headerlink" title="6. 多 Agent 架构：Generator-Evaluator 模式"></a>6. 多 Agent 架构：Generator-Evaluator 模式</h2><p>Anthropic 从<strong>生成对抗网络（GAN）</strong>中获得灵感，设计了解决自我评估偏差的多 Agent 架构：</p>
+<figure class="highlight angelscript"><table><tr><td class="code"><pre><span class="line">用户 prompt</span><br><span class="line">    ↓</span><br><span class="line"><span class="string">[Planner Agent]</span>    将<span class="number">1</span><span class="number">-4</span>句 prompt 扩展为完整产品规格</span><br><span class="line">    ↓ 详细规格</span><br><span class="line"><span class="string">[Generator Agent]</span>  按功能/Sprint 逐步实现代码</span><br><span class="line">    ↓ 实现成果</span><br><span class="line"><span class="string">[Evaluator Agent]</span>  用 Playwright 真实点击应用，执行 QA</span><br><span class="line">    ↓ 评分 + 具体反馈</span><br><span class="line"><span class="string">[Generator Agent]</span>  根据反馈修复，下一轮迭代</span><br><span class="line">（循环直到通过所有评估标准）</span><br></pre></td></tr></table></figure>
+
+<h3 id="为什么需要独立的评估-Agent？"><a href="#为什么需要独立的评估-Agent？" class="headerlink" title="为什么需要独立的评估 Agent？"></a>为什么需要独立的评估 Agent？</h3><blockquote>
+<p>“将做工作的 Agent 与判断工作的 Agent 分离，证明是解决这一问题的强力手段。单独调优一个持怀疑态度的评估者，比让生成者批判自己的工作要容易得多。”<br>—— Anthropic 工程博客</p>
+</blockquote>
+<p>关键是让评估 Agent <strong>真实操作应用</strong>：评估 Agent 配备了 Playwright MCP，会像真实用户一样点击应用界面、测试 API、检查数据库状态，然后才给分。</p>
+<hr>
+<h2 id="7-Sprint-合约：在写代码之前就定义”完成”"><a href="#7-Sprint-合约：在写代码之前就定义”完成”" class="headerlink" title="7. Sprint 合约：在写代码之前就定义”完成”"></a>7. Sprint 合约：在写代码之前就定义”完成”</h2><p>Anthropic 实践中的重要创新：在每个 Sprint 开始前，Generator 和 Evaluator 必须就”完成”的具体含义达成共识。</p>
+<p>Sprint 合约协商流程：</p>
+<ol>
+<li>Generator 提案：”我将实现 X，成功标准是 Y，验证方式是 Z”</li>
+<li>Evaluator 审查：”你需要补充 W 的验证，否则我无法判断完成”</li>
+<li>双方修订，直到达成一致</li>
+<li>Generator 开始实现（有合约约束）</li>
+<li>Evaluator 按合约标准验证</li>
+</ol>
+<p>这一机制将产品规格（高层次）和可测试实现（底层细节）之间的鸿沟显式化，防止 Generator 和 Evaluator 对”完成”有不同理解。</p>
+<hr>
+<h2 id="8-架构约束：让-Agent-在规则中高效工作"><a href="#8-架构约束：让-Agent-在规则中高效工作" class="headerlink" title="8. 架构约束：让 Agent 在规则中高效工作"></a>8. 架构约束：让 Agent 在规则中高效工作</h2><p>OpenAI 的经验：<strong>Agent 在有严格边界和可预测结构的环境中最为高效。</strong></p>
+<p>他们围绕严格的分层架构构建应用，每个业务域的依赖方向（只能”向前”）：</p>
+<figure class="highlight routeros"><table><tr><td class="code"><pre><span class="line">Types →<span class="built_in"> Config </span>→ Repo →<span class="built_in"> Service </span>→ Runtime → UI</span><br><span class="line">横切关注点只能通过单一接口 Providers 进入</span><br></pre></td></tr></table></figure>
+
+<p>这些约束通过<strong>自定义 Linter 和结构测试机械地强制执行</strong>（同样由 Agent 生成）。</p>
+<blockquote>
+<p>“这种架构通常要等到拥有数百名工程师时才会推迟。对于编码 Agent 来说，这是一个早期的先决条件：有了约束，速度才不会下降，架构才不会漂移。”</p>
+</blockquote>
+<p>自定义 Lint 规则的错误消息会<strong>在 Agent 上下文中注入修复指令</strong>，让 Agent 在违规时立即知道如何修复，而非只看到一条晦涩的错误。</p>
+<hr>
+<h2 id="9-总结：Harness-的本质"><a href="#9-总结：Harness-的本质" class="headerlink" title="9. 总结：Harness 的本质"></a>9. 总结：Harness 的本质</h2><table>
+<thead>
+<tr>
+<th>问题类型</th>
+<th>Harness 的解法</th>
+<th>来源</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>上下文遗忘</td>
+<td>状态层（progress.md、feature_list）</td>
+<td>GitHub 仓库</td>
+</tr>
+<tr>
+<td>上下文焦虑</td>
+<td>上下文重置 + 结构化交接</td>
+<td>Anthropic</td>
+</tr>
+<tr>
+<td>自我评估偏差</td>
+<td>Generator-Evaluator 分离</td>
+<td>Anthropic</td>
+</tr>
+<tr>
+<td>越界失控</td>
+<td>Scope 层（一次一个功能）</td>
+<td>GitHub 仓库</td>
+</tr>
+<tr>
+<td>指令腐烂</td>
+<td>分层文档路由</td>
+<td>OpenAI</td>
+</tr>
+<tr>
+<td>知识不可见</td>
+<td>仓库即事实来源</td>
+<td>OpenAI + Anthropic</td>
+</tr>
+<tr>
+<td>架构漂移</td>
+<td>机械强制约束 + Linter</td>
+<td>OpenAI</td>
+</tr>
+<tr>
+<td>验证不足</td>
+<td>Playwright E2E + Sprint 合约</td>
+<td>Anthropic</td>
+</tr>
+</tbody></table>
+<blockquote>
+<p><strong>模型提供能力（Capability），Harness 提供可靠性（Reliability）。随着模型越来越强，Harness 的有趣组合空间不会缩小——它只会移动。</strong></p>
+</blockquote>
+<p>下一篇<a href="/post/harness-engineering-practice.html">实践篇</a>将手把手带你用 4 个文件搭建第一个最小 Harness。</p>
+<hr>
+<p><strong>参考资料</strong></p>
+<ul>
+<li><a href="https://github.com/walkinglabs/learn-harness-engineering">walkinglabs/learn-harness-engineering</a></li>
+<li><a href="https://openai.com/zh-Hans-CN/index/harness-engineering/">OpenAI: 工程技术——在智能体优先的世界中利用 Codex</a></li>
+<li><a href="https://www.anthropic.com/engineering/harness-design-long-running-apps">Anthropic: Harness design for long-running application development</a></li>
+</ul>
+]]></content>
+      <categories>
+        <category>AI 工程</category>
+      </categories>
+      <tags>
+        <tag>AI Engineering</tag>
+        <tag>Harness Engineering</tag>
+        <tag>Agent</tag>
       </tags>
   </entry>
 </search>

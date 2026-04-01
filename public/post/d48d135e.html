@@ -1,0 +1,787 @@
+<!DOCTYPE html>
+<html lang="zh-Hans">
+<head>
+  <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=2">
+<meta name="theme-color" content="#222">
+<meta name="generator" content="Hexo 5.4.0">
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png">
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32-next.png">
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next.png">
+  <link rel="mask-icon" href="/images/logo.svg" color="#222">
+
+<link rel="stylesheet" href="/css/main.css">
+
+
+<link rel="stylesheet" href="/lib/font-awesome/css/all.min.css">
+  <link rel="stylesheet" href="//cdn.jsdelivr.net/gh/fancyapps/fancybox@3/dist/jquery.fancybox.min.css">
+
+<script id="hexo-configurations">
+    var NexT = window.NexT || {};
+    var CONFIG = {"hostname":"www.arclin.cn","root":"/","scheme":"Muse","version":"7.8.0","exturl":false,"sidebar":{"position":"left","display":"post","padding":18,"offset":12,"onmobile":false},"copycode":{"enable":false,"show_result":false,"style":null},"back2top":{"enable":true,"sidebar":false,"scrollpercent":false},"bookmark":{"enable":false,"color":"#222","save":"auto"},"fancybox":true,"mediumzoom":false,"lazyload":false,"pangu":false,"comments":{"style":"tabs","active":null,"storage":true,"lazyload":false,"nav":null},"algolia":{"appID":"VOFC7668C9","apiKey":"24c644edc8e7353bf2e8d8e31f03a940","indexName":"hexo","hits":{"per_page":10},"labels":{"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}},"localsearch":{"enable":true,"trigger":"auto","top_n_per_article":1,"unescape":false,"preload":false},"motion":{"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},"path":"search.xml"};
+  </script>
+
+  <meta name="description" content="适读人群：希望用 AI Agent 完成真实软件工程任务的开发者和架构师。">
+<meta property="og:type" content="article">
+<meta property="og:title" content="Harness Engineering 理论篇 — 为什么强大的 AI 还需要&quot;脚手架&quot;？">
+<meta property="og:url" content="https://www.arclin.cn/post/d48d135e.html">
+<meta property="og:site_name" content="Arclin">
+<meta property="og:description" content="适读人群：希望用 AI Agent 完成真实软件工程任务的开发者和架构师。">
+<meta property="og:locale">
+<meta property="article:published_time" content="2026-04-01T02:00:00.000Z">
+<meta property="article:modified_time" content="2026-04-01T03:05:38.889Z">
+<meta property="article:author" content="Arclin">
+<meta property="article:tag" content="AI Engineering">
+<meta property="article:tag" content="Harness Engineering">
+<meta property="article:tag" content="Agent">
+<meta name="twitter:card" content="summary">
+
+<link rel="canonical" href="https://www.arclin.cn/post/d48d135e.html">
+
+
+<script id="page-configurations">
+  // https://hexo.io/docs/variables.html
+  CONFIG.page = {
+    sidebar: "",
+    isHome : false,
+    isPost : true,
+    lang   : 'zh-Hans'
+  };
+</script>
+
+  <title>Harness Engineering 理论篇 — 为什么强大的 AI 还需要"脚手架"？ | Arclin</title>
+  
+
+
+
+
+
+
+  <noscript>
+  <style>
+  .use-motion .brand,
+  .use-motion .menu-item,
+  .sidebar-inner,
+  .use-motion .post-block,
+  .use-motion .pagination,
+  .use-motion .comments,
+  .use-motion .post-header,
+  .use-motion .post-body,
+  .use-motion .collection-header { opacity: initial; }
+
+  .use-motion .site-title,
+  .use-motion .site-subtitle {
+    opacity: initial;
+    top: initial;
+  }
+
+  .use-motion .logo-line-before i { left: initial; }
+  .use-motion .logo-line-after i { right: initial; }
+  </style>
+</noscript>
+
+<link rel="alternate" href="/atom.xml" title="Arclin" type="application/atom+xml">
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage">
+  <div class="container use-motion">
+    <div class="headband"></div>
+
+    <header class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-container">
+  <div class="site-nav-toggle">
+    <div class="toggle" aria-label="切换导航栏">
+      <span class="toggle-line toggle-line-first"></span>
+      <span class="toggle-line toggle-line-middle"></span>
+      <span class="toggle-line toggle-line-last"></span>
+    </div>
+  </div>
+
+  <div class="site-meta">
+
+    <a href="/" class="brand" rel="start">
+      <span class="logo-line-before"><i></i></span>
+      <h1 class="site-title">Arclin</h1>
+      <span class="logo-line-after"><i></i></span>
+    </a>
+      <p class="site-subtitle" itemprop="description">Advocate Technology. Enjoy Technology.</p>
+  </div>
+
+  <div class="site-nav-right">
+    <div class="toggle popup-trigger">
+        <i class="fa fa-search fa-fw fa-lg"></i>
+    </div>
+  </div>
+</div>
+
+
+
+
+<nav class="site-nav">
+  <ul id="menu" class="main-menu menu">
+        <li class="menu-item menu-item-home">
+
+    <a href="/" rel="section"><i class="fa fa-home fa-fw"></i>首页</a>
+
+  </li>
+        <li class="menu-item menu-item-tags">
+
+    <a href="/tags/" rel="section"><i class="fa fa-tags fa-fw"></i>标签</a>
+
+  </li>
+        <li class="menu-item menu-item-categories">
+
+    <a href="/categories/" rel="section"><i class="fa fa-th fa-fw"></i>分类</a>
+
+  </li>
+        <li class="menu-item menu-item-archives">
+
+    <a href="/archives/" rel="section"><i class="fa fa-archive fa-fw"></i>归档</a>
+
+  </li>
+        <li class="menu-item menu-item-about">
+
+    <a href="/about/" rel="section"><i class="fa fa-user fa-fw"></i>关于</a>
+
+  </li>
+      <li class="menu-item menu-item-search">
+        <a role="button" class="popup-trigger"><i class="fa fa-search fa-fw"></i>搜索
+        </a>
+      </li>
+  </ul>
+</nav>
+
+
+
+  <div class="search-pop-overlay">
+    <div class="popup search-popup">
+        <div class="search-header">
+  <span class="search-icon">
+    <i class="fa fa-search"></i>
+  </span>
+  <div class="search-input-container">
+    <input autocomplete="off" autocapitalize="off"
+           placeholder="搜索..." spellcheck="false"
+           type="search" class="search-input">
+  </div>
+  <span class="popup-btn-close">
+    <i class="fa fa-times-circle"></i>
+  </span>
+</div>
+<div id="search-result">
+  <div id="no-result">
+    <i class="fa fa-spinner fa-pulse fa-5x fa-fw"></i>
+  </div>
+</div>
+
+    </div>
+  </div>
+
+</div>
+    </header>
+
+    
+  <div class="back-to-top">
+    <i class="fa fa-arrow-up"></i>
+    <span>0%</span>
+  </div>
+
+
+    <main class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          
+
+          <div class="content post posts-expand">
+            
+
+    
+  
+  
+  <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="zh-Hans">
+    <link itemprop="mainEntityOfPage" href="https://www.arclin.cn/post/d48d135e.html">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="https://avatars.githubusercontent.com/u/12107804?v=4">
+      <meta itemprop="name" content="Arclin">
+      <meta itemprop="description" content="Stay hungry,stay foolish">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="Arclin">
+    </span>
+      <header class="post-header">
+        <h1 class="post-title" itemprop="name headline">
+          Harness Engineering 理论篇 — 为什么强大的 AI 还需要"脚手架"？
+        </h1>
+
+        <div class="post-meta">
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-calendar"></i>
+              </span>
+              <span class="post-meta-item-text">发表于</span>
+
+              <time title="创建时间：2026-04-01 10:00:00" itemprop="dateCreated datePublished" datetime="2026-04-01T10:00:00+08:00">2026-04-01</time>
+            </span>
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-folder"></i>
+              </span>
+              <span class="post-meta-item-text">分类于</span>
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/AI-%E5%B7%A5%E7%A8%8B/" itemprop="url" rel="index"><span itemprop="name">AI 工程</span></a>
+                </span>
+            </span>
+
+          
+            <span class="post-meta-item" title="阅读次数" id="busuanzi_container_page_pv" style="display: none;">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-eye"></i>
+              </span>
+              <span class="post-meta-item-text">阅读次数：</span>
+              <span id="busuanzi_value_page_pv"></span>
+            </span>
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+        <blockquote>
+<p>适读人群：希望用 AI Agent 完成真实软件工程任务的开发者和架构师。</p>
+</blockquote>
+<span id="more"></span>
+
+<h2 id="0-两个震撼的真实实验"><a href="#0-两个震撼的真实实验" class="headerlink" title="0. 两个震撼的真实实验"></a>0. 两个震撼的真实实验</h2><h3 id="实验一：Anthropic-的受控对照实验"><a href="#实验一：Anthropic-的受控对照实验" class="headerlink" title="实验一：Anthropic 的受控对照实验"></a>实验一：Anthropic 的受控对照实验</h3><p>Anthropic 的工程师用 Claude Sonnet 4.5 做了一组对照实验，相同的模型、相同的任务（构建一个可运行的游戏），只改变 Harness 配置：</p>
+<table>
+<thead>
+<tr>
+<th>条件</th>
+<th>耗时</th>
+<th>花费</th>
+<th>结果</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>无 Harness（单 Agent）</td>
+<td>短</td>
+<td>$9</td>
+<td>核心玩法功能不可运行（物理引擎接线断裂，输入无响应）</td>
+</tr>
+<tr>
+<td>完整 Harness（planner + generator + evaluator）</td>
+<td>6 小时</td>
+<td>$200</td>
+<td>游戏可以实际运行，16个功能完整实现</td>
+</tr>
+</tbody></table>
+<p><strong>模型没有变，Harness 变了。差距超过 20 倍。</strong></p>
+<h3 id="实验二：OpenAI-的五个月生产实践"><a href="#实验二：OpenAI-的五个月生产实践" class="headerlink" title="实验二：OpenAI 的五个月生产实践"></a>实验二：OpenAI 的五个月生产实践</h3><p>OpenAI 内部有一个三人工程师团队，用五个月时间构建了一款有真实用户的内部产品，设立了一条铁律：<strong>没有一行代码由人类编写</strong>。</p>
+<p>五个月后：</p>
+<ul>
+<li>代码库约 <strong>100 万行代码</strong></li>
+<li>约 <strong>1,500 个 PR</strong> 被打开并合并</li>
+<li>平均每位工程师每天处理 <strong>3.5 个 PR</strong>（随团队扩展到 7 人后吞吐量还在增长）</li>
+<li>产品已有数百名内测用户，包括每日活跃的深度用户</li>
+</ul>
+<p>他们的结论是：</p>
+<blockquote>
+<p>“工程师的工作从编写代码，转变为设计环境、明确意图、构建反馈回路。”</p>
+</blockquote>
+<p>这两个实验共同指向同一个结论：<strong>模型提供能力，Harness 提供可靠性。</strong></p>
+<hr>
+<h2 id="1-什么是-Harness-Engineering？"><a href="#1-什么是-Harness-Engineering？" class="headerlink" title="1. 什么是 Harness Engineering？"></a>1. 什么是 Harness Engineering？</h2><h3 id="1-1-核心定义"><a href="#1-1-核心定义" class="headerlink" title="1.1 核心定义"></a>1.1 核心定义</h3><blockquote>
+<p><strong>为 AI Agent 构建的、用于指导、约束、验证和延续其工作的完整运行环境。</strong></p>
+</blockquote>
+<p>“Harness”原意是”马具”或”安全带”——它本身不产生动力，但让力量得以被安全、可控地使用。</p>
+<p>在软件工程中，test harness（测试框架）早已是成熟概念：包裹待测代码的基础设施，负责初始化环境、提供数据、收集结果。<strong>Harness Engineering</strong> 将这一思想延伸到 AI Agent 的整个工作流。</p>
+<h3 id="1-2-直观类比：赛车工程团队"><a href="#1-2-直观类比：赛车工程团队" class="headerlink" title="1.2 直观类比：赛车工程团队"></a>1.2 直观类比：赛车工程团队</h3><table>
+<thead>
+<tr>
+<th>赛车要素</th>
+<th>AI Agent 对应</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>驾驶员技术</td>
+<td>模型能力（Claude / GPT 的智能水平）</td>
+</tr>
+<tr>
+<td>赛前策略简报</td>
+<td>Instructions（AGENTS.md、架构文档）</td>
+</tr>
+<tr>
+<td>实时遥测数据</td>
+<td>State（progress.md、feature_list）</td>
+</tr>
+<tr>
+<td>进站检验</td>
+<td>Verification（测试、lint、E2E）</td>
+</tr>
+<tr>
+<td>明确的圈次目标</td>
+<td>Scope（一次一个功能）</td>
+</tr>
+<tr>
+<td>赛后技术分析</td>
+<td>Session Lifecycle（handoff、clean-state）</td>
+</tr>
+</tbody></table>
+<p>没有工程团队，顶级驾驶员也会跑偏、跑没油、跑完不知道发生了什么。</p>
+<hr>
+<h2 id="2-AI-Agent-在真实任务上失败的三大根源"><a href="#2-AI-Agent-在真实任务上失败的三大根源" class="headerlink" title="2. AI Agent 在真实任务上失败的三大根源"></a>2. AI Agent 在真实任务上失败的三大根源</h2><h3 id="2-1-上下文遗忘（Context-Loss）"><a href="#2-1-上下文遗忘（Context-Loss）" class="headerlink" title="2.1 上下文遗忘（Context Loss）"></a>2.1 上下文遗忘（Context Loss）</h3><p>AI 模型没有跨会话的持久记忆，<strong>上下文窗口有限且会清零</strong>。一个需要 6 小时完成的任务，如果没有状态持久化：</p>
+<ul>
+<li>Agent 会重新实现已完成的功能</li>
+<li>不知道哪些部分处于损坏状态</li>
+<li>在”模糊记忆”的基础上做决策，产生错误积累</li>
+</ul>
+<p>Anthropic 的工程师还发现了一个更微妙的问题——**”上下文焦虑”（Context Anxiety）**：</p>
+<blockquote>
+<p>当模型接近它认为的上下文限制时，会开始提前收尾工作，草草了事，即便实际上还有足够的空间。Claude Sonnet 4.5 表现出这一倾向，单靠压缩（Compaction）不足以解决，必须通过”上下文重置（Context Reset）”——清空上下文并用结构化交接文档重新启动——才能解决。</p>
+</blockquote>
+<h3 id="2-2-验证差距（Verification-Gap）"><a href="#2-2-验证差距（Verification-Gap）" class="headerlink" title="2.2 验证差距（Verification Gap）"></a>2.2 验证差距（Verification Gap）</h3><p>Agent 有强烈的”完成偏见”——它倾向于相信自己写的代码是正确的：</p>
+<blockquote>
+<p>“当被要求评估自己的工作时，Agent 倾向于自信地称赞它——即使在人类观察者看来质量明显平庸。”<br>—— Anthropic 工程博客</p>
+</blockquote>
+<p>在 Anthropic 的早期实验中，评估 Agent 会发现合法的问题，然后自我说服认为”其实没那么严重”，最终批准了有缺陷的工作。这不是模型缺陷，而是<strong>在没有外部验证机制时的系统性偏差</strong>。</p>
+<h3 id="2-3-越界失控（Overreach）与范围蔓延"><a href="#2-3-越界失控（Overreach）与范围蔓延" class="headerlink" title="2.3 越界失控（Overreach）与范围蔓延"></a>2.3 越界失控（Overreach）与范围蔓延</h3><p>没有明确的 Scope 约束，Agent 会：</p>
+<ul>
+<li>修复 bug A 时顺手重构模块 B</li>
+<li>实现功能 X 时预先为功能 Y 搭骨架</li>
+<li>最终每个功能都 70% 完成，没有一个完全可用</li>
+</ul>
+<p>OpenAI 的团队描述为：<strong>当环境规范不够明确时，Agent 缺乏实现高级目标所需的工具、抽象层和内部结构，无法取得可靠进展。</strong></p>
+<blockquote>
+<p>解决方案从来不是”让它再努力一点”，而是追问：”还需要什么样的能力，如何让它对 Agent 既清晰可读又可强制执行？”</p>
+</blockquote>
+<hr>
+<h2 id="3-Harness-的五大子系统"><a href="#3-Harness-的五大子系统" class="headerlink" title="3. Harness 的五大子系统"></a>3. Harness 的五大子系统</h2><p>Harness 由五层构成，每层解决一类核心问题：</p>
+<p><strong>Instructions（指令层）</strong></p>
+<ul>
+<li>AGENTS.md（路由入口，约100行）</li>
+<li>ARCHITECTURE.md / QUALITY_SCORE.md / SECURITY.md / FRONTEND.md / PLANS.md</li>
+</ul>
+<p><strong>State（状态层）</strong></p>
+<ul>
+<li>progress.md / feature_list.json</li>
+<li>git log / session-handoff.md</li>
+<li>自动生成的 db-schema.md 等</li>
+</ul>
+<p><strong>Verification（验证层）</strong></p>
+<ul>
+<li>单元测试 / 类型检查 / Lint</li>
+<li>Playwright E2E（用户行为验证）</li>
+<li>Sprint 合约 / 评估量表</li>
+</ul>
+<p><strong>Scope（范围层）</strong></p>
+<ul>
+<li>一次一个功能 / Sprint 划分</li>
+<li>Definition of Done（完成定义）</li>
+</ul>
+<p><strong>Session Lifecycle（生命周期层）</strong></p>
+<ul>
+<li>init.sh（启动阶段）</li>
+<li>context-reset / handoff（中间交接）</li>
+<li>clean-state checklist（结束阶段）</li>
+</ul>
+<hr>
+<h2 id="4-仓库即唯一事实来源"><a href="#4-仓库即唯一事实来源" class="headerlink" title="4. 仓库即唯一事实来源"></a>4. 仓库即唯一事实来源</h2><p>这是 OpenAI 和 Anthropic 两篇文章最一致强调的原则：</p>
+<blockquote>
+<p>“从 Agent 的角度来看，它在运行时无法在上下文中访问的任何内容都是不存在的。存储在 Google Docs、聊天记录或人们头脑中的知识都无法被系统访问。”<br>—— OpenAI 工程博客</p>
+</blockquote>
+<h3 id="知识编码的四个层次"><a href="#知识编码的四个层次" class="headerlink" title="知识编码的四个层次"></a>知识编码的四个层次</h3><ul>
+<li><strong>层次 1：基础规范</strong>（持续有效）：AGENTS.md / ARCHITECTURE.md / SECURITY.md</li>
+<li><strong>层次 2：当前状态</strong>（随项目演进）：feature_list.json / progress.md / 自动生成的 db-schema.md</li>
+<li><strong>层次 3：执行计划</strong>（任务粒度）：docs/exec-plans/active/ 和 docs/exec-plans/completed/</li>
+<li><strong>层次 4：参考文档</strong>（工具和库文档）：docs/references/framework-llms.txt</li>
+</ul>
+<h3 id="知识腐烂防治"><a href="#知识腐烂防治" class="headerlink" title="知识腐烂防治"></a>知识腐烂防治</h3><p>OpenAI 的实践中，有一个<strong>持续运行的”doc-gardening” Agent</strong>，专门扫描那些不再反映真实代码行为的过时文档，并自动发起修复 PR。同时有专门的 CI 作业验证知识库的更新状况、交叉链接和结构正确性。</p>
+<hr>
+<h2 id="5-渐进式指令披露：从百科全书到路由器"><a href="#5-渐进式指令披露：从百科全书到路由器" class="headerlink" title="5. 渐进式指令披露：从百科全书到路由器"></a>5. 渐进式指令披露：从百科全书到路由器</h2><h3 id="5-1-单一大文件的四大失败原因"><a href="#5-1-单一大文件的四大失败原因" class="headerlink" title="5.1 单一大文件的四大失败原因"></a>5.1 单一大文件的四大失败原因</h3><p>OpenAI 团队亲身验证了这一点：</p>
+<ol>
+<li><strong>上下文是稀缺资源</strong>：巨型文件挤掉了任务本身、相关代码和关键文档</li>
+<li><strong>过多指导反而无效</strong>：当一切都”重要”时，一切都不重要</li>
+<li><strong>立即腐烂</strong>：庞杂的手册变成陈旧规则的坟场，Agent 无法判断哪些信息仍然有效</li>
+<li><strong>难以验证</strong>：单一 blob 不适合机械检查（覆盖率、新鲜度、所有权、交叉链接）</li>
+</ol>
+<h3 id="5-2-文档路由模式"><a href="#5-2-文档路由模式" class="headerlink" title="5.2 文档路由模式"></a>5.2 文档路由模式</h3><figure class="highlight reasonml"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><span class="line"><span class="module-access"><span class="module"><span class="identifier">AGENTS</span>.</span></span>md（约<span class="number">100</span>行，作为目录）</span><br><span class="line">├── 启动流程（强制执行）</span><br><span class="line">├── 核心规则（<span class="number">3</span>-<span class="number">5</span>条不可违反的约束）</span><br><span class="line">└── 路由地图：</span><br><span class="line">    ├── 架构问题      → <span class="module-access"><span class="module"><span class="identifier">ARCHITECTURE</span>.</span></span>md</span><br><span class="line">    ├── 质量评分追踪  → docs/<span class="module-access"><span class="module"><span class="identifier">QUALITY_SCORE</span>.</span></span>md</span><br><span class="line">    ├── 安全规则      → docs/<span class="module-access"><span class="module"><span class="identifier">SECURITY</span>.</span></span>md</span><br><span class="line">    ├── 前端规范      → docs/<span class="module-access"><span class="module"><span class="identifier">FRONTEND</span>.</span></span>md</span><br><span class="line">    ├── 执行计划      → docs/<span class="module-access"><span class="module"><span class="identifier">PLANS</span>.</span></span>md<span class="operator"> / </span>exec-plans/</span><br><span class="line">    └── 可靠性标准    → docs/<span class="module-access"><span class="module"><span class="identifier">RELIABILITY</span>.</span></span>md</span><br></pre></td></tr></table></figure>
+
+<p><strong>QUALITY_SCORE.md</strong> 是一个特别有价值的文档：它按产品域和架构层（A/B/C/D）追踪仓库随时间变强或变弱的趋势，让 Agent 能直接了解代码库的健康状态。</p>
+<hr>
+<h2 id="6-多-Agent-架构：Generator-Evaluator-模式"><a href="#6-多-Agent-架构：Generator-Evaluator-模式" class="headerlink" title="6. 多 Agent 架构：Generator-Evaluator 模式"></a>6. 多 Agent 架构：Generator-Evaluator 模式</h2><p>Anthropic 从<strong>生成对抗网络（GAN）</strong>中获得灵感，设计了解决自我评估偏差的多 Agent 架构：</p>
+<figure class="highlight angelscript"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><span class="line">用户 prompt</span><br><span class="line">    ↓</span><br><span class="line"><span class="string">[Planner Agent]</span>    将<span class="number">1</span><span class="number">-4</span>句 prompt 扩展为完整产品规格</span><br><span class="line">    ↓ 详细规格</span><br><span class="line"><span class="string">[Generator Agent]</span>  按功能/Sprint 逐步实现代码</span><br><span class="line">    ↓ 实现成果</span><br><span class="line"><span class="string">[Evaluator Agent]</span>  用 Playwright 真实点击应用，执行 QA</span><br><span class="line">    ↓ 评分 + 具体反馈</span><br><span class="line"><span class="string">[Generator Agent]</span>  根据反馈修复，下一轮迭代</span><br><span class="line">（循环直到通过所有评估标准）</span><br></pre></td></tr></table></figure>
+
+<h3 id="为什么需要独立的评估-Agent？"><a href="#为什么需要独立的评估-Agent？" class="headerlink" title="为什么需要独立的评估 Agent？"></a>为什么需要独立的评估 Agent？</h3><blockquote>
+<p>“将做工作的 Agent 与判断工作的 Agent 分离，证明是解决这一问题的强力手段。单独调优一个持怀疑态度的评估者，比让生成者批判自己的工作要容易得多。”<br>—— Anthropic 工程博客</p>
+</blockquote>
+<p>关键是让评估 Agent <strong>真实操作应用</strong>：评估 Agent 配备了 Playwright MCP，会像真实用户一样点击应用界面、测试 API、检查数据库状态，然后才给分。</p>
+<hr>
+<h2 id="7-Sprint-合约：在写代码之前就定义”完成”"><a href="#7-Sprint-合约：在写代码之前就定义”完成”" class="headerlink" title="7. Sprint 合约：在写代码之前就定义”完成”"></a>7. Sprint 合约：在写代码之前就定义”完成”</h2><p>Anthropic 实践中的重要创新：在每个 Sprint 开始前，Generator 和 Evaluator 必须就”完成”的具体含义达成共识。</p>
+<p>Sprint 合约协商流程：</p>
+<ol>
+<li>Generator 提案：”我将实现 X，成功标准是 Y，验证方式是 Z”</li>
+<li>Evaluator 审查：”你需要补充 W 的验证，否则我无法判断完成”</li>
+<li>双方修订，直到达成一致</li>
+<li>Generator 开始实现（有合约约束）</li>
+<li>Evaluator 按合约标准验证</li>
+</ol>
+<p>这一机制将产品规格（高层次）和可测试实现（底层细节）之间的鸿沟显式化，防止 Generator 和 Evaluator 对”完成”有不同理解。</p>
+<hr>
+<h2 id="8-架构约束：让-Agent-在规则中高效工作"><a href="#8-架构约束：让-Agent-在规则中高效工作" class="headerlink" title="8. 架构约束：让 Agent 在规则中高效工作"></a>8. 架构约束：让 Agent 在规则中高效工作</h2><p>OpenAI 的经验：<strong>Agent 在有严格边界和可预测结构的环境中最为高效。</strong></p>
+<p>他们围绕严格的分层架构构建应用，每个业务域的依赖方向（只能”向前”）：</p>
+<figure class="highlight routeros"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">Types →<span class="built_in"> Config </span>→ Repo →<span class="built_in"> Service </span>→ Runtime → UI</span><br><span class="line">横切关注点只能通过单一接口 Providers 进入</span><br></pre></td></tr></table></figure>
+
+<p>这些约束通过<strong>自定义 Linter 和结构测试机械地强制执行</strong>（同样由 Agent 生成）。</p>
+<blockquote>
+<p>“这种架构通常要等到拥有数百名工程师时才会推迟。对于编码 Agent 来说，这是一个早期的先决条件：有了约束，速度才不会下降，架构才不会漂移。”</p>
+</blockquote>
+<p>自定义 Lint 规则的错误消息会<strong>在 Agent 上下文中注入修复指令</strong>，让 Agent 在违规时立即知道如何修复，而非只看到一条晦涩的错误。</p>
+<hr>
+<h2 id="9-总结：Harness-的本质"><a href="#9-总结：Harness-的本质" class="headerlink" title="9. 总结：Harness 的本质"></a>9. 总结：Harness 的本质</h2><table>
+<thead>
+<tr>
+<th>问题类型</th>
+<th>Harness 的解法</th>
+<th>来源</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>上下文遗忘</td>
+<td>状态层（progress.md、feature_list）</td>
+<td>GitHub 仓库</td>
+</tr>
+<tr>
+<td>上下文焦虑</td>
+<td>上下文重置 + 结构化交接</td>
+<td>Anthropic</td>
+</tr>
+<tr>
+<td>自我评估偏差</td>
+<td>Generator-Evaluator 分离</td>
+<td>Anthropic</td>
+</tr>
+<tr>
+<td>越界失控</td>
+<td>Scope 层（一次一个功能）</td>
+<td>GitHub 仓库</td>
+</tr>
+<tr>
+<td>指令腐烂</td>
+<td>分层文档路由</td>
+<td>OpenAI</td>
+</tr>
+<tr>
+<td>知识不可见</td>
+<td>仓库即事实来源</td>
+<td>OpenAI + Anthropic</td>
+</tr>
+<tr>
+<td>架构漂移</td>
+<td>机械强制约束 + Linter</td>
+<td>OpenAI</td>
+</tr>
+<tr>
+<td>验证不足</td>
+<td>Playwright E2E + Sprint 合约</td>
+<td>Anthropic</td>
+</tr>
+</tbody></table>
+<blockquote>
+<p><strong>模型提供能力（Capability），Harness 提供可靠性（Reliability）。随着模型越来越强，Harness 的有趣组合空间不会缩小——它只会移动。</strong></p>
+</blockquote>
+<p>下一篇<a href="/post/harness-engineering-practice.html">实践篇</a>将手把手带你用 4 个文件搭建第一个最小 Harness。</p>
+<hr>
+<p><strong>参考资料</strong></p>
+<ul>
+<li><a target="_blank" rel="noopener" href="https://github.com/walkinglabs/learn-harness-engineering">walkinglabs/learn-harness-engineering</a></li>
+<li><a target="_blank" rel="noopener" href="https://openai.com/zh-Hans-CN/index/harness-engineering/">OpenAI: 工程技术——在智能体优先的世界中利用 Codex</a></li>
+<li><a target="_blank" rel="noopener" href="https://www.anthropic.com/engineering/harness-design-long-running-apps">Anthropic: Harness design for long-running application development</a></li>
+</ul>
+
+    </div>
+
+    
+    
+    
+
+      <footer class="post-footer">
+          <div class="post-tags">
+              <a href="/tags/AI-Engineering/" rel="tag"># AI Engineering</a>
+              <a href="/tags/Harness-Engineering/" rel="tag"># Harness Engineering</a>
+              <a href="/tags/Agent/" rel="tag"># Agent</a>
+          </div>
+
+        
+
+
+        
+    <div class="post-nav">
+      <div class="post-nav-item">
+    <a href="/post/8af9107c.html" rel="prev" title="纯Swift热修方案">
+      <i class="fa fa-chevron-left"></i> 纯Swift热修方案
+    </a></div>
+      <div class="post-nav-item">
+    <a href="/post/21de888a.html" rel="next" title="Harness Engineering 实践篇 — 手把手搭建你的第一个 AI Agent 脚手架">
+      Harness Engineering 实践篇 — 手把手搭建你的第一个 AI Agent 脚手架 <i class="fa fa-chevron-right"></i>
+    </a></div>
+    </div>
+      </footer>
+    
+  </article>
+  
+  
+  
+
+
+
+          </div>
+          
+    <div class="comments" id="gitalk-container"></div>
+
+<script>
+  window.addEventListener('tabs:register', () => {
+    let { activeClass } = CONFIG.comments;
+    if (CONFIG.comments.storage) {
+      activeClass = localStorage.getItem('comments_active') || activeClass;
+    }
+    if (activeClass) {
+      let activeTab = document.querySelector(`a[href="#comment-${activeClass}"]`);
+      if (activeTab) {
+        activeTab.click();
+      }
+    }
+  });
+  if (CONFIG.comments.storage) {
+    window.addEventListener('tabs:click', event => {
+      if (!event.target.matches('.tabs-comment .tab-content .tab-pane')) return;
+      let commentClass = event.target.classList[1];
+      localStorage.setItem('comments_active', commentClass);
+    });
+  }
+</script>
+
+        </div>
+          
+  
+  <div class="toggle sidebar-toggle">
+    <span class="toggle-line toggle-line-first"></span>
+    <span class="toggle-line toggle-line-middle"></span>
+    <span class="toggle-line toggle-line-last"></span>
+  </div>
+
+  <aside class="sidebar">
+    <div class="sidebar-inner">
+
+      <ul class="sidebar-nav motion-element">
+        <li class="sidebar-nav-toc">
+          文章目录
+        </li>
+        <li class="sidebar-nav-overview">
+          站点概览
+        </li>
+      </ul>
+
+      <!--noindex-->
+      <div class="post-toc-wrap sidebar-panel">
+          <div class="post-toc motion-element"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#0-%E4%B8%A4%E4%B8%AA%E9%9C%87%E6%92%BC%E7%9A%84%E7%9C%9F%E5%AE%9E%E5%AE%9E%E9%AA%8C"><span class="nav-number">1.</span> <span class="nav-text">0. 两个震撼的真实实验</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#%E5%AE%9E%E9%AA%8C%E4%B8%80%EF%BC%9AAnthropic-%E7%9A%84%E5%8F%97%E6%8E%A7%E5%AF%B9%E7%85%A7%E5%AE%9E%E9%AA%8C"><span class="nav-number">1.1.</span> <span class="nav-text">实验一：Anthropic 的受控对照实验</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E5%AE%9E%E9%AA%8C%E4%BA%8C%EF%BC%9AOpenAI-%E7%9A%84%E4%BA%94%E4%B8%AA%E6%9C%88%E7%94%9F%E4%BA%A7%E5%AE%9E%E8%B7%B5"><span class="nav-number">1.2.</span> <span class="nav-text">实验二：OpenAI 的五个月生产实践</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#1-%E4%BB%80%E4%B9%88%E6%98%AF-Harness-Engineering%EF%BC%9F"><span class="nav-number">2.</span> <span class="nav-text">1. 什么是 Harness Engineering？</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#1-1-%E6%A0%B8%E5%BF%83%E5%AE%9A%E4%B9%89"><span class="nav-number">2.1.</span> <span class="nav-text">1.1 核心定义</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#1-2-%E7%9B%B4%E8%A7%82%E7%B1%BB%E6%AF%94%EF%BC%9A%E8%B5%9B%E8%BD%A6%E5%B7%A5%E7%A8%8B%E5%9B%A2%E9%98%9F"><span class="nav-number">2.2.</span> <span class="nav-text">1.2 直观类比：赛车工程团队</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#2-AI-Agent-%E5%9C%A8%E7%9C%9F%E5%AE%9E%E4%BB%BB%E5%8A%A1%E4%B8%8A%E5%A4%B1%E8%B4%A5%E7%9A%84%E4%B8%89%E5%A4%A7%E6%A0%B9%E6%BA%90"><span class="nav-number">3.</span> <span class="nav-text">2. AI Agent 在真实任务上失败的三大根源</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#2-1-%E4%B8%8A%E4%B8%8B%E6%96%87%E9%81%97%E5%BF%98%EF%BC%88Context-Loss%EF%BC%89"><span class="nav-number">3.1.</span> <span class="nav-text">2.1 上下文遗忘（Context Loss）</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#2-2-%E9%AA%8C%E8%AF%81%E5%B7%AE%E8%B7%9D%EF%BC%88Verification-Gap%EF%BC%89"><span class="nav-number">3.2.</span> <span class="nav-text">2.2 验证差距（Verification Gap）</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#2-3-%E8%B6%8A%E7%95%8C%E5%A4%B1%E6%8E%A7%EF%BC%88Overreach%EF%BC%89%E4%B8%8E%E8%8C%83%E5%9B%B4%E8%94%93%E5%BB%B6"><span class="nav-number">3.3.</span> <span class="nav-text">2.3 越界失控（Overreach）与范围蔓延</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#3-Harness-%E7%9A%84%E4%BA%94%E5%A4%A7%E5%AD%90%E7%B3%BB%E7%BB%9F"><span class="nav-number">4.</span> <span class="nav-text">3. Harness 的五大子系统</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#4-%E4%BB%93%E5%BA%93%E5%8D%B3%E5%94%AF%E4%B8%80%E4%BA%8B%E5%AE%9E%E6%9D%A5%E6%BA%90"><span class="nav-number">5.</span> <span class="nav-text">4. 仓库即唯一事实来源</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#%E7%9F%A5%E8%AF%86%E7%BC%96%E7%A0%81%E7%9A%84%E5%9B%9B%E4%B8%AA%E5%B1%82%E6%AC%A1"><span class="nav-number">5.1.</span> <span class="nav-text">知识编码的四个层次</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E7%9F%A5%E8%AF%86%E8%85%90%E7%83%82%E9%98%B2%E6%B2%BB"><span class="nav-number">5.2.</span> <span class="nav-text">知识腐烂防治</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#5-%E6%B8%90%E8%BF%9B%E5%BC%8F%E6%8C%87%E4%BB%A4%E6%8A%AB%E9%9C%B2%EF%BC%9A%E4%BB%8E%E7%99%BE%E7%A7%91%E5%85%A8%E4%B9%A6%E5%88%B0%E8%B7%AF%E7%94%B1%E5%99%A8"><span class="nav-number">6.</span> <span class="nav-text">5. 渐进式指令披露：从百科全书到路由器</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#5-1-%E5%8D%95%E4%B8%80%E5%A4%A7%E6%96%87%E4%BB%B6%E7%9A%84%E5%9B%9B%E5%A4%A7%E5%A4%B1%E8%B4%A5%E5%8E%9F%E5%9B%A0"><span class="nav-number">6.1.</span> <span class="nav-text">5.1 单一大文件的四大失败原因</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#5-2-%E6%96%87%E6%A1%A3%E8%B7%AF%E7%94%B1%E6%A8%A1%E5%BC%8F"><span class="nav-number">6.2.</span> <span class="nav-text">5.2 文档路由模式</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#6-%E5%A4%9A-Agent-%E6%9E%B6%E6%9E%84%EF%BC%9AGenerator-Evaluator-%E6%A8%A1%E5%BC%8F"><span class="nav-number">7.</span> <span class="nav-text">6. 多 Agent 架构：Generator-Evaluator 模式</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#%E4%B8%BA%E4%BB%80%E4%B9%88%E9%9C%80%E8%A6%81%E7%8B%AC%E7%AB%8B%E7%9A%84%E8%AF%84%E4%BC%B0-Agent%EF%BC%9F"><span class="nav-number">7.1.</span> <span class="nav-text">为什么需要独立的评估 Agent？</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#7-Sprint-%E5%90%88%E7%BA%A6%EF%BC%9A%E5%9C%A8%E5%86%99%E4%BB%A3%E7%A0%81%E4%B9%8B%E5%89%8D%E5%B0%B1%E5%AE%9A%E4%B9%89%E2%80%9D%E5%AE%8C%E6%88%90%E2%80%9D"><span class="nav-number">8.</span> <span class="nav-text">7. Sprint 合约：在写代码之前就定义”完成”</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#8-%E6%9E%B6%E6%9E%84%E7%BA%A6%E6%9D%9F%EF%BC%9A%E8%AE%A9-Agent-%E5%9C%A8%E8%A7%84%E5%88%99%E4%B8%AD%E9%AB%98%E6%95%88%E5%B7%A5%E4%BD%9C"><span class="nav-number">9.</span> <span class="nav-text">8. 架构约束：让 Agent 在规则中高效工作</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#9-%E6%80%BB%E7%BB%93%EF%BC%9AHarness-%E7%9A%84%E6%9C%AC%E8%B4%A8"><span class="nav-number">10.</span> <span class="nav-text">9. 总结：Harness 的本质</span></a></li></ol></div>
+      </div>
+      <!--/noindex-->
+
+      <div class="site-overview-wrap sidebar-panel">
+        <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+    <img class="site-author-image" itemprop="image" alt="Arclin"
+      src="https://avatars.githubusercontent.com/u/12107804?v=4">
+  <p class="site-author-name" itemprop="name">Arclin</p>
+  <div class="site-description" itemprop="description">Stay hungry,stay foolish</div>
+</div>
+<div class="site-state-wrap motion-element">
+  <nav class="site-state">
+      <div class="site-state-item site-state-posts">
+          <a href="/archives/">
+        
+          <span class="site-state-item-count">105</span>
+          <span class="site-state-item-name">日志</span>
+        </a>
+      </div>
+      <div class="site-state-item site-state-categories">
+            <a href="/categories/">
+          
+        <span class="site-state-item-count">13</span>
+        <span class="site-state-item-name">分类</span></a>
+      </div>
+      <div class="site-state-item site-state-tags">
+            <a href="/tags/">
+          
+        <span class="site-state-item-count">42</span>
+        <span class="site-state-item-name">标签</span></a>
+      </div>
+  </nav>
+</div>
+  <div class="links-of-author motion-element">
+      <span class="links-of-author-item">
+        <a href="https://github.com/Arc-lin" title="GitHub → https://github.com/Arc-lin" rel="noopener" target="_blank"><i class="fab fa-github fa-fw"></i>GitHub</a>
+      </span>
+      <span class="links-of-author-item">
+        <a href="mailto:arclin325@gmail.com" title="E-Mail → mailto:arclin325@gmail.com" rel="noopener" target="_blank"><i class="fa fa-envelope fa-fw"></i>E-Mail</a>
+      </span>
+  </div>
+
+
+
+      </div>
+
+    </div>
+  </aside>
+  <div id="sidebar-dimmer"></div>
+
+
+      </div>
+    </main>
+
+    <footer class="footer">
+      <div class="footer-inner">
+        
+
+        
+
+<div class="copyright">
+  
+  &copy; 
+  <span itemprop="copyrightYear">2026</span>
+  <span class="with-love">
+    <i class="fa fa-heart"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">Arclin</span>
+</div>
+  <div class="powered-by">由 <a href="https://hexo.io" class="theme-link" rel="noopener" target="_blank">Hexo</a> & <a href="https://muse.theme-next.org" class="theme-link" rel="noopener" target="_blank">NexT.Muse</a> 强力驱动
+  </div>
+
+        
+<div class="busuanzi-count">
+  <script async src="https://busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js"></script>
+    <span class="post-meta-item" id="busuanzi_container_site_uv" style="display: none;">
+      <span class="post-meta-item-icon">
+        <i class="fa fa-user"></i>
+      </span>
+      <span class="site-uv" title="总访客量">
+        <span id="busuanzi_value_site_uv"></span>
+      </span>
+    </span>
+    <span class="post-meta-divider">|</span>
+    <span class="post-meta-item" id="busuanzi_container_site_pv" style="display: none;">
+      <span class="post-meta-item-icon">
+        <i class="fa fa-eye"></i>
+      </span>
+      <span class="site-pv" title="总访问量">
+        <span id="busuanzi_value_site_pv"></span>
+      </span>
+    </span>
+</div>
+
+
+
+
+
+
+
+
+      </div>
+    </footer>
+  </div>
+
+  
+  <script src="/lib/anime.min.js"></script>
+  <script src="//cdn.jsdelivr.net/npm/jquery@3/dist/jquery.min.js"></script>
+  <script src="//cdn.jsdelivr.net/gh/fancyapps/fancybox@3/dist/jquery.fancybox.min.js"></script>
+  <script src="/lib/velocity/velocity.min.js"></script>
+  <script src="/lib/velocity/velocity.ui.min.js"></script>
+
+<script src="/js/utils.js"></script>
+
+<script src="/js/motion.js"></script>
+
+
+<script src="/js/schemes/muse.js"></script>
+
+
+<script src="/js/next-boot.js"></script>
+
+
+
+
+  
+  <script>
+    (function(){
+      var canonicalURL, curProtocol;
+      //Get the <link> tag
+      var x=document.getElementsByTagName("link");
+		//Find the last canonical URL
+		if(x.length > 0){
+			for (i=0;i<x.length;i++){
+				if(x[i].rel.toLowerCase() == 'canonical' && x[i].href){
+					canonicalURL=x[i].href;
+				}
+			}
+		}
+    //Get protocol
+	    if (!canonicalURL){
+	    	curProtocol = window.location.protocol.split(':')[0];
+	    }
+	    else{
+	    	curProtocol = canonicalURL.split(':')[0];
+	    }
+      //Get current URL if the canonical URL does not exist
+	    if (!canonicalURL) canonicalURL = window.location.href;
+	    //Assign script content. Replace current URL with the canonical URL
+      !function(){var e=/([http|https]:\/\/[a-zA-Z0-9\_\.]+\.baidu\.com)/gi,r=canonicalURL,t=document.referrer;if(!e.test(r)){var n=(String(curProtocol).toLowerCase() === 'https')?"https://sp0.baidu.com/9_Q4simg2RQJ8t7jm9iCKT-xh_/s.gif":"//api.share.baidu.com/s.gif";t?(n+="?r="+encodeURIComponent(document.referrer),r&&(n+="&l="+r)):r&&(n+="?l="+r);var i=new Image;i.src=n}}(window);})();
+  </script>
+
+
+
+
+  
+<script src="/js/local-search.js"></script>
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+  
+
+<link rel="stylesheet" href="//cdn.jsdelivr.net/npm/gitalk@1/dist/gitalk.min.css">
+
+<script>
+NexT.utils.loadComments(document.querySelector('#gitalk-container'), () => {
+  NexT.utils.getScript('//cdn.jsdelivr.net/npm/gitalk@1/dist/gitalk.min.js', () => {
+    var gitalk = new Gitalk({
+      clientID    : 'df6d1f33bb4a66f5fa60',
+      clientSecret: '5fcc9fb756ac9d4b16381288da7b29f691b45e0a',
+      repo        : 'arc-lin.github.io',
+      owner       : 'Arc-lin',
+      admin       : ['Arc-lin'],
+      id          : '54387a70285f07b392c874d0db35e01a',
+        language: 'zh-CN',
+      distractionFreeMode: false
+    });
+    gitalk.render('gitalk-container');
+  }, window.Gitalk);
+});
+</script>
+
+</body>
+</html>
