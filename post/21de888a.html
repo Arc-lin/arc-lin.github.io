@@ -270,7 +270,20 @@
 
 <p><img src="/images/harness-four-files.png" alt="最小 Harness 四个文件"></p>
 <p>这四个文件是 Harness 的最小可行单元（MVP），覆盖了五大子系统中的四个（验证层通过 init.sh 中的测试命令实现）。</p>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br></pre></td><td class="code"><pre><span class="line">graph TD</span><br><span class="line">    A[AGENTS.md&lt;br&#x2F;&gt;指令层] --&gt; B[init.sh&lt;br&#x2F;&gt;生命周期层]</span><br><span class="line">    B --&gt; C&#123;验证通过？&#125;</span><br><span class="line">    C --&gt;|是 | D[feature_list.json&lt;br&#x2F;&gt;范围层 + 状态层]</span><br><span class="line">    C --&gt;|否 | E[停止并报告问题]</span><br><span class="line">    D --&gt; F[claude-progress.md&lt;br&#x2F;&gt;状态层]</span><br><span class="line">    F --&gt; A</span><br><span class="line">    </span><br><span class="line">    style A fill:#4dabf7,color:#fff</span><br><span class="line">    style B fill:#51cf66,color:#fff</span><br><span class="line">    style C fill:#fcc419</span><br><span class="line">    style D fill:#ff6b6b,color:#fff</span><br><span class="line">    style E fill:#868e96,color:#fff</span><br><span class="line">    style F fill:#a760ff,color:#fff</span><br></pre></td></tr></table></figure>
+<pre class="mermaid">graph TD
+    A[AGENTS.md<br/>指令层] --> B[init.sh<br/>生命周期层]
+    B --> C{验证通过？}
+    C -->|是 | D[feature_list.json<br/>范围层 + 状态层]
+    C -->|否 | E[停止并报告问题]
+    D --> F[claude-progress.md<br/>状态层]
+    F --> A
+    
+    style A fill:#4dabf7,color:#fff
+    style B fill:#51cf66,color:#fff
+    style C fill:#fcc419
+    style D fill:#ff6b6b,color:#fff
+    style E fill:#868e96,color:#fff
+    style F fill:#a760ff,color:#fff</pre>
 
 <hr>
 <h2 id="1-核心文件详解与模板"><a href="#1-核心文件详解与模板" class="headerlink" title="1. 核心文件详解与模板"></a>1. 核心文件详解与模板</h2><h3 id="1-1-AGENTS-md-——-Agent-的工作手册"><a href="#1-1-AGENTS-md-——-Agent-的工作手册" class="headerlink" title="1.1 AGENTS.md —— Agent 的工作手册"></a>1.1 AGENTS.md —— Agent 的工作手册</h3><p>这是 Agent 每次会话读取的第一个文件，决定了它如何工作。</p>
@@ -288,7 +301,40 @@
 <li>脚本本身就是”环境健康”的可执行定义</li>
 </ul>
 <h3 id="1-3-feature-list-json-——-功能清单"><a href="#1-3-feature-list-json-——-功能清单" class="headerlink" title="1.3 feature_list.json —— 功能清单"></a>1.3 feature_list.json —— 功能清单</h3><p>这是整个 Harness 中最关键的状态文件，定义了”什么是工作，工作到什么程度算完成”。</p>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br></pre></td><td class="code"><pre><span class="line">graph TD</span><br><span class="line">    subgraph feature_list.json</span><br><span class="line">        A[功能清单] --&gt; B[规则定义]</span><br><span class="line">        A --&gt; C[状态图例]</span><br><span class="line">        A --&gt; D[功能列表]</span><br><span class="line">        </span><br><span class="line">        B --&gt; B1[single_active_feature]</span><br><span class="line">        B --&gt; B2[passing_requires_evidence]</span><br><span class="line">        </span><br><span class="line">        C --&gt; C1[not_started]</span><br><span class="line">        C --&gt; C2[in_progress]</span><br><span class="line">        C --&gt; C3[blocked]</span><br><span class="line">        C --&gt; C4[passing]</span><br><span class="line">        </span><br><span class="line">        D --&gt; D1[user_visible_behavior&lt;br&#x2F;&gt;用户可见行为]</span><br><span class="line">        D --&gt; D2[verification&lt;br&#x2F;&gt;验证步骤]</span><br><span class="line">        D --&gt; D3[evidence&lt;br&#x2F;&gt;证据]</span><br><span class="line">        D --&gt; D4[status&lt;br&#x2F;&gt;状态]</span><br><span class="line">    end</span><br><span class="line">    </span><br><span class="line">    style A fill:#ff6b6b,color:#fff</span><br><span class="line">    style B fill:#4dabf7,color:#fff</span><br><span class="line">    style C fill:#51cf66,color:#fff</span><br><span class="line">    style D fill:#fcc419</span><br><span class="line">    style B1 fill:#f8f9fa</span><br><span class="line">    style B2 fill:#f8f9fa</span><br><span class="line">    style C1 fill:#f8f9fa</span><br><span class="line">    style C2 fill:#f8f9fa</span><br><span class="line">    style C3 fill:#f8f9fa</span><br><span class="line">    style C4 fill:#f8f9fa</span><br><span class="line">    style D1 fill:#f8f9fa</span><br><span class="line">    style D2 fill:#f8f9fa</span><br><span class="line">    style D3 fill:#f8f9fa</span><br><span class="line">    style D4 fill:#f8f9fa</span><br></pre></td></tr></table></figure>
+<pre class="mermaid">graph TD
+    subgraph feature_list.json
+        A[功能清单] --> B[规则定义]
+        A --> C[状态图例]
+        A --> D[功能列表]
+        
+        B --> B1[single_active_feature]
+        B --> B2[passing_requires_evidence]
+        
+        C --> C1[not_started]
+        C --> C2[in_progress]
+        C --> C3[blocked]
+        C --> C4[passing]
+        
+        D --> D1[user_visible_behavior<br/>用户可见行为]
+        D --> D2[verification<br/>验证步骤]
+        D --> D3[evidence<br/>证据]
+        D --> D4[status<br/>状态]
+    end
+    
+    style A fill:#ff6b6b,color:#fff
+    style B fill:#4dabf7,color:#fff
+    style C fill:#51cf66,color:#fff
+    style D fill:#fcc419
+    style B1 fill:#f8f9fa
+    style B2 fill:#f8f9fa
+    style C1 fill:#f8f9fa
+    style C2 fill:#f8f9fa
+    style C3 fill:#f8f9fa
+    style C4 fill:#f8f9fa
+    style D1 fill:#f8f9fa
+    style D2 fill:#f8f9fa
+    style D3 fill:#f8f9fa
+    style D4 fill:#f8f9fa</pre>
 
 <figure class="highlight json"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br></pre></td><td class="code"><pre><span class="line">&#123;</span><br><span class="line">  <span class="attr">&quot;rules&quot;</span>: &#123;</span><br><span class="line">    <span class="attr">&quot;single_active_feature&quot;</span>: <span class="literal">true</span>,</span><br><span class="line">    <span class="attr">&quot;passing_requires_evidence&quot;</span>: <span class="literal">true</span>,</span><br><span class="line">    <span class="attr">&quot;do_not_skip_verification&quot;</span>: <span class="literal">true</span></span><br><span class="line">  &#125;,</span><br><span class="line">  <span class="attr">&quot;status_legend&quot;</span>: &#123;</span><br><span class="line">    <span class="attr">&quot;not_started&quot;</span>: <span class="string">&quot;尚未开始&quot;</span>,</span><br><span class="line">    <span class="attr">&quot;in_progress&quot;</span>: <span class="string">&quot;当前会话正在处理（同时只能有一个）&quot;</span>,</span><br><span class="line">    <span class="attr">&quot;blocked&quot;</span>: <span class="string">&quot;有阻塞项，记录在 notes 中&quot;</span>,</span><br><span class="line">    <span class="attr">&quot;passing&quot;</span>: <span class="string">&quot;已通过验证，有证据记录&quot;</span></span><br><span class="line">  &#125;,</span><br><span class="line">  <span class="attr">&quot;features&quot;</span>: [</span><br><span class="line">    &#123;</span><br><span class="line">      <span class="attr">&quot;id&quot;</span>: <span class="string">&quot;F001&quot;</span>,</span><br><span class="line">      <span class="attr">&quot;priority&quot;</span>: <span class="number">1</span>,</span><br><span class="line">      <span class="attr">&quot;area&quot;</span>: <span class="string">&quot;core&quot;</span>,</span><br><span class="line">      <span class="attr">&quot;title&quot;</span>: <span class="string">&quot;用户登录功能&quot;</span>,</span><br><span class="line">      <span class="attr">&quot;user_visible_behavior&quot;</span>: <span class="string">&quot;用户可以输入用户名和密码登录，登录失败时显示错误提示&quot;</span>,</span><br><span class="line">      <span class="attr">&quot;status&quot;</span>: <span class="string">&quot;not_started&quot;</span>,</span><br><span class="line">      <span class="attr">&quot;verification&quot;</span>: [</span><br><span class="line">        <span class="string">&quot;npm test -- --testPathPattern=auth 通过&quot;</span>,</span><br><span class="line">        <span class="string">&quot;手动登录成功后跳转到主页&quot;</span>,</span><br><span class="line">        <span class="string">&quot;密码错误时显示用户名或密码错误&quot;</span></span><br><span class="line">      ],</span><br><span class="line">      <span class="attr">&quot;evidence&quot;</span>: [],</span><br><span class="line">      <span class="attr">&quot;notes&quot;</span>: <span class="string">&quot;&quot;</span></span><br><span class="line">    &#125;</span><br><span class="line">  ]</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
 
@@ -333,7 +379,36 @@
 <p>最小 Harness 至少需要 Level 1，理想情况包含 Level 3。</p>
 <hr>
 <h2 id="3-Session-Handoff：跨会话连续性"><a href="#3-Session-Handoff：跨会话连续性" class="headerlink" title="3. Session Handoff：跨会话连续性"></a>3. Session Handoff：跨会话连续性</h2><p><code>claude-progress.md</code> 记录”发生了什么”，<code>session-handoff.md</code> 则回答”下一步怎么做”。前者是历史，后者是指导。</p>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br></pre></td><td class="code"><pre><span class="line">graph LR</span><br><span class="line">    subgraph 会话 N</span><br><span class="line">        A[claude-progress.md&lt;br&#x2F;&gt;记录发生了什么] --&gt; B[session-handoff.md&lt;br&#x2F;&gt;指导下一步]</span><br><span class="line">    end</span><br><span class="line">    </span><br><span class="line">    B --&gt; C&#123;会话 N+1&#125;</span><br><span class="line">    C --&gt; D[读取 handoff&lt;br&#x2F;&gt;3 分钟恢复上下文]</span><br><span class="line">    D --&gt; E[继续工作]</span><br><span class="line">    </span><br><span class="line">    subgraph 关键元素</span><br><span class="line">        A1[已完成]</span><br><span class="line">        A2[本次变更]</span><br><span class="line">        A3[已知问题]</span><br><span class="line">        A4[下一步]</span><br><span class="line">    end</span><br><span class="line">    </span><br><span class="line">    A --- A1</span><br><span class="line">    A --- A2</span><br><span class="line">    A --- A3</span><br><span class="line">    A --- A4</span><br><span class="line">    </span><br><span class="line">    style A fill:#4dabf7,color:#fff</span><br><span class="line">    style B fill:#51cf66,color:#fff</span><br><span class="line">    style C fill:#fcc419</span><br><span class="line">    style D fill:#ff6b6b,color:#fff</span><br><span class="line">    style E fill:#40c057,color:#fff</span><br><span class="line">    style A1 fill:#f8f9fa</span><br><span class="line">    style A2 fill:#f8f9fa</span><br><span class="line">    style A3 fill:#f8f9fa</span><br><span class="line">    style A4 fill:#f8f9fa</span><br></pre></td></tr></table></figure>
+<pre class="mermaid">graph LR
+    subgraph 会话 N
+        A[claude-progress.md<br/>记录发生了什么] --> B[session-handoff.md<br/>指导下一步]
+    end
+    
+    B --> C{会话 N+1}
+    C --> D[读取 handoff<br/>3 分钟恢复上下文]
+    D --> E[继续工作]
+    
+    subgraph 关键元素
+        A1[已完成]
+        A2[本次变更]
+        A3[已知问题]
+        A4[下一步]
+    end
+    
+    A --- A1
+    A --- A2
+    A --- A3
+    A --- A4
+    
+    style A fill:#4dabf7,color:#fff
+    style B fill:#51cf66,color:#fff
+    style C fill:#fcc419
+    style D fill:#ff6b6b,color:#fff
+    style E fill:#40c057,color:#fff
+    style A1 fill:#f8f9fa
+    style A2 fill:#f8f9fa
+    style A3 fill:#f8f9fa
+    style A4 fill:#f8f9fa</pre>
 
 <h3 id="session-handoff-md-模板"><a href="#session-handoff-md-模板" class="headerlink" title="session-handoff.md 模板"></a>session-handoff.md 模板</h3><figure class="highlight markdown"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br></pre></td><td class="code"><pre><span class="line"><span class="section"># Session Handoff — 2026-04-01</span></span><br><span class="line"></span><br><span class="line"><span class="section">## 当前可用（Verified Now）</span></span><br><span class="line"><span class="bullet">-</span> 用户登录功能（F001）可用：npm test 通过，手动验证通过</span><br><span class="line"><span class="bullet">-</span> 基础路由框架正常</span><br><span class="line"></span><br><span class="line"><span class="section">## 本次变更（Changed This Session）</span></span><br><span class="line"><span class="bullet">-</span> 新增 src/auth/login.ts（JWT 认证逻辑）</span><br><span class="line"><span class="bullet">-</span> 修改 package.json 添加 jsonwebtoken 依赖</span><br><span class="line"></span><br><span class="line"><span class="section">## 已知损坏或未验证（Broken Or Unverified）</span></span><br><span class="line"><span class="bullet">-</span> src/auth/refresh.ts 已创建但未测试（占位符代码）</span><br><span class="line"></span><br><span class="line"><span class="section">## 下一步最佳行动（Next Best Step）</span></span><br><span class="line"><span class="bullet">-</span> 开始 F002（用户注册功能）</span><br><span class="line"></span><br><span class="line"><span class="section">## 关键命令（Commands）</span></span><br><span class="line">./init.sh       # 环境验证</span><br><span class="line">npm run dev     # 启动应用（localhost:3000）</span><br><span class="line">npm test        # 运行所有测试</span><br></pre></td></tr></table></figure>
 
@@ -388,7 +463,16 @@
 </tr>
 </tbody></table>
 <h3 id="4-2-Generator-Evaluator-分离架构（进阶）"><a href="#4-2-Generator-Evaluator-分离架构（进阶）" class="headerlink" title="4.2 Generator-Evaluator 分离架构（进阶）"></a>4.2 Generator-Evaluator 分离架构（进阶）</h3><p>来自 Anthropic 的核心创新——将”做工作的 Agent”与”判断工作的 Agent”分离：</p>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><span class="line">flowchart TD</span><br><span class="line">    G[Generator&lt;br&#x2F;&gt;实现代码] --&gt; E[Evaluator&lt;br&#x2F;&gt;Playwright 真实测试]</span><br><span class="line">    E --&gt;|发现 Bug| B[Bug 报告]</span><br><span class="line">    B --&gt; G</span><br><span class="line">    E --&gt;|通过 | Done[✅ 完成]</span><br><span class="line">    </span><br><span class="line">    style G fill:#51cf66,color:#fff</span><br><span class="line">    style E fill:#fcc419</span><br><span class="line">    style B fill:#ff6b6b,color:#fff</span><br><span class="line">    style Done fill:#40c057,color:#fff</span><br></pre></td></tr></table></figure>
+<pre class="mermaid">flowchart TD
+    G[Generator<br/>实现代码] --> E[Evaluator<br/>Playwright 真实测试]
+    E -->|发现 Bug| B[Bug 报告]
+    B --> G
+    E -->|通过 | Done[✅ 完成]
+    
+    style G fill:#51cf66,color:#fff
+    style E fill:#fcc419
+    style B fill:#ff6b6b,color:#fff
+    style Done fill:#40c057,color:#fff</pre>
 
 <p><img src="/images/generator-evaluator-flow.png" alt="Generator-Evaluator 验证闭环"></p>
 <p>在 Anthropic 的实验中，评估 Agent 在第一轮就发现了诸如”点击保存按钮无反应”、”API 返回 undefined”等真实 bug，而这些在代码审查中很容易被遗漏。</p>
@@ -417,7 +501,19 @@
 <p>通过自定义 Linter 机械强制执行，Lint 错误消息中直接包含修复指令，让 Agent 在违规时立即知道如何修复。</p>
 <hr>
 <h2 id="7-渐进式实战路径"><a href="#7-渐进式实战路径" class="headerlink" title="7. 渐进式实战路径"></a>7. 渐进式实战路径</h2><p>基于 <a target="_blank" rel="noopener" href="https://github.com/walkinglabs/learn-harness-engineering">walkinglabs/learn-harness-engineering</a> 课程体系：</p>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br></pre></td><td class="code"><pre><span class="line">graph TD</span><br><span class="line">    P1[P01&lt;br&#x2F;&gt;最小 Harness&lt;br&#x2F;&gt;4 文件] --&gt; P2[P02&lt;br&#x2F;&gt;Agent 可读工作区]</span><br><span class="line">    P2 --&gt; P3[P03&lt;br&#x2F;&gt;多会话连续性]</span><br><span class="line">    P3 --&gt; P4[P04&lt;br&#x2F;&gt;增量开发 + 运行时反馈]</span><br><span class="line">    P4 --&gt; P5[P05&lt;br&#x2F;&gt;基于证据的验证]</span><br><span class="line">    P5 --&gt; P6[P06&lt;br&#x2F;&gt;完整 Harness&lt;br&#x2F;&gt;毕业项目]</span><br><span class="line">    </span><br><span class="line">    style P1 fill:#4dabf7,color:#fff</span><br><span class="line">    style P2 fill:#51cf66,color:#fff</span><br><span class="line">    style P3 fill:#fcc419</span><br><span class="line">    style P4 fill:#ff6b6b,color:#fff</span><br><span class="line">    style P5 fill:#a760ff,color:#fff</span><br><span class="line">    style P6 fill:#40c057,color:#fff</span><br></pre></td></tr></table></figure>
+<pre class="mermaid">graph TD
+    P1[P01<br/>最小 Harness<br/>4 文件] --> P2[P02<br/>Agent 可读工作区]
+    P2 --> P3[P03<br/>多会话连续性]
+    P3 --> P4[P04<br/>增量开发 + 运行时反馈]
+    P4 --> P5[P05<br/>基于证据的验证]
+    P5 --> P6[P06<br/>完整 Harness<br/>毕业项目]
+    
+    style P1 fill:#4dabf7,color:#fff
+    style P2 fill:#51cf66,color:#fff
+    style P3 fill:#fcc419
+    style P4 fill:#ff6b6b,color:#fff
+    style P5 fill:#a760ff,color:#fff
+    style P6 fill:#40c057,color:#fff</pre>
 
 <table>
 <thead>
